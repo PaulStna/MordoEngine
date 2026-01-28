@@ -3,11 +3,13 @@
 #include "API/OpenGL/OpenGLBackend.h"
 #include "Input/Input.h"
 #include "Renderer/TriangleRenderer.h"
+#include "Core/Texture/TextureManager.h"
 
 void Engine::Run()
 {
 	OpenGLBackend::Init(800, 800);
 	Input::Init(OpenGLBackend::GetGLFWwindow());
+	TextureManager::Init();
 	TriangleRenderer triangleRenderer;
 
 	float lastTime = 0.0f;

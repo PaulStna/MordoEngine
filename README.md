@@ -19,8 +19,9 @@ The codebase evolves over time as I learn new concepts, improve the architecture
 - GLM
 
 ## Project Status
-After several space key presses, dynamically generated triangles 
-![Triangle Renderer](imgs/2026-01-25.png)
+After several space key presses, dynamically generated triangles
+Now textured using stb_image and a custom Texture class: 
+![Triangle Renderer](imgs/2026-01-27.png)
 
 ## Notes
 This is an educational and personal project focused on learning and experimentation.  

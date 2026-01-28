@@ -1,15 +1,15 @@
 #include "TriangleRenderer.h"
 #include "../Input/Input.h"
-#include <random>
 #include <iostream>
 
-TriangleRenderer::TriangleRenderer() : shader("triangle.vs", "triangle.fs"), flag(false) {
+TriangleRenderer::TriangleRenderer() : shader("res/shaders/triangle.vs", "res/shaders/triangle.fs"), gen(std::random_device{}()) {
 
-	// triangle base 
+	defaultTextureID = TextureManager::Load("res/textures/bricks.png");
+	// base triangle // texcoords
 	float vertices[] = {
-		 0.0f,  0.5f,
-		-0.5f, -0.5f,
-		 0.5f, -0.5f
+		 0.0f,  0.5f, 0.0f, 0.5f, 0.0f,
+		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+		 0.5f, -0.5f, 0.0f, 1.0f, 1.0f
 	};
 
 	glGenVertexArrays(1, &vao);
@@ -20,72 +20,42 @@ TriangleRenderer::TriangleRenderer() : shader("triangle.vs", "triangle.fs"), fla
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+	// position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	// Instance VBO
-	glGenBuffers(1, &instanceVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-	glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_DYNAMIC_DRAW);
-
-	// position
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Triangle), (void*)0);
+	// texcoords
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	glVertexAttribDivisor(1, 1);
 
-	// size
-	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Triangle), (void*)(sizeof(glm::vec2)));
-	glEnableVertexAttribArray(2);
-	glVertexAttribDivisor(2, 1);
-
-	// color
-	glVertexAttribPointer(
-		3, 3, GL_FLOAT, GL_FALSE, sizeof(Triangle),
-		(void*)(sizeof(glm::vec2) + sizeof(float))
-	);
-	glEnableVertexAttribArray(3);
-	glVertexAttribDivisor(3, 1);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
 
 TriangleRenderer::~TriangleRenderer() {
 	triangles.clear();
 	glDeleteBuffers(1, &vbo);
-	glDeleteBuffers(1, &instanceVBO);
 	glDeleteVertexArrays(1, &vao);
 }
 
 void TriangleRenderer::AddRandomTriangle() {
-	std::random_device rd;
-	std::mt19937 gen(rd());
-
 	std::uniform_real_distribution<float> pos(-1.0f, 1.0f);
 	std::uniform_real_distribution<float> sizeDist(0.1f, 0.5f);
 	std::uniform_real_distribution<float> color(0.0f, 1.0f);
 	std::uniform_real_distribution<float> vel(-0.5f, 0.5f);
 
 	triangles.push_back({
-		{ pos(gen), pos(gen) },
+		glm::vec3(pos(gen), pos(gen), 0.0f),
 		sizeDist(gen),
-		{ color(gen), color(gen), color(gen) },
-		{ vel(gen), vel(gen) }
+		glm::vec3(color(gen), color(gen), color(gen)),
+		glm::vec3(vel(gen), vel(gen), 0.0f)
 		});
-
-	flag = true;
 }
 
 void TriangleRenderer::Update(float deltaTime) {
-	for (Triangle& t : triangles) {
-		t.position += t.velocity * deltaTime;
-
-		if (t.position.x > 1.0f || t.position.x < -1.0f)
-			t.velocity.x *= -1.0f;
-
-		if (t.position.y > 1.0f || t.position.y < -1.0f)
-			t.velocity.y *= -1.0f;
+	for (Triangle& triangle : triangles) {
+		triangle.Update(deltaTime);
 	}
-
-	flag = true;
-
 	HandleInputs();
 }
 
@@ -100,22 +70,10 @@ void TriangleRenderer::Render() {
 	shader.Use();
 	glBindVertexArray(vao);
 
-	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	TextureManager::Get(defaultTextureID).Use();
 
-	if (flag) {
-		glBufferData(
-			GL_ARRAY_BUFFER,
-			triangles.size() * sizeof(Triangle),
-			triangles.data(),
-			GL_DYNAMIC_DRAW
-		);
-		flag = false;
+	for (Triangle& triangle : triangles) {
+		triangle.Render(shader);
 	}
-
-	glDrawArraysInstanced(
-		GL_TRIANGLES,
-		0,
-		3,
-		triangles.size()
-	);
+	glBindVertexArray(0);
 }

@@ -1,15 +1,12 @@
 #include "Shader.h"
+#include "../FileSystem/FileSystem.h"
 #include <fstream>
-#include <sstream>
 #include <iostream>
 
-// Base path for shaders
-std::filesystem::path Shader::basePath =
-std::filesystem::current_path() / "res" / "shaders";
 
-Shader::Shader(const char* vertexShaderPath, const char* fragmentShaderPath) {
-	std::string vertexCode = readFile(basePath / vertexShaderPath);
-	std::string fragmentCode = readFile(basePath / fragmentShaderPath);
+Shader::Shader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) {
+	std::string vertexCode = readFile(FileSystem::getPath(vertexShaderPath));
+	std::string fragmentCode = readFile(FileSystem::getPath(fragmentShaderPath));
 
 	GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertexCode);
 	GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentCode);
@@ -73,4 +70,19 @@ GLuint Shader::compileShader(GLenum type, const std::string& source) {
 	}
 
 	return shader;
+}
+
+void Shader::setFloat(const std::string& name, float value) const
+{
+	glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+}
+
+void Shader::setVec2(const std::string& name, const glm::vec2& value) const
+{
+	glUniform2fv(glGetUniformLocation(ID, name.c_str()),1,&value[0]);
+}
+
+void Shader::setVec3(const std::string& name, const glm::vec3& value) const
+{
+	glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
 }

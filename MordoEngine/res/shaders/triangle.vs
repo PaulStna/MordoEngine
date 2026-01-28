@@ -1,14 +1,20 @@
 ﻿#version 330 core
 
-layout (location = 0) in vec2 aPos;
-layout (location = 1) in vec2 iPos;
-layout (location = 2) in float iSize;
-layout (location = 3) in vec3 iColor;
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec2 aTexCoord;
+layout (location = 2) in vec3 aColor;
 
-out vec3 vColor;
+uniform vec3 iPos;   
+uniform float iSize;  
 
-void main() {
-	vec2 pos = aPos * iSize + iPos;
-	gl_Position = vec4(pos, 0.0, 1.0);
-	vColor = iColor;
+out vec3 Color;
+out vec2 TexCoord;
+
+void main()
+{
+    vec3 pos = aPos * iSize + iPos;
+    gl_Position = vec4(pos, 1.0);
+
+    Color = aColor;
+    TexCoord = aTexCoord;
 }
