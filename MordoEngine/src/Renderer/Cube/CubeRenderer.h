@@ -9,7 +9,6 @@ class CubeRenderer {
 private:
 	GLuint vao, vbo, ebo;
 	std::vector<Cube> cubes;
-	glm::vec3 cameraPosition = glm::vec3{ 0.0f,0.0f,-5.0f };
 	void AddRandomCube();
 	void HandleInputs(float deltaTime);
 	Camera camera;

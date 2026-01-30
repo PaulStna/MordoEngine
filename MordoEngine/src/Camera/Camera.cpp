@@ -4,9 +4,7 @@
 Camera::Camera(glm::vec3 position, unsigned int windowWidth, unsigned int windowHeight)
     : m_position(position), WINDOW_WIDTH(windowWidth), WINDOW_HEIGHT(windowHeight)
 {
-    // Initialize with default yaw pointing forward
-    m_rotation = glm::vec3(0.0f, glm::radians(-90.0f), 0.0f); // pitch, yaw, roll
-    Update();
+    LookAt(glm::vec3{0.0f});
 }
 
 void Camera::Update() {
@@ -83,6 +81,15 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset) {
     float sensitivity = 0.0025f;
     AddYaw(-xoffset * sensitivity);    
     AddPitch(yoffset * sensitivity);    
+}
+
+void Camera::LookAt(glm::vec3 target) {
+    glm::vec3 direction = glm::normalize(target - m_position);
+    float yaw = atan2(-direction.x, -direction.z);
+    float pitch = asin(-direction.y);
+    pitch = std::clamp(pitch, m_minPitch, m_maxPitch);
+    m_rotation = glm::vec3(pitch, yaw, 0.0f);
+    Update();
 }
 
 const glm::mat4& Camera::GetViewMatrix() const {

@@ -9,8 +9,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
-CubeRenderer::CubeRenderer() : gen(std::random_device{}()), 
-camera(Camera(glm::vec3{0.0f,0.0f,-5.0f}, OpenGLBackend::SCR_WIDTH, OpenGLBackend::SCR_HEIGHT)){
+CubeRenderer::CubeRenderer() : gen(std::random_device{}()),
+camera(Camera(glm::vec3{ 0.0f,0.0f,10.0f }, OpenGLBackend::SCR_WIDTH, OpenGLBackend::SCR_HEIGHT)) {
 
 	defaultShaderID = "basic";
 	defaultTextureID = "bricks";
@@ -111,25 +111,23 @@ CubeRenderer::~CubeRenderer() {
 }
 
 void CubeRenderer::AddRandomCube() {
-	std::uniform_real_distribution<float> pos(-10.0f, 10.0f);
-	std::uniform_real_distribution<float> sizeDist(1.0f, 2.5f);
-	std::uniform_real_distribution<float> color(0.0f, 1.0f);
-	std::uniform_int_distribution<int> indx(0, 2);
-	glm::vec3 rotationAxes[3] = {
-		{0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f} , {1.0f, 0.0f, 0.0f}
-	};
-
-	cubes.push_back({
-		glm::vec3(pos(gen), pos(gen), pos(gen)),
-		glm::vec3(sizeDist(gen),sizeDist(gen),sizeDist(gen)),
-		glm::vec3(color(gen), color(gen), color(gen)),
-		rotationAxes[indx(gen)]
-		});
+	if (!cubes.empty()) {
+		cubes.clear();
+	}
+	static unsigned int gridSize = 5;
+	for (unsigned int x = 0; x < gridSize; x++) {
+		for (unsigned int z = 0; z < gridSize; z++) {
+			cubes.push_back(
+				{ glm::vec3(x, 0.0f, z) }
+			);
+		}
+	}
+	gridSize += 5;
 }
 
 void CubeRenderer::Update(float deltaTime) {
 	for (Cube& cube : cubes) {
-		cube.Update(deltaTime);
+	//	cube.Update(deltaTime);
 	}
 
 	HandleInputs(deltaTime);

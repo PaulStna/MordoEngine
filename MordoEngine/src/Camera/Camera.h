@@ -18,6 +18,7 @@ public:
 	void AddHeight(float value);
 	void SetPosition(glm::vec3 position);
 	void ProcessMouseMovement(float xoffset, float yoffset);
+	void LookAt(glm::vec3 target);
 	const glm::mat4& GetViewMatrix() const;
 	const glm::mat4& GetInverseViewMatrix() const;
 	glm::mat4 GetProjectionMatrix() const;
