@@ -18,9 +18,10 @@ The codebase evolves over time as I learn new concepts, improve the architecture
 - GLFW
 - GLM
 - stb_image
+- perlin noise
 
 ## Project Status
-NxN grids of grass textured cubes, rendered with instanced rendering.
+Procedural terrain generator with NxN grass blocks using Perlin noise for height variation, rendered efficiently with OpenGL instanced rendering.
 ![Triangle Renderer](imgs/2026-01-31.png)
 
 ## Notes

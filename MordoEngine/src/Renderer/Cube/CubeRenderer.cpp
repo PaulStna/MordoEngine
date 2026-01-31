@@ -8,12 +8,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <random>
+#define STB_PERLIN_IMPLEMENTATION
+#include <stb_perlin.h>
 
 CubeRenderer::CubeRenderer(unsigned int side) :
 	camera(Camera(glm::vec3{ 0.0f, 0.0f, 10.0f },
 		OpenGLBackend::SCR_WIDTH,
 		OpenGLBackend::SCR_HEIGHT)),
-	colorCoord(glm::vec2{ 0.1f, 0.4f }),
+	colorCoord(glm::vec2{ .15f, 0.45f }),
 	chunkSide(side),         
 	totalInstances(side*side)    
 {
@@ -97,11 +99,22 @@ CubeRenderer::CubeRenderer(unsigned int side) :
 
 	std::vector<glm::vec3> translations(totalInstances);
 	int index = 0;
-	std::mt19937 gen;
-	std::uniform_int_distribution<int> dist(0, 1);
+	float scale = 0.05f;
 	for ( int x = 0; x < chunkSide; x++) {
 		for ( int z = 0; z < chunkSide; z++) {
-			glm::vec3 translation{ x, dist(gen) , z };
+			float noise = stb_perlin_fbm_noise3(
+				x * scale,
+				0.0f,
+				z * scale,
+				2.0f,
+				0.5f,
+				4
+			);
+			float alturaf = (noise + 1.0f) * 2.5f;
+			int altura = static_cast<int>(std::round(alturaf));
+			altura = std::clamp(altura, 0, 5);
+
+			glm::vec3 translation{ x, static_cast<float>(altura), z };
 			translations[index++] = translation;
 		}
 	}
