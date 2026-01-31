@@ -13,7 +13,7 @@ void Engine::Run()
 	Input::Init(OpenGLBackend::GetGLFWwindow());
 	Manager<Texture>::Init();
 	Manager<Shader>::Init();
-	CubeRenderer cubeRenderer;
+	CubeRenderer cubeRenderer(32);
 
 	float lastTime = 0.0f;
 

@@ -145,7 +145,6 @@
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\Input\Input.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Renderer\Cube\Cube.cpp" />
     <ClCompile Include="src\Renderer\Cube\CubeRenderer.cpp" />
     <ClCompile Include="vendor\glad\src\glad.c" />
   </ItemGroup>
@@ -158,7 +157,6 @@
     <ClInclude Include="src\Core\Texture\Texture.h" />
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Input\Input.h" />
-    <ClInclude Include="src\Renderer\Cube\Cube.h" />
     <ClInclude Include="src\Renderer\Cube\CubeRenderer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -166,7 +164,8 @@
     <None Include="res\shaders\basic.vs" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\textures\bricks.png" />
+    <Image Include="res\textures\atlas.png" />
+    <Image Include="res\textures\colormap.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

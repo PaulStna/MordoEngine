@@ -42,9 +42,6 @@
     <ClCompile Include="src\Renderer\Cube\CubeRenderer.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Cube\Cube.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Managers\Implementation\TextureManager.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
@@ -74,9 +71,6 @@
     <ClInclude Include="src\Core\FileSystem\FileSystem.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\Cube\Cube.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="src\Renderer\Cube\CubeRenderer.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
@@ -92,7 +86,10 @@
     <None Include="res\shaders\basic.fs" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\textures\bricks.png">
+    <Image Include="res\textures\colormap.png">
+      <Filter>Archivos de recursos</Filter>
+    </Image>
+    <Image Include="res\textures\atlas.png">
       <Filter>Archivos de recursos</Filter>
     </Image>
   </ItemGroup>

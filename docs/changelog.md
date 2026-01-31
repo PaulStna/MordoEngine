@@ -38,3 +38,10 @@
 - Updated CubeRenderer to utilize the Camera for rendering cubes in 3D space
 - Implemented WASD movement and mouse functionality in the cube renderer for camera control
 
+## 2026-01-31
+- Replace bricks texture with grass texture atlas
+- Add color map for grass tinting
+- Remove Cube class and dynamic cube generation
+- Render NxN cube grids via instanced rendering with random heights
+- Improve Texture class to auto-detect channel count
+- Update fragment shader to tint top grass using color map

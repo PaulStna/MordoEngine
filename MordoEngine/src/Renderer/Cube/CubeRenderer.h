@@ -1,23 +1,23 @@
 #pragma once
 #include <glad/glad.h>
-#include <vector>
-#include <random>
+#include <string>
 #include "../../Camera/Camera.h"
-#include "Cube.h"
 
 class CubeRenderer {
 private:
-	GLuint vao, vbo, ebo;
-	std::vector<Cube> cubes;
-	void AddRandomCube();
-	void HandleInputs(float deltaTime);
-	Camera camera;
-	std::string defaultTextureID;
-	std::string defaultShaderID;
-	std::mt19937 gen;
+    unsigned int vao, vbo, ebo , instanceVbo;
+    const unsigned int chunkSide; 
+    const unsigned int totalInstances; 
+    glm::vec2 colorCoord;
+    std::string defaultShaderID;
+    std::string defaultTextureID;
+    Camera camera;
+    void HandleInputs(float deltaTime);
+
 public:
-	CubeRenderer();
-	~CubeRenderer();
-	void Update(float deltaTime);
-	void Render();
+    CubeRenderer(unsigned int side);
+    ~CubeRenderer();
+
+    void Update(float deltaTime);
+    void Render();
 };

@@ -20,8 +20,8 @@ The codebase evolves over time as I learn new concepts, improve the architecture
 - stb_image
 
 ## Project Status
-After several space key presses, dynamically generated 3D textured Cubes, rendered in a 3D space with camera navigation:
-![Triangle Renderer](imgs/2026-01-30.png)
+NxN grids of grass textured cubes, rendered with instanced rendering.
+![Triangle Renderer](imgs/2026-01-31.png)
 
 ## Notes
 This is an educational and personal project focused on learning and experimentation.  
