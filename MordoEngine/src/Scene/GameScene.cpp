@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "../Terrain/HeightmapTerrain.h"
 #include "../Terrain/FaultFormationTerrain.h"
+#include "../Terrain/MidpointDisplacement.h"
 #include "../API/OpenGL/OpenGLBackend.h"
 #include "../Renderer/TriangleRenderer.h"
 #include "../Core/Managers/Manager.h"
@@ -9,7 +10,8 @@
 
 GameScene::GameScene() : Scene("terrain"),
 						//m_Terrain(std::make_unique<HeightMapTerrain>("res/maps/heightmap.raw")),
-						m_Terrain(std::make_unique<FaultFormationTerrain>(256*2, 50, 0, 45535.0f, 0.26f)),
+						//m_Terrain(std::make_unique<FaultFormationTerrain>(256*2, 50, 0, 45535.0f, 0.26f)),
+						m_Terrain(std::make_unique<MidpointDisplacement>(256*2, 1.f, 0, 60535.0f)),
 						m_Camera(Camera(glm::vec3{ 0.0f, 50.0f, .0f },
 							OpenGLBackend::SCR_WIDTH,
 							OpenGLBackend::SCR_HEIGHT)

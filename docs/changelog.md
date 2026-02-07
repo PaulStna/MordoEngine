@@ -63,3 +63,6 @@
 - Implemented Fault Formation terrain generation and rendering
 - Refactored GameScene to use the FaultFormation class for terrain generation and rendering
 - Refactored Terrain to support multiple terrain generation techniques
+
+## 2026-02-05
+- Implemented midpoint displacement terrain generation and rendering

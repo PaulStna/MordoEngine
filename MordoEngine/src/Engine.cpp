@@ -34,7 +34,7 @@ void Engine::Run()
 
 		if (Input::KeyPressed(GLFW_KEY_SPACE)) {
 			drawModeInLines = !drawModeInLines;
-			if (drawModeInLines) {
+			if (drawModeInLines) { 
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			}
 			else {

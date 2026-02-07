@@ -148,6 +148,7 @@
     <ClCompile Include="src\Scene\GameScene.cpp" />
     <ClCompile Include="src\Terrain\FaultFormationTerrain.cpp" />
     <ClCompile Include="src\Terrain\HeightMapTerrain.cpp" />
+    <ClCompile Include="src\Terrain\MidpointDisplacement.cpp" />
     <ClCompile Include="src\Terrain\Terrain.cpp" />
     <ClCompile Include="vendor\glad\src\glad.c" />
   </ItemGroup>
@@ -166,6 +167,7 @@
     <ClInclude Include="src\Scene\Scene.h" />
     <ClInclude Include="src\Terrain\FaultFormationTerrain.h" />
     <ClInclude Include="src\Terrain\HeightmapTerrain.h" />
+    <ClInclude Include="src\Terrain\MidpointDisplacement.h" />
     <ClInclude Include="src\Terrain\Terrain.h" />
   </ItemGroup>
   <ItemGroup>
