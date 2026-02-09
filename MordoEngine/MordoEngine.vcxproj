@@ -145,6 +145,7 @@
     <ClCompile Include="src\Input\Input.cpp" />
     <ClCompile Include="src\Lighting\Sun.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Renderer\Geomipmapping.cpp" />
     <ClCompile Include="src\Renderer\TriangleRenderer.cpp" />
     <ClCompile Include="src\Scene\GameScene.cpp" />
     <ClCompile Include="src\Terrain\FaultFormationTerrain.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Input\Input.h" />
     <ClInclude Include="src\Lighting\Sun.h" />
+    <ClInclude Include="src\Renderer\Geomipmapping.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\Renderer\TriangleRenderer.h" />
     <ClInclude Include="src\Scene\GameScene.h" />

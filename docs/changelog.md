@@ -71,3 +71,6 @@
 - Implemented terrain normal calculation for lighting
 - Updated shaders to apply basic directional lighting using computed normals
 - Added a basic sun light that moves across the sky based on time of day, affecting terrain lighting
+
+## 2026-02-08
+- Implemented geomipmapping for terrain level-of-detail (LOD) rendering 
