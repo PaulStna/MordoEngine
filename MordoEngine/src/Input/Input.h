@@ -9,6 +9,8 @@ public:
 	static bool KeyDown(int key);
 	static bool KeyPressed(int key);
 
+	static float MouseX();
+	static float MouseY();
 	static float MouseDeltaX();
 	static float MouseDeltaY();
 

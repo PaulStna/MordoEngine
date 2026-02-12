@@ -72,6 +72,12 @@
     <ClCompile Include="src\Renderer\LodManager .cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene\Editor\EditorScene.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\AreaSelectorRenderer.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\API\OpenGL\OpenGLBackend.h">
@@ -131,11 +137,19 @@
     <ClInclude Include="src\Renderer\LodManager.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scene\Editor\EditorScene.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\AreaSelectorRenderer.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\terrain.vs" />
     <None Include="res\shaders\terrain.fs" />
     <None Include="res\maps\heightmap.raw" />
+    <None Include="res\shaders\terrainSelector.vs" />
+    <None Include="res\shaders\terrainSelector.fs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\dirt_mid.png">

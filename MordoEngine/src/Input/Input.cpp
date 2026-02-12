@@ -61,6 +61,14 @@ bool Input::KeyPressed(int key) {
 	return keyPressed[key];
 }
 
+float Input::MouseX() {
+	return static_cast<float>(mouseX);
+}
+
+float Input::MouseY() {
+	return static_cast<float>(mouseY);
+}
+
 float Input::MouseDeltaX() {
 	return static_cast<float>(mouseDeltaX);
 }

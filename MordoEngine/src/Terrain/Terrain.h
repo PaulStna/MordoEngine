@@ -37,6 +37,8 @@ namespace terrain
 		float GetNormalizedHeightAt(std::size_t x, std::size_t z) const;
 		float GetScaledHeightAt(std::size_t x, std::size_t z) const;
 
+		float GetHeightInterpolated(float x, float z) const;
+
 		std::size_t GetSize() const noexcept;
 		int GetWorldScale() const noexcept;
 

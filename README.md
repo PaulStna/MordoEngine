@@ -22,9 +22,9 @@ The codebase evolves over time as I learn new concepts, improve the architecture
 - perlin noise
 
 ## Project Status
-Terrain Renderer using GeoMipMapping with camera distance-based LOD selection (GL_LINE / GL_FILL)
-![Triangle Renderer](imgs/2026-02-10-1.png)
-![Triangle Renderer](imgs/2026-02-10-2.png)
+Terrain Editor Preview (Terrain Selector Indicator), Yellow circles indicate selected terrain areas using mouse raycasting:
+![Triangle Renderer](imgs/2026-02-12-1.png)
+![Triangle Renderer](imgs/2026-02-12-2.png)
 
 ## Notes
 This is an educational and personal project focused on learning and experimentation.  

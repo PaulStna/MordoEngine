@@ -78,3 +78,9 @@
 ## 2026-02-10
 - Implemented GeoMipMapping with dynamic camera distance-based LOD selection
 - Added world size parameter to control terrain scale and LOD levels
+
+## 2026-02-12
+- Added a terrain editor scene to handle terrain editing functionality
+- Implemented a basic terrain picking system using ray casting to select terrain points with the mouse
+- Added visual feedback for selected terrain area points (yellow circle)
+- Added terrain selector fragment and vertex shaders for rendering the selection indicator on the terrain

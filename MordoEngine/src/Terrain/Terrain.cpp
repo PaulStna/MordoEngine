@@ -50,7 +50,7 @@ bool Terrain::LoadHeightMap(const std::string& filename)
 	std::size_t totalElements = fileSize / sizeof(std::uint16_t);
 	std::size_t size = static_cast<std::size_t>(std::sqrt(totalElements));
 
-	if (size * size != totalElements){
+	if (size * size != totalElements) {
 		std::cerr << "Not a Square!" << std::endl;
 		return false;
 	}
@@ -62,7 +62,7 @@ bool Terrain::LoadHeightMap(const std::string& filename)
 		return false;
 
 	Initialize(size, 1.0f, 0.0f, RAW_HEIGHT_MAX);
-	for (std::size_t i = 0; i < totalElements; i++){
+	for (std::size_t i = 0; i < totalElements; i++) {
 		p_HeightData.data[i] = static_cast<float>(tempData[i]);
 	}
 	return true;
@@ -78,7 +78,7 @@ bool Terrain::SaveHeightMap(const std::string& filename) const
 		return false;
 
 	std::vector<std::uint16_t> tempData(p_HeightData.data.size());
-	for (std::size_t i = 0; i < p_HeightData.data.size(); i++){
+	for (std::size_t i = 0; i < p_HeightData.data.size(); i++) {
 		float clamped = std::clamp(p_HeightData.data[i], 0.0f, RAW_HEIGHT_MAX);
 		tempData[i] = static_cast<std::uint16_t>(clamped);
 	}
@@ -123,18 +123,43 @@ void Terrain::SetHeightAt(float height, std::size_t x, std::size_t z)
 float Terrain::GetNormalizedHeightAt(std::size_t x, std::size_t z) const
 {
 	float rawHeight = GetHeightAt(x, z);
-	if (p_IsScaled){
+	if (p_IsScaled) {
 		if (p_MaxHeight <= p_MinHeight)
 			return 0.0f;
 		return (rawHeight - p_MinHeight) / (p_MaxHeight - p_MinHeight);
 	}
 
-	return rawHeight / RAW_HEIGHT_MAX;
+	return rawHeight / p_MaxHeight;
 }
 
 float Terrain::GetScaledHeightAt(std::size_t x, std::size_t z) const
 {
 	return GetNormalizedHeightAt(x, z) * p_HeightScale;
+}
+
+float Terrain::GetHeightInterpolated(float x, float z) const
+{
+	x /= GetWorldScale();
+	z /= GetWorldScale();
+
+	float bottomLeftHeight = GetHeightAt((int)x, (int)z);
+
+	if (((int)x + 1 >= GetSize()) || ((int)z + 1 >= GetSize())) {
+		return (bottomLeftHeight / p_MaxHeight) * p_HeightScale;
+	}
+
+	float bottomRightHeight = GetHeightAt((int)x + 1, (int)z);
+	float topLeftHeight = GetHeightAt((int)x, (int)z + 1);
+	float topRightHeight = GetHeightAt((int)x + 1, (int)z + 1);
+
+	float xFraction = x - floorf(x);
+	float interpolatedBottomEdge = (bottomRightHeight - bottomLeftHeight) * xFraction + bottomLeftHeight;
+	float interpolatedTopEdge = (topRightHeight - topLeftHeight) * xFraction + topLeftHeight;
+
+	float zFraction = z - floorf(z);
+	float finalHeight = (interpolatedTopEdge - interpolatedBottomEdge) * zFraction + interpolatedBottomEdge;
+
+	return (finalHeight / p_MaxHeight) * p_HeightScale;
 }
 
 float Terrain::GetHeightAt(std::size_t x, std::size_t z) const
@@ -156,7 +181,7 @@ int Terrain::GetWorldScale() const noexcept
 
 void Terrain::RescaleData(float minRange, float maxRange)
 {
-	if (p_HeightData.data.empty() || p_HeightData.size == 0){
+	if (p_HeightData.data.empty() || p_HeightData.size == 0) {
 		std::cerr << "Error: Empty HeightData" << std::endl;
 		return;
 	}
@@ -164,7 +189,7 @@ void Terrain::RescaleData(float minRange, float maxRange)
 	float minVal = *std::min_element(p_HeightData.data.begin(), p_HeightData.data.end());
 	float maxVal = *std::max_element(p_HeightData.data.begin(), p_HeightData.data.end());
 
-	if (maxVal <= minVal){
+	if (maxVal <= minVal) {
 		std::cerr << "Same maxVal and minVal" << std::endl;
 		return;
 	}
@@ -172,7 +197,7 @@ void Terrain::RescaleData(float minRange, float maxRange)
 	float delta = maxVal - minVal;
 	float range = maxRange - minRange;
 
-	for (std::size_t i = 0; i < p_HeightData.data.size(); i++){
+	for (std::size_t i = 0; i < p_HeightData.data.size(); i++) {
 		float normalized = (p_HeightData.data[i] - minVal) / delta;
 		p_HeightData.data[i] = normalized * range + minRange;
 	}

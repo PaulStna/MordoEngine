@@ -145,9 +145,11 @@
     <ClCompile Include="src\Input\Input.cpp" />
     <ClCompile Include="src\Lighting\Sun.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Renderer\AreaSelectorRenderer.cpp" />
     <ClCompile Include="src\Renderer\Geomipmapping.cpp" />
     <ClCompile Include="src\Renderer\LodManager .cpp" />
     <ClCompile Include="src\Renderer\TriangleRenderer.cpp" />
+    <ClCompile Include="src\Scene\Editor\EditorScene.cpp" />
     <ClCompile Include="src\Scene\GameScene.cpp" />
     <ClCompile Include="src\Terrain\FaultFormationTerrain.cpp" />
     <ClCompile Include="src\Terrain\HeightMapTerrain.cpp" />
@@ -165,10 +167,12 @@
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Input\Input.h" />
     <ClInclude Include="src\Lighting\Sun.h" />
+    <ClInclude Include="src\Renderer\AreaSelectorRenderer.h" />
     <ClInclude Include="src\Renderer\Geomipmapping.h" />
     <ClInclude Include="src\Renderer\LodManager.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\Renderer\TriangleRenderer.h" />
+    <ClInclude Include="src\Scene\Editor\EditorScene.h" />
     <ClInclude Include="src\Scene\GameScene.h" />
     <ClInclude Include="src\Scene\Scene.h" />
     <ClInclude Include="src\Terrain\FaultFormationTerrain.h" />
@@ -180,6 +184,8 @@
     <None Include="res\maps\heightmap.raw" />
     <None Include="res\shaders\terrain.fs" />
     <None Include="res\shaders\terrain.vs" />
+    <None Include="res\shaders\terrainSelector.fs" />
+    <None Include="res\shaders\terrainSelector.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\dirt_mid.jpg" />
