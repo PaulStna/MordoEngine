@@ -6,5 +6,6 @@ class Renderer
 {
 public:
 	virtual void Render(const Shader& shader, const glm::vec3& cameraPos) = 0;
+	virtual void SetHeights(const std::vector<float>& heights, const glm::vec3& position) = 0;
 	virtual ~Renderer() = default;
 };

@@ -2,13 +2,13 @@
 #include "../../../Terrain/Terrain.h"
 #include "../../../Camera/Camera.h"
 #include <glm/vec3.hpp>
-#include "../../../Renderer/AreaSelectorRenderer.h"
+#include "../../../Renderer/Renderer.h"
 #include <memory>
 
 class EditorSystem {
 
 private:
-	std::unique_ptr<AreaSelectorRenderer> m_Renderer;
+	std::unique_ptr<Renderer> m_Renderer;
 	int m_Segments = 256;
 	float m_Radius = 15.0f;
 	int m_HeightOffSet = 12.0f;

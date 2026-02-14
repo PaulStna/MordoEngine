@@ -10,6 +10,10 @@ public:
 	Geomipmapping(const terrain::Terrain& terrain, int patchSize);
 	void SetTextureScale(float scale);
 	void SetHeightThresholds(float threshold1, float threshold2);
+	void SetHeights(const std::vector<float>& heights, const glm::vec3& position) override
+	{
+		return;
+	};
 	void Render(const Shader& shader, const glm::vec3& cameraPos) override;
 	~Geomipmapping();
 private:
@@ -51,7 +55,7 @@ private:
 	int InitIndicesLOD(int index, std::vector<unsigned int>& indices, int lod);
 	int InitIndicesLODSingle(int index, std::vector<unsigned int>& indices,
 		int lodCore, int lodLeft, int lodRight, int lodTop, int lodBottom);
-	unsigned int CreateTriangleFan(int index, std::vector<unsigned int>& indices, 
+	unsigned int CreateTriangleFan(int index, std::vector<unsigned int>& indices,
 		int lodCore, int lodLeft, int lodRight, int lodTop, int lodBottom, int x, int z);
 	int Powi(int base, int exp);
 };

@@ -1,5 +1,8 @@
 #include "EditorSystem.h"
 #include <glm/glm.hpp>
+#include "../../../Core/Managers/Manager.h"
+#include "../../../Core/Shader/Shader.h"
+#include "../../../Renderer/AreaSelectorRenderer.h"
 
 EditorSystem::EditorSystem()
 {
@@ -68,5 +71,18 @@ glm::vec3 EditorSystem::RaycastToTerrain(
 
 void EditorSystem::Render(const Camera& camera)
 {
-	m_Renderer->Render(camera, m_Segments);
+	Shader& shader = Manager<Shader>::Get("terrainSelector");
+	shader.Use();
+
+	glm::mat4 projection = camera.GetProjectionMatrix();
+	shader.SetMat4("projection", projection);
+
+	glm::mat4 view = camera.GetViewMatrix();
+	shader.SetMat4("view", view);
+
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, m_LastWorldPosition);
+	shader.SetMat4("model", model);
+
+	m_Renderer->Render(shader, glm::vec3(0.0f));
 }

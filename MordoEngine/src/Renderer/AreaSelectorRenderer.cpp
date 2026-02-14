@@ -6,10 +6,9 @@
 
 AreaSelectorRenderer::AreaSelectorRenderer(float radius, int segments)
 {
-	m_ShaderID = "terrainSelector";
+	m_Segments = segments;
 	CreateGLState();
-	PopulateBuffers(radius, segments);
-
+	PopulateBuffers(radius);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -33,12 +32,12 @@ void AreaSelectorRenderer::CreateGLState()
 
 }
 
-void AreaSelectorRenderer::PopulateBuffers(float radius, int segments)
+void AreaSelectorRenderer::PopulateBuffers(float radius)
 {
 	std::vector<glm::vec2> verticesXZ;
-	std::vector<float> heights(segments, 0.0f);
+	std::vector<float> heights(m_Segments, 0.0f);
 
-	InitVertices(verticesXZ, radius, segments);
+	InitVertices(verticesXZ, radius);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_PosVbo);
 	glBufferData(
@@ -57,12 +56,12 @@ void AreaSelectorRenderer::PopulateBuffers(float radius, int segments)
 	);
 }
 
-void AreaSelectorRenderer::InitVertices(std::vector<glm::vec2>& vertices, float radius, int segments)
+void AreaSelectorRenderer::InitVertices(std::vector<glm::vec2>& vertices, float radius)
 {
 
-	for (int i = 0; i < segments; ++i)
+	for (int i = 0; i < m_Segments; ++i)
 	{
-		float angle = (float)i / segments * glm::two_pi<float>();
+		float angle = (float)i / m_Segments * glm::two_pi<float>();
 
 		vertices.push_back({
 			glm::cos(angle) * radius,
@@ -81,24 +80,13 @@ void AreaSelectorRenderer::SetHeights(const std::vector<float>& heights, const g
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void AreaSelectorRenderer::Render(const Camera& camera, int segments)
+void AreaSelectorRenderer::Render(const Shader& shader, const glm::vec3& cameraPos)
 {
-	Shader& shader = Manager<Shader>::Get(m_ShaderID);
 	shader.Use();
-
-	glm::mat4 projection = camera.GetProjectionMatrix();
-	shader.SetMat4("projection", projection);
-
-	glm::mat4 view = camera.GetViewMatrix();
-	shader.SetMat4("view", view);
-
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, m_WorldPosition);
-	shader.SetMat4("model", model);
 
 	glBindVertexArray(m_Vao);
 	glLineWidth(10.0f);
-	glDrawArrays(GL_LINE_LOOP, 0, segments);
+	glDrawArrays(GL_LINE_LOOP, 0, m_Segments);
 	glBindVertexArray(0);
 }
 
