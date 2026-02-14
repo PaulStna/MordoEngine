@@ -3,7 +3,7 @@
 #include "../Core/Texture/Texture.h"
 #include <cassert>
 
-TriangleRenderer::TriangleRenderer(const terrain::Terrain& terrain)
+TriangleRenderer::TriangleRenderer(Shader& shader, const terrain::Terrain& terrain) : Renderer(shader)
 {
 	SetTextureScale(50.0f);
 	SetHeightThresholds(0.3f, 0.7f);
@@ -121,23 +121,25 @@ void TriangleRenderer::InitIndices(std::vector<unsigned int>& indices)
 	}
 }
 
-void TriangleRenderer::Render(const Shader& shader , const glm::vec3& cameraPos)
+void TriangleRenderer::Render(const glm::vec3& cameraPos)
 {
-	shader.SetInt("texture1", 0);
+	p_Shader.Use();
+
+	p_Shader.SetInt("texture1", 0);
 	glActiveTexture(GL_TEXTURE0);
 	Manager<Texture>::Get(m_Texture1ID).Use();
 
-	shader.SetInt("texture2", 1);
+	p_Shader.SetInt("texture2", 1);
 	glActiveTexture(GL_TEXTURE1);
 	Manager<Texture>::Get(m_Texture2ID).Use();
 
-	shader.SetInt("texture3", 2);
+	p_Shader.SetInt("texture3", 2);
 	glActiveTexture(GL_TEXTURE2);
 	Manager<Texture>::Get(m_Texture3ID).Use();
 
-	shader.SetFloat("textureScale", m_TextureScale);
-	shader.SetFloat("heightThreshold1", m_HeightThreshold1);
-	shader.SetFloat("heightThreshold2", m_HeightThreshold2);
+	p_Shader.SetFloat("textureScale", m_TextureScale);
+	p_Shader.SetFloat("heightThreshold1", m_HeightThreshold1);
+	p_Shader.SetFloat("heightThreshold2", m_HeightThreshold2);
 
 	glBindVertexArray(m_Vao);
 	glDrawElements(GL_TRIANGLES, (m_Width - 1) * (m_Depth - 1) * 6, GL_UNSIGNED_INT, NULL);

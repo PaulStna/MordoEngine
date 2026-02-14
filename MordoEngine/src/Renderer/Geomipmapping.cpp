@@ -1,24 +1,16 @@
 #include "Geomipmapping.h"
-#include "../Core/Managers/Manager.h"
 #include "../Core/Texture/Texture.h"
-#include "../Core/Shader/Shader.h"
+#include "../Core/Managers/Manager.h"
 
-Geomipmapping::Geomipmapping(const terrain::Terrain& terrain, int patchSize)
-    : m_PatchSize(patchSize)
+Geomipmapping::Geomipmapping(Shader& shader, const terrain::Terrain& terrain, int patchSize) : Renderer(shader)
 {
+    m_PatchSize = patchSize;
     SetTextureScale(50.0f);
     SetHeightThresholds(0.3f, 0.7f);
     CreateGeomipGrid(terrain);
     m_Texture1ID = "grass";
     m_Texture2ID = "dirt";
     m_Texture3ID = "rock";
-}
-
-Geomipmapping::~Geomipmapping()
-{
-    glDeleteBuffers(1, &m_Vbo);
-    glDeleteBuffers(1, &m_Ebo);
-    glDeleteVertexArrays(1, &m_Vao);
 }
 
 void Geomipmapping::CreateGeomipGrid(const terrain::Terrain& terrain)
@@ -309,25 +301,30 @@ void Geomipmapping::CalculateSmoothNormals(std::vector<terrain::Vertex>& vertice
     }
 }
 
-void Geomipmapping::Render(const Shader& shader, const glm::vec3& cameraPos)
+void Geomipmapping::Render(const glm::vec3& cameraPos, 
+                           const glm::mat4* view,
+                           const glm::mat4* projection,
+                           const glm::mat4* model,
+                           const glm::vec3* lightDir)
 {
+    Renderer::Render(view, projection, model, lightDir);
     m_LodManager.Update(cameraPos);
 
-    shader.SetInt("texture1", 0);
+    p_Shader.SetInt("texture1", 0);
     glActiveTexture(GL_TEXTURE0);
     Manager<Texture>::Get(m_Texture1ID).Use();
 
-    shader.SetInt("texture2", 1);
+    p_Shader.SetInt("texture2", 1);
     glActiveTexture(GL_TEXTURE1);
     Manager<Texture>::Get(m_Texture2ID).Use();
 
-    shader.SetInt("texture3", 2);
+    p_Shader.SetInt("texture3", 2);
     glActiveTexture(GL_TEXTURE2);
     Manager<Texture>::Get(m_Texture3ID).Use();
 
-    shader.SetFloat("textureScale", m_TextureScale);
-    shader.SetFloat("heightThreshold1", m_HeightThreshold1);
-    shader.SetFloat("heightThreshold2", m_HeightThreshold2);
+    p_Shader.SetFloat("textureScale", m_TextureScale);
+    p_Shader.SetFloat("heightThreshold1", m_HeightThreshold1);
+    p_Shader.SetFloat("heightThreshold2", m_HeightThreshold2);
 
     glBindVertexArray(m_Vao);
 
@@ -363,4 +360,11 @@ void Geomipmapping::SetHeightThresholds(float threshold1, float threshold2)
 {
     m_HeightThreshold1 = threshold1;
     m_HeightThreshold2 = threshold2;
+}
+
+Geomipmapping::~Geomipmapping()
+{
+    glDeleteBuffers(1, &m_Vbo);
+    glDeleteBuffers(1, &m_Ebo);
+    glDeleteVertexArrays(1, &m_Vao);
 }

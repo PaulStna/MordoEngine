@@ -1,10 +1,12 @@
 #include "SceneManager.h"
-#include "../API/OpenGL/OpenGLBackend.h"
 #include "Editor/EditorScene.h"
-#include "../Terrain/FaultFormationTerrain.h"
 #include "Game/GameScene.h"
+#include "../API/OpenGL/OpenGLBackend.h"
+#include "../Terrain/FaultFormationTerrain.h"
 #include "../Renderer/Geomipmapping.h"
 #include "../Input/Input.h"
+#include "../Core/Managers/Manager.h"
+#include "../Core/Shader/Shader.h"
 #include <iostream>
 
 SceneManager::SceneManager() : m_ActiveScene(nullptr), m_ActiveSceneName("")
@@ -23,7 +25,7 @@ SceneManager::SceneManager() : m_ActiveScene(nullptr), m_ActiveSceneName("")
 										  m_SharedTerrain->GetSize() / 2));
 	m_SharedCamera->LookAt(glm::vec3(m_SharedTerrain->GetSize() / 2, 180.0f, m_SharedTerrain->GetSize() / 2));
 	
-	m_SharedRenderer = std::make_shared<Geomipmapping>(*m_SharedTerrain, 33.0f);
+	m_SharedRenderer = std::make_shared<Geomipmapping>(Manager<Shader>::Get("terrain"), * m_SharedTerrain, 33.0f);
 
 	AddScene("game", std::make_unique<GameScene>(m_SharedTerrain, m_SharedCamera, m_SharedRenderer));
 	AddScene("editor", std::make_unique<EditorScene>(m_SharedTerrain, m_SharedCamera, m_SharedRenderer));

@@ -1,11 +1,11 @@
 #pragma once
-#include <memory>
-#include <unordered_map>
+#include "Scene.h"
 #include "../Renderer/Renderer.h"
 #include "../Terrain/Terrain.h"
 #include "../Camera/Camera.h"
+#include <unordered_map>
+#include <memory>
 #include <string>
-#include "Scene.h"
 
 class SceneManager
 {

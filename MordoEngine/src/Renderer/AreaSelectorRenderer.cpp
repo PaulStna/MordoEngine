@@ -4,7 +4,7 @@
 #include <iostream>
 
 
-AreaSelectorRenderer::AreaSelectorRenderer(float radius, int segments)
+AreaSelectorRenderer::AreaSelectorRenderer(Shader& shader, float radius, int segments) : Renderer(shader)
 {
 	m_Segments = segments;
 	CreateGLState();
@@ -80,10 +80,12 @@ void AreaSelectorRenderer::SetHeights(const std::vector<float>& heights, const g
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void AreaSelectorRenderer::Render(const Shader& shader, const glm::vec3& cameraPos)
+void AreaSelectorRenderer::Render(const glm::mat4* view,
+								  const glm::mat4* projection,
+								  const glm::mat4* model,
+								  const glm::vec3* lightDir)
 {
-	shader.Use();
-
+	Renderer::Render(view, projection, model, lightDir);
 	glBindVertexArray(m_Vao);
 	glLineWidth(10.0f);
 	glDrawArrays(GL_LINE_LOOP, 0, m_Segments);

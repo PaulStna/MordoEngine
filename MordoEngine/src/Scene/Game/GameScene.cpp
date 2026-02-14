@@ -19,17 +19,16 @@ void GameScene::Update(float deltaTime)
 
 void GameScene::Render()
 {
-	Shader& shader = Manager<Shader>::Get(p_ShaderID);
-	shader.Use();
-
 	glm::mat4 projection = m_Camera->GetProjectionMatrix();
-	shader.SetMat4("projection", projection);
-
 	glm::mat4 view = m_Camera->GetViewMatrix();
-	shader.SetMat4("view", view);
-
-	shader.SetVec3("reverseLightDir", m_Sun->GetReverseLightDirection());
-	m_Renderer->Render(shader, m_Camera->GetPosition());
+	glm::vec3 lightDir = m_Sun->GetReverseLightDirection();
+	m_Renderer->Render(
+		m_Camera->GetPosition(),
+		&view,
+		&projection,
+		nullptr,
+		&lightDir
+	);
 }
 
 GameScene::~GameScene()

@@ -1,12 +1,10 @@
 #include "EditorSystem.h"
-#include <glm/glm.hpp>
-#include "../../../Core/Managers/Manager.h"
-#include "../../../Core/Shader/Shader.h"
 #include "../../../Renderer/AreaSelectorRenderer.h"
+#include <glm/glm.hpp>
 
-EditorSystem::EditorSystem()
+EditorSystem::EditorSystem(Shader& areaSelectorShader)
 {
-	m_Renderer = std::make_unique<AreaSelectorRenderer>(m_Radius, m_Segments);
+	m_Renderer = std::make_unique<AreaSelectorRenderer>(areaSelectorShader, m_Radius, m_Segments);
 	m_LastWorldPosition = glm::vec3(0.0f);
 }
 
@@ -69,20 +67,15 @@ glm::vec3 EditorSystem::RaycastToTerrain(
 	return glm::vec3(rayOrigin.x, 0.0f, rayOrigin.z);
 }
 
-void EditorSystem::Render(const Camera& camera)
+void EditorSystem::Render(glm::mat4* view,
+						  glm::mat4* projection,
+						  glm::mat4* model,
+						  glm::vec3* lightDir)
 {
-	Shader& shader = Manager<Shader>::Get("terrainSelector");
-	shader.Use();
+	m_Renderer->Render(view, projection, model, lightDir);
+}
 
-	glm::mat4 projection = camera.GetProjectionMatrix();
-	shader.SetMat4("projection", projection);
-
-	glm::mat4 view = camera.GetViewMatrix();
-	shader.SetMat4("view", view);
-
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, m_LastWorldPosition);
-	shader.SetMat4("model", model);
-
-	m_Renderer->Render(shader, glm::vec3(0.0f));
+glm::vec3 EditorSystem::GetWorldPosition() const
+{
+	return m_LastWorldPosition;
 }

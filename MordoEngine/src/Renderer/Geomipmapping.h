@@ -1,21 +1,11 @@
 #pragma once
 #include "Renderer.h"
-#include <vector>
 #include "LodManager.h"
 #include "../Terrain/Terrain.h"
+#include <vector>
 
 class Geomipmapping : public Renderer
 {
-public:
-	Geomipmapping(const terrain::Terrain& terrain, int patchSize);
-	void SetTextureScale(float scale);
-	void SetHeightThresholds(float threshold1, float threshold2);
-	void SetHeights(const std::vector<float>& heights, const glm::vec3& position) override
-	{
-		return;
-	};
-	void Render(const Shader& shader, const glm::vec3& cameraPos) override;
-	~Geomipmapping();
 private:
 	int m_Width;
 	int m_Depth;
@@ -58,4 +48,14 @@ private:
 	unsigned int CreateTriangleFan(int index, std::vector<unsigned int>& indices,
 		int lodCore, int lodLeft, int lodRight, int lodTop, int lodBottom, int x, int z);
 	int Powi(int base, int exp);
+public:
+	Geomipmapping(Shader& shader, const terrain::Terrain& terrain, int patchSize);
+	void SetTextureScale(float scale);
+	void SetHeightThresholds(float threshold1, float threshold2);
+	void Render(const glm::vec3& cameraPos,
+		const glm::mat4* view,
+		const glm::mat4* projection,
+		const glm::mat4* model,
+		const glm::vec3* lightDir) override;
+	~Geomipmapping();
 };

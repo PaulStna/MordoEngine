@@ -2,7 +2,6 @@
 #include "Renderer.h"
 #include "../Camera/Camera.h"
 #include "../Terrain/Terrain.h"
-#include "Renderer.h"
 #include <memory>
 #include <string>
 
@@ -18,8 +17,12 @@ private:
 	void PopulateBuffers(float radius);
 	void InitVertices(std::vector<glm::vec2>& vertices, float radius);
 public:
-	AreaSelectorRenderer(float radius, int segments);
-	void Render(const Shader& shader, const glm::vec3& cameraPos) override;
+	AreaSelectorRenderer(Shader& shader, float radius, int segments);
+	void Render(const glm::mat4* view,
+			    const glm::mat4* projection,
+				const glm::mat4* model,
+				const glm::vec3* lightDir) override;
+
 	void SetHeights(const std::vector<float>& heights, const glm::vec3& position) override;
 	~AreaSelectorRenderer();
 };

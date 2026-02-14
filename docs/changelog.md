@@ -93,6 +93,8 @@
 - Refactored scene update methods to delegate input and camera updates to editor camera controller class
 
 ## 2026-02-14
-- Added a EditorSystem class to manage editor-specific functionality and tools
-- Refactored AreaSelectorRenderer to use the EditorSystem for managing area selection state
-- Refactored AreaSelectorRenderer to herit from a base Renderer class for better code organization and reuse 
+- Added EditorSystem class to manage editor-specific functionality and tools
+- Refactored AreaSelectorRenderer to use EditorSystem for area selection state management
+- Refactored AreaSelectorRenderer to inherit from the base Renderer class
+- Refactored Render methods in Redenderer class to be more flexible and reusable across different renderers
+- Refactored Render methods in all Renderer subclasses

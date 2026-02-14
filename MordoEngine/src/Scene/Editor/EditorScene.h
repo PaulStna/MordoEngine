@@ -1,11 +1,10 @@
 #pragma once
-#include "../Scene.h"
-#include "../../Terrain/Terrain.h"
-#include "../../Renderer/Geomipmapping.h"
-#include "../../Camera/Camera.h"
-#include "../../Renderer/AreaSelectorRenderer.h"
 #include "./Controllers/EditorCameraController.h"
 #include "./System/EditorSystem.h"
+#include "../Scene.h"
+#include "../../Terrain/Terrain.h"
+#include "../../Camera/Camera.h"
+#include "../../Renderer/Renderer.h"
 #include <memory>
 
 class EditorScene : public Scene
