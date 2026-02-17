@@ -101,5 +101,9 @@
 
 ## 2026-02-15
 - Implemented terrain editing in TerrainEditorScene using EditorSystem
-- Added height increment on left mouse click (unoptimized)
+- Added terrain height increment on left mouse click (unoptimized)
 - Refactor terrain vertex and fragment shaders 
+
+## 2026-02-16
+- Added terrain height decrement on right mouse click (still unoptimized)
+- Added EditorInputHandlerController for selector size and brush strength input handling

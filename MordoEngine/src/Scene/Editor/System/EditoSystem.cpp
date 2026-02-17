@@ -81,7 +81,42 @@ glm::vec3 EditorSystem::GetWorldPosition() const
 	return m_LastWorldPosition;
 }
 
-void EditorSystem::ModifyTerrain(terrain::Terrain& terrain)
+void EditorSystem::IncreaseSelector()
+{
+	ModyfySelector(m_RadiusStep);
+}
+
+void EditorSystem::DecreaseSelector()
+{
+	ModyfySelector(-m_RadiusStep);
+}
+
+void EditorSystem::ModyfySelector(float radius)
+{
+	m_Radius += radius;
+	if (m_Radius > 35.0f) {
+		m_Radius = 35.f;
+	}
+
+	if (m_Radius < 5.0f) {
+		m_Radius = 5.f;
+	}
+
+	auto* castedRenderer = static_cast<AreaSelectorRenderer*>(m_Renderer.get());
+	castedRenderer->SetRadio(m_Radius);
+}
+
+void EditorSystem::IncreaseTerrain(terrain::Terrain& terrain)
+{
+	ModifyTerrain(terrain, m_BrushStrenght);
+}
+
+void EditorSystem::DecreaseTerrain(terrain::Terrain& terrain)
+{
+	ModifyTerrain(terrain, -m_BrushStrenght);
+}
+
+void EditorSystem::ModifyTerrain(terrain::Terrain& terrain, float heightFactor)
 {
 	float worldScale = terrain.GetWorldScale();
 	int centerX = (int)(m_LastWorldPosition.x / worldScale);
@@ -106,9 +141,32 @@ void EditorSystem::ModifyTerrain(terrain::Terrain& terrain)
 			float falloff = 1.0f - t;
 
 			float currentHeight = terrain.GetHeightAt(x, z);
-			float newHeight = currentHeight + falloff * m_BrushStrenght * terrain.GetHeightScale();
+			float newHeight = currentHeight + falloff * heightFactor * terrain.GetHeightScale();
 			terrain.SetHeightAt(newHeight, x, z);
 			terrain.MarkVertexAsModified(x, z);
 		}
+	}
+}
+
+void EditorSystem::IncreaseBrushStrenght()
+{
+	ModifyBrushStrenght(m_BrushStrenghtStep);
+}
+void EditorSystem::DecreaseBrushStrenght()
+{
+	ModifyBrushStrenght(-m_BrushStrenghtStep);
+}
+
+void EditorSystem::ModifyBrushStrenght(float strenghtFactor)
+{
+	m_BrushStrenght += strenghtFactor;
+	if (m_BrushStrenght > 50)
+	{
+		m_BrushStrenght = 50;
+	}
+
+	if (m_BrushStrenght < 0)
+	{
+		m_BrushStrenght = 0.5f;
 	}
 }

@@ -15,6 +15,10 @@ bool Input::leftMouseDown = false;
 bool Input::leftMousePressed = false;
 bool Input::leftMouseDownLastFrame = false;
 
+bool Input::rightMouseDown = false;
+bool Input::rightMousePressed = false;
+bool Input::rightMouseDownLastFrame = false;
+
 bool Input::cursorVisible = false;
 
 void Input::Init(GLFWwindow* win) {
@@ -50,6 +54,11 @@ void Input::Update() {
 	leftMousePressed = leftMouseDown && !leftMouseDownLastFrame;
 	leftMouseDownLastFrame = leftMouseDown;
 
+	// Right mouse
+	rightMouseDown = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
+	rightMousePressed = rightMouseDown && !rightMouseDownLastFrame;
+	rightMouseDownLastFrame = rightMouseDown;
+
 	cursorVisible = glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL;
 }
 
@@ -83,6 +92,14 @@ bool Input::LeftMouseDown() {
 
 bool Input::LeftMousePressed() {
 	return leftMousePressed;
+}
+
+bool Input::RightMouseDown() {
+	return rightMouseDown;
+}
+
+bool Input::RightMousePressed() {
+	return rightMousePressed;
 }
 
 void Input::DisableCursor() {

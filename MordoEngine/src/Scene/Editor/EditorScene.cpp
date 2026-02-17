@@ -7,6 +7,7 @@ EditorScene::EditorScene(std::shared_ptr<terrain::Terrain> terrain, std::shared_
 {
 	m_CameraController = std::make_unique<EditorCameraController>(m_Camera);
 	m_EditorSystem = std::make_unique<EditorSystem>(Manager<Shader>::Get("terrainSelector"));
+	m_EditorInputController = std::make_unique<EditorInputHandlerController>();
 }
 
 
@@ -15,16 +16,7 @@ void EditorScene::Update(float deltaTime)
     float velocity = 100.0f * m_Terrain->GetWorldScale() * deltaTime;
     m_CameraController->Update(deltaTime, velocity);
     m_EditorSystem->Update(*m_Terrain, *m_Camera);
-
-
-    if (Input::LeftMousePressed()) {
-        m_EditorSystem->ModifyTerrain(*m_Terrain);
-    }
-
-    if (m_Terrain->HasModifications()) {
-        m_Renderer->UpdateBuffers(*m_Terrain);
-        m_Terrain->ClearModifications();  
-    }
+	m_EditorInputController->Update(*m_EditorSystem, *m_Terrain, *m_Renderer);
 }
 
 void EditorScene::Render()

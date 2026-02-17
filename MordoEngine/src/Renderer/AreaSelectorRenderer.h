@@ -16,6 +16,7 @@ private:
 	void CreateGLState();
 	void PopulateBuffers(float radius);
 	void InitVertices(std::vector<glm::vec2>& vertices, float radius);
+
 public:
 	AreaSelectorRenderer(Shader& shader, float radius, int segments);
 	void Render(const glm::mat4* view,
@@ -24,5 +25,6 @@ public:
 				const glm::vec3* lightDir) override;
 
 	void SetHeights(const std::vector<float>& heights, const glm::vec3& position) override;
+	void SetRadio(float radius);
 	~AreaSelectorRenderer();
 };

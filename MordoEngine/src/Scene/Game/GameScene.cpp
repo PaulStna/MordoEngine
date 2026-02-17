@@ -14,7 +14,6 @@ void GameScene::Update(float deltaTime)
 	m_Sun->Update(deltaTime);
 	float velocity = 100.0f * m_Terrain->GetWorldScale() * deltaTime;
 	m_CameraController->Update(deltaTime, velocity);
-	m_Camera->ProcessMouseMovement(Input::MouseDeltaX(), Input::MouseDeltaY());
 }
 
 void GameScene::Render()

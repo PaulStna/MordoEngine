@@ -22,7 +22,7 @@ The codebase evolves over time as I learn new concepts, improve the architecture
 - perlin noise
 
 ## Project Status
-Terrain Editor Preview, left click to raise terrain ( 7ms -> should be optimized in the future):
+Terrain Editor Preview, left click to increase terrain, right click to decrease terrain ( 7ms -> should be optimized in the future):
 ![Triangle Renderer](imgs/2026-02-15-1.png)
 ![Triangle Renderer](imgs/2026-02-15-2.png)
 

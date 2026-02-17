@@ -87,6 +87,9 @@
     <ClCompile Include="src\Scene\Editor\System\EditoSystem.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene\Editor\Controllers\EditorInputHandlerController.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\API\OpenGL\OpenGLBackend.h">
@@ -159,6 +162,9 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene\Editor\System\EditorSystem.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\Editor\Controllers\EditorInputHandlerController.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

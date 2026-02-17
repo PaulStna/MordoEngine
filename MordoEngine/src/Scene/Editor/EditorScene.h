@@ -5,6 +5,7 @@
 #include "../../Terrain/Terrain.h"
 #include "../../Camera/Camera.h"
 #include "../../Renderer/Renderer.h"
+#include "./Controllers/EditorInputHandlerController.h"
 #include <memory>
 
 class EditorScene : public Scene
@@ -15,6 +16,7 @@ private:
 	std::shared_ptr<Renderer> m_Renderer;
 	std::unique_ptr<EditorCameraController> m_CameraController;
 	std::unique_ptr<EditorSystem> m_EditorSystem;
+	std::unique_ptr<EditorInputHandlerController> m_EditorInputController;
 
 public:
 	EditorScene(std::shared_ptr<terrain::Terrain> terrain, std::shared_ptr<Camera> camera, std::shared_ptr<Renderer> renderer);

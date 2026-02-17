@@ -18,6 +18,9 @@ public:
 	static bool LeftMouseDown();
 	static bool LeftMousePressed();
 
+	static bool RightMouseDown();
+	static bool RightMousePressed();
+
 	static void DisableCursor();
 	static void ShowCursor();
 	static bool CursorVisible();
@@ -37,6 +40,10 @@ private:
 	static bool leftMouseDown;
 	static bool leftMousePressed;
 	static bool leftMouseDownLastFrame;
+
+	static bool rightMouseDown;
+	static bool rightMousePressed;
+	static bool rightMouseDownLastFrame;
 
 	static bool cursorVisible;
 };

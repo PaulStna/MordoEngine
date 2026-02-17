@@ -3,6 +3,7 @@
 #include "Game/GameScene.h"
 #include "../API/OpenGL/OpenGLBackend.h"
 #include "../Terrain/FaultFormationTerrain.h"
+#include "../Terrain/MidpointDisplacement.h"
 #include "../Renderer/Geomipmapping.h"
 #include "../Input/Input.h"
 #include "../Core/Managers/Manager.h"
@@ -12,9 +13,9 @@
 SceneManager::SceneManager() : m_ActiveScene(nullptr), m_ActiveSceneName("")
 {
 	Input::DisableCursor();
-	// m_ShaderTerrain = std::make_shared<HeightMapTerrain>("res/maps/heightmap.raw");
-	// m_ShaderTerrain = std::make_unique<MidpointDisplacement>(1057, 3.0f, 1.0f, 0, terrain::RAW_HEIGHT_MAX);
-	m_SharedTerrain = std::make_shared<FaultFormationTerrain>(513, 3.0f, 50, 0, terrain::RAW_HEIGHT_MAX, 0.15f);
+	// m_SharedTerrain = std::make_shared<HeightMapTerrain>("res/maps/heightmap.raw");
+	//m_SharedTerrain = std::make_unique<MidpointDisplacement>(1057, 3.0f, .8f, 0, terrain::RAW_HEIGHT_MAX);
+	m_SharedTerrain = std::make_shared<FaultFormationTerrain>(1057, 3.0f, 50, 0, terrain::RAW_HEIGHT_MAX, 0.15f);
 	m_SharedTerrain->SetHeightScale(200.0f * m_SharedTerrain->GetWorldScale());
 
 	m_SharedCamera = std::make_shared<Camera>(glm::vec3{ 0.0f, 50.0f, .80f },

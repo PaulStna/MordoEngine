@@ -80,6 +80,18 @@ void AreaSelectorRenderer::SetHeights(const std::vector<float>& heights, const g
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void AreaSelectorRenderer::SetRadio(float radius)
+{
+	std::vector<glm::vec2> verticesXZ;
+
+	InitVertices(verticesXZ, radius);
+	glBindVertexArray(m_Vao);
+	glBindBuffer(GL_ARRAY_BUFFER, m_PosVbo);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, verticesXZ.size() * sizeof(verticesXZ[0]), &verticesXZ[0]);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void AreaSelectorRenderer::Render(const glm::mat4* view,
 								  const glm::mat4* projection,
 								  const glm::mat4* model,
