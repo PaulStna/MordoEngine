@@ -22,5 +22,8 @@ public:
 	EditorScene(std::shared_ptr<terrain::Terrain> terrain, std::shared_ptr<Camera> camera, std::shared_ptr<Renderer> renderer);
 	void Render() override;
 	void Update(float deltaTime) override;
+	void OnEntry() override {
+		//
+	}
 	~EditorScene() override;
 };

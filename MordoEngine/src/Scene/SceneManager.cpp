@@ -63,6 +63,7 @@ void SceneManager::SetActiveScene(const std::string& name) {
 		exit(-1);
 	}
 	m_ActiveScene = it->second.get();
+	m_ActiveScene->OnEntry();
 	m_ActiveSceneName = name;
 }
 

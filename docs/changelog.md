@@ -107,3 +107,8 @@
 ## 2026-02-16
 - Added terrain height decrement on right mouse click (still unoptimized)
 - Added EditorInputHandlerController for selector size and brush strength input handling
+
+## 2026-02-17
+- Added GameCameraController to manage camera input in the main game scene
+- Added an OnEntry method for Scenes to handle scene initialization logic or switching scenes
+- GameCameraController handles WASD movement and mouse look with terrain collision detection

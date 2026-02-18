@@ -6,14 +6,19 @@
 GameScene::GameScene(std::shared_ptr<terrain::Terrain> terrain, std::shared_ptr<Camera> camera, std::shared_ptr<Renderer> renderer) 
 	: Scene("terrain"), m_Terrain(terrain) , m_Camera(camera) , m_Renderer(renderer) , m_Sun(std::make_unique<Sun>(0.9f))
 {
-	m_CameraController = std::make_unique<EditorCameraController>(m_Camera);
+	m_CameraController = std::make_unique<GameCameraController>(m_Camera);
+}
+
+void GameScene::OnEntry()
+{
+	m_CameraController->TouchTerrain(*m_Terrain);
 }
 
 void GameScene::Update(float deltaTime)
 {
 	m_Sun->Update(deltaTime);
 	float velocity = 100.0f * m_Terrain->GetWorldScale() * deltaTime;
-	m_CameraController->Update(deltaTime, velocity);
+	m_CameraController->Update(deltaTime, velocity, *m_Terrain);
 }
 
 void GameScene::Render()

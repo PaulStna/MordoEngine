@@ -153,6 +153,7 @@
     <ClCompile Include="src\Scene\Editor\Controllers\EditorInputHandlerController.cpp" />
     <ClCompile Include="src\Scene\Editor\EditorScene.cpp" />
     <ClCompile Include="src\Scene\Editor\System\EditoSystem.cpp" />
+    <ClCompile Include="src\Scene\Game\Controllers\GameCameraController.cpp" />
     <ClCompile Include="src\Scene\Game\GameScene.cpp" />
     <ClCompile Include="src\Scene\SceneManager.cpp" />
     <ClCompile Include="src\Terrain\FaultFormationTerrain.cpp" />
@@ -180,6 +181,7 @@
     <ClInclude Include="src\Scene\Editor\Controllers\EditorInputHandlerController.h" />
     <ClInclude Include="src\Scene\Editor\EditorScene.h" />
     <ClInclude Include="src\Scene\Editor\System\EditorSystem.h" />
+    <ClInclude Include="src\Scene\Game\Controllers\GameCameraController.h" />
     <ClInclude Include="src\Scene\Game\GameScene.h" />
     <ClInclude Include="src\Scene\Scene.h" />
     <ClInclude Include="src\Scene\SceneManager.h" />
