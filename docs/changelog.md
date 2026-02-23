@@ -119,3 +119,6 @@
 - Added cubemap textures for the skybox
 - Added SkyboxRenderer to render the skybox using the cubemap textures
 - Updated GameScene to include the SkyboxRenderer for rendering the skybox in the background
+
+## 2026-02-22
+- Replaced test Sun class light with a DirLight class that calculates sun direction based on time of day.
