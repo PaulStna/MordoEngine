@@ -14,7 +14,6 @@ public:
 	SkyBoxRenderer(Shader& shaders);
 	void Render(const glm::mat4* view,
 		const glm::mat4* projection,
-		const glm::mat4* model,
-		const glm::vec3* lightDir) override;
+		const glm::mat4* model) override;
 	~SkyBoxRenderer();
 };

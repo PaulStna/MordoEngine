@@ -1,6 +1,7 @@
 #pragma once
 #include "../Core/Shader/Shader.h"
 #include "../Terrain/Terrain.h"
+#include "../Lighting/PointLight/PointLightData.h"
 #include <glm/vec3.hpp>
 
 class Renderer
@@ -14,15 +15,12 @@ public:
     virtual void Render(const glm::vec3& cameraPos,
                         const glm::mat4* view,
                         const glm::mat4* projection,
-                        const glm::mat4* model,
-                        const glm::vec3* lightDir) {};
+                        const glm::mat4* model) {};
 
     virtual void Render(const glm::mat4* view,
                         const glm::mat4* projection,
-                        const glm::mat4* model,
-                        const glm::vec3* lightDir)
+                        const glm::mat4* model)
     {
-        p_Shader.Use();
         if (view) {
             p_Shader.SetMat4("view", *view);
         }
@@ -31,9 +29,6 @@ public:
         }
         if (model) {
             p_Shader.SetMat4("model", *model);
-        }
-        if (lightDir) {
-            p_Shader.SetVec3("lightDir", *lightDir);
         }
     }
 

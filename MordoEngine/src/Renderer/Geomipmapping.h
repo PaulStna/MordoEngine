@@ -67,8 +67,7 @@ public:
     void Render(const glm::vec3& cameraPos,
         const glm::mat4* view,
         const glm::mat4* projection,
-        const glm::mat4* model,
-        const glm::vec3* lightDir) override;
+        const glm::mat4* model) override;
     void UpdateBuffers(const terrain::Terrain& terrain) override;
     ~Geomipmapping();
 };

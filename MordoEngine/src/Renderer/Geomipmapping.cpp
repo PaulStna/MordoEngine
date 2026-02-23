@@ -1,6 +1,7 @@
 #include "Geomipmapping.h"
 #include "../Core/Texture/Texture.h"
 #include "../Core/Managers/Manager.h"
+#include "../Lighting/PointLight/PointLightData.h"
 
 #define ENABLE_TERRAIN_DEBUG 1 
 
@@ -304,10 +305,9 @@ void Geomipmapping::CalculateSmoothNormals(std::vector<terrain::Vertex>& vertice
 void Geomipmapping::Render(const glm::vec3& cameraPos,
 	const glm::mat4* view,
 	const glm::mat4* projection,
-	const glm::mat4* model,
-	const glm::vec3* lightDir)
+	const glm::mat4* model)
 {
-	Renderer::Render(view, projection, model, lightDir);
+	Renderer::Render(view, projection, model);
 	m_LodManager.Update(cameraPos);
 
 	p_Shader.SetInt("texture1", 0);

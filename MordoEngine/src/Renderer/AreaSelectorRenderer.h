@@ -21,9 +21,7 @@ public:
 	AreaSelectorRenderer(Shader& shader, float radius, int segments);
 	void Render(const glm::mat4* view,
 			    const glm::mat4* projection,
-				const glm::mat4* model,
-				const glm::vec3* lightDir) override;
-
+				const glm::mat4* model) override;
 	void SetHeights(const std::vector<float>& heights, const glm::vec3& position) override;
 	void SetRadio(float radius);
 	~AreaSelectorRenderer();

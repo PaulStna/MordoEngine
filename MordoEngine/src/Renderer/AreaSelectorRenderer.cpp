@@ -94,10 +94,10 @@ void AreaSelectorRenderer::SetRadio(float radius)
 
 void AreaSelectorRenderer::Render(const glm::mat4* view,
 								  const glm::mat4* projection,
-								  const glm::mat4* model,
-								  const glm::vec3* lightDir)
+								  const glm::mat4* model)
 {
-	Renderer::Render(view, projection, model, lightDir);
+	p_Shader.Use();
+	Renderer::Render(view, projection, model);
 	glBindVertexArray(m_Vao);
 	glLineWidth(10.0f);
 	glDrawArrays(GL_LINE_LOOP, 0, m_Segments);

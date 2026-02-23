@@ -88,11 +88,11 @@ void SkyBoxRenderer::InitVertices(std::vector<float>& vertices)
 
 void SkyBoxRenderer::Render(const glm::mat4* view,
 							const glm::mat4* projection,
-							const glm::mat4* model,
-							const glm::vec3* lightDir)
+							const glm::mat4* model)
 {
 	glm::mat4 skyboxView = glm::mat4(glm::mat3(*view));
-	Renderer::Render(&skyboxView, projection, nullptr, nullptr);
+	p_Shader.Use();
+	Renderer::Render(&skyboxView, projection, nullptr);
 
 	glDepthFunc(GL_LEQUAL);
 	glDepthMask(GL_FALSE);
