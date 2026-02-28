@@ -22,10 +22,10 @@ void Manager<Shader>::Init() {
 			FileSystem::getPath("res/shaders/skyBox.fs"))
 	);
 
-	resources.emplace("light_cube",
+	resources.emplace("lightCube",
 		Shader(
-			FileSystem::getPath("res/shaders/light_cube.vs"),
-			FileSystem::getPath("res/shaders/light_cube.fs"))
+			FileSystem::getPath("res/shaders/lightCube.vs"),
+			FileSystem::getPath("res/shaders/lightCube.fs"))
 	);
 }
 

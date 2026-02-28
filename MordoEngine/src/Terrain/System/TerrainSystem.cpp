@@ -22,6 +22,7 @@ void TerrainSystem::Render(const Shader& shader,
 						   const glm::mat4* view,
 						   const glm::mat4* model)
 {
+	shader.Use();
 	if (projection) {
 		shader.SetMat4("projection", *projection);
 	}

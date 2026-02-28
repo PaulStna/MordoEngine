@@ -14,6 +14,9 @@ private:
 	std::unique_ptr<GameCameraController> m_CameraController;
 	std::unique_ptr<Renderer> m_SkyBoxRenderer;
 	std::unique_ptr<LightSystem> m_LightSystem;
+	std::string m_TerrainShaderID;
+	std::string m_CubeLightShaderID;
+	std::string m_SkyBoxShaderID;
 
 public:
 	GameScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSystem> terrainSystem);

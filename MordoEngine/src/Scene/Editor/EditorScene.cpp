@@ -3,7 +3,7 @@
 #include "../../Core/Shader/Shader.h"
 
 EditorScene::EditorScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSystem> terrainSystem)
-	: Scene("terrain"), m_TerrainSystem(terrainSystem), m_Camera(camera)
+	: m_TerrainSystem(terrainSystem), m_Camera(camera)
 {
 	m_CameraController = std::make_unique<EditorCameraController>(m_Camera);
 	m_EditorSystem = std::make_unique<EditorSystem>(Manager<Shader>::Get("terrainSelector"));
@@ -27,7 +27,6 @@ void EditorScene::Render()
 	//glm::vec3 lightDir = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	Shader& terrainShader = Manager<Shader>::Get("terrain");
-	terrainShader.Use();
 	m_TerrainSystem->Render(terrainShader, m_Camera->GetPosition(), &projection, &view, &model);
 	model = glm::translate(model, m_EditorSystem->GetWorldPosition());
 	m_EditorSystem->Render(&view, &projection, &model);

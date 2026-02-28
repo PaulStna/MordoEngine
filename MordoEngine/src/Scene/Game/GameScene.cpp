@@ -5,9 +5,14 @@
 #include "../../Renderer/SkyBoxRenderer.h"
 
 GameScene::GameScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSystem> terrainSystem)
-	: Scene("terrain"), m_Camera(camera), m_TerrainSystem(terrainSystem), m_LightSystem(std::make_unique<LightSystem>())
+	: m_Camera(camera),
+	  m_TerrainSystem(terrainSystem),
+	  m_CameraController(std::make_unique<GameCameraController>(m_Camera)),
+	  m_LightSystem(std::make_unique<LightSystem>()),
+	  m_TerrainShaderID("terrain"),
+	  m_CubeLightShaderID("lightCube"),
+	  m_SkyBoxShaderID("skyBox")
 {
-	m_CameraController = std::make_unique<GameCameraController>(m_Camera);
 	m_SkyBoxRenderer = std::make_unique<SkyBoxRenderer>(
 		Manager<Shader>::Get("skyBox")
 	);
@@ -49,8 +54,9 @@ void GameScene::Render()
 	glm::mat4 model = glm::mat4(1.0f);
 	glm::vec3 cameraPos = m_Camera->GetPosition();
 
-	Shader& terrainShader = Manager<Shader>::Get("terrain");
-	m_LightSystem->Render(terrainShader, cameraPos, &projection, &view, &model);
+	Shader& terrainShader = Manager<Shader>::Get(m_TerrainShaderID);
+	Shader& cubeLightShader = Manager<Shader>::Get(m_CubeLightShaderID);
+	m_LightSystem->Render(terrainShader, cubeLightShader, cameraPos, &projection, &view, &model);
 	m_TerrainSystem->Render(terrainShader, cameraPos, &projection, &view, &model);
 	m_SkyBoxRenderer->Render(&view, &projection, nullptr);
 }

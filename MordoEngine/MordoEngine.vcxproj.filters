@@ -218,8 +218,8 @@
     <None Include="res\shaders\terrainSelector.fs" />
     <None Include="res\shaders\skyBox.fs" />
     <None Include="res\shaders\skyBox.vs" />
-    <None Include="res\shaders\light_cube.vs" />
-    <None Include="res\shaders\light_cube.fs" />
+    <None Include="res\shaders\lightCube.vs" />
+    <None Include="res\shaders\lightCube.fs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\dirt_mid.png">
