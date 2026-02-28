@@ -126,3 +126,6 @@
 - Added vertex and fragment shaders for rendering white point light cubes (used by CubeRenderer).
 - Added a PointLight class that handles point light data and properties.
 - Implemented light system to handle multiple light types (directional, point) and pass light data to shaders
+
+## 2026-02-28
+- Implemented a TerrainSystem to manage terrain rendering and related functionality.

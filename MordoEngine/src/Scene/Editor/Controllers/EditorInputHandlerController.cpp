@@ -1,14 +1,14 @@
 #include "EditorInputHandlerController.h"
 #include "../../../Input/Input.h"
 
-void EditorInputHandlerController::Update(EditorSystem& editorSystem, terrain::Terrain& terrain, Renderer& renderer)
+void EditorInputHandlerController::Update(EditorSystem& editorSystem, TerrainSystem& terrainSystem)
 {
 	if (Input::LeftMousePressed()) {
-		editorSystem.IncreaseTerrain(terrain);
+		editorSystem.IncreaseTerrain(terrainSystem.GetTerrain());
 	}
 
 	if (Input::RightMousePressed()) {
-		editorSystem.DecreaseTerrain(terrain);
+		editorSystem.DecreaseTerrain(terrainSystem.GetTerrain());
 	}
 
 	if (Input::KeyPressed(GLFW_KEY_J)) {
@@ -27,8 +27,5 @@ void EditorInputHandlerController::Update(EditorSystem& editorSystem, terrain::T
 		editorSystem.DecreaseBrushStrenght();
 	}
 
-	if (terrain.HasModifications()) {
-		renderer.UpdateBuffers(terrain);
-		terrain.ClearModifications();
-	}
+	terrainSystem.CheckForModifications();
 }

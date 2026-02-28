@@ -164,6 +164,7 @@
     <ClCompile Include="src\Terrain\HeightMapTerrain.cpp" />
     <ClCompile Include="src\Terrain\MidpointDisplacement.cpp" />
     <ClCompile Include="src\Terrain\Terrain.cpp" />
+    <ClCompile Include="src\Terrain\System\TerrainSystem.cpp" />
     <ClCompile Include="vendor\glad\src\glad.c" />
   </ItemGroup>
   <ItemGroup>
@@ -199,6 +200,7 @@
     <ClInclude Include="src\Terrain\HeightmapTerrain.h" />
     <ClInclude Include="src\Terrain\MidpointDisplacement.h" />
     <ClInclude Include="src\Terrain\Terrain.h" />
+    <ClInclude Include="src\Terrain\System\TerrainSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\maps\heightmap.raw" />

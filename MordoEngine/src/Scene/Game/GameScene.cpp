@@ -4,8 +4,8 @@
 #include "../../Input/Input.h"
 #include "../../Renderer/SkyBoxRenderer.h"
 
-GameScene::GameScene(std::shared_ptr<terrain::Terrain> terrain, std::shared_ptr<Camera> camera, std::shared_ptr<Renderer> renderer)
-	: Scene("terrain"), m_Terrain(terrain), m_Camera(camera), m_Renderer(renderer) , m_LightSystem( std::make_unique<LightSystem>() )
+GameScene::GameScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSystem> terrainSystem)
+	: Scene("terrain"), m_Camera(camera), m_TerrainSystem(terrainSystem), m_LightSystem(std::make_unique<LightSystem>())
 {
 	m_CameraController = std::make_unique<GameCameraController>(m_Camera);
 	m_SkyBoxRenderer = std::make_unique<SkyBoxRenderer>(
@@ -15,13 +15,13 @@ GameScene::GameScene(std::shared_ptr<terrain::Terrain> terrain, std::shared_ptr<
 
 void GameScene::OnEntry()
 {
-	m_CameraController->TouchTerrain(*m_Terrain);
+	m_CameraController->TouchTerrain(*m_TerrainSystem);
 }
 
 void GameScene::Update(float deltaTime)
 {
-	float velocity = 100.0f * m_Terrain->GetWorldScale() * deltaTime;
-	m_CameraController->Update(deltaTime, velocity, *m_Terrain);
+	float velocity = 100.0f * m_TerrainSystem->GetTerrainWorldScale() * deltaTime;
+	m_CameraController->Update(deltaTime, velocity, *m_TerrainSystem);
     m_LightSystem->Update(deltaTime);
 }
 
@@ -34,7 +34,7 @@ void GameScene::Render()
 
     Shader& terrainShader = Manager<Shader>::Get("terrain");
     m_LightSystem->Render(terrainShader, cameraPos, &projection, &view, &model);
-    m_Renderer->Render(cameraPos, &view, &projection, &model);
+    m_TerrainSystem->Render(terrainShader, cameraPos, &projection, &view, &model);
     m_SkyBoxRenderer->Render(&view, &projection, nullptr);
 }
 

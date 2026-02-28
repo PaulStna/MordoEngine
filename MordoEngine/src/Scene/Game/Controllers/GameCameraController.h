@@ -1,6 +1,6 @@
 #pragma once
 #include "../../../Camera/Camera.h"
-#include "../../../Terrain/Terrain.h"
+#include "../../../Terrain/System/TerrainSystem.h"
 #include <memory>
 
 class GameCameraController
@@ -11,6 +11,6 @@ private:
 
 public:
 	GameCameraController(std::weak_ptr<Camera> camera);
-	void Update(float deltaTime, float velocity, const terrain::Terrain& terrain);
-	void TouchTerrain(const terrain::Terrain& terrain);
+	void Update(float deltaTime, float velocity, const TerrainSystem& terrainSystem);
+	void TouchTerrain(const TerrainSystem& terrainSystem);
 };

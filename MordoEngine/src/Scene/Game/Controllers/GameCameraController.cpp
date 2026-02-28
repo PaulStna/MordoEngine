@@ -6,7 +6,7 @@ GameCameraController::GameCameraController(std::weak_ptr<Camera> camera) : m_Cam
 
 }
 
-void GameCameraController::Update(float deltaTime, float velocity, const terrain::Terrain& terrain)
+void GameCameraController::Update(float deltaTime, float velocity, const TerrainSystem& terrainSystem)
 {
 	auto camera = m_Camera.lock();
 	if (!camera) {
@@ -28,8 +28,8 @@ void GameCameraController::Update(float deltaTime, float velocity, const terrain
 	}
 
 	if (newCameraPosition != camera->GetPosition()) {
-		float yTerrainPosition = terrain.GetHeightInterpolated(newCameraPosition.x, newCameraPosition.z)
-							   + m_HeightOffset * terrain.GetHeightScale();
+		float yTerrainPosition = terrainSystem.GetTerrainInterpolatedHeightAt(
+								 newCameraPosition.x, newCameraPosition.z, m_HeightOffset);
 		glm::vec3 finalPosition = glm::vec3(newCameraPosition.x, yTerrainPosition, newCameraPosition.z);
 		camera->SetPosition(finalPosition);
 	}
@@ -37,15 +37,15 @@ void GameCameraController::Update(float deltaTime, float velocity, const terrain
 	camera->ProcessMouseMovement(Input::MouseDeltaX(), Input::MouseDeltaY());
 }
 
-void GameCameraController::TouchTerrain(const terrain::Terrain& terrain)
+void GameCameraController::TouchTerrain(const TerrainSystem& terrainSystem)
 {
 	auto camera = m_Camera.lock();
 	if (!camera) {
 		return;
 	}
 	glm::vec3 cameraPosition = camera->GetPosition();
-	float yTerrainPosition = terrain.GetHeightInterpolated(cameraPosition.x, cameraPosition.z)
-		+ m_HeightOffset * terrain.GetHeightScale();
+	float yTerrainPosition = terrainSystem.GetTerrainInterpolatedHeightAt(
+							 cameraPosition.x, cameraPosition.z, m_HeightOffset);
 	glm::vec3 finalPosition = glm::vec3(cameraPosition.x, yTerrainPosition, cameraPosition.z);
 	camera->SetPosition(finalPosition);
 }

@@ -3,6 +3,7 @@
 #include "../Renderer/Renderer.h"
 #include "../Terrain/Terrain.h"
 #include "../Camera/Camera.h"
+#include "../Terrain/System/TerrainSystem.h"
 #include <unordered_map>
 #include <memory>
 #include <string>
@@ -10,9 +11,8 @@
 class SceneManager
 {
 private:
+	std::shared_ptr<TerrainSystem> m_SharedTerrainSystem;
 	std::shared_ptr<Camera> m_SharedCamera;
-	std::shared_ptr<terrain::Terrain> m_SharedTerrain;
-	std::shared_ptr<Renderer> m_SharedRenderer;
 
 	std::unordered_map<std::string, std::unique_ptr<Scene>> m_Scenes;
 	Scene* m_ActiveScene;

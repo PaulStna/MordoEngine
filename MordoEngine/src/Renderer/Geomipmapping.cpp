@@ -307,9 +307,9 @@ void Geomipmapping::Render(const glm::vec3& cameraPos,
 	const glm::mat4* projection,
 	const glm::mat4* model)
 {
-	Renderer::Render(view, projection, model);
+	//Renderer::Render(view, projection, model);
 	m_LodManager.Update(cameraPos);
-
+	/*
 	p_Shader.SetInt("texture1", 0);
 	glActiveTexture(GL_TEXTURE0);
 	Manager<Texture>::Get(m_Texture1ID).Use();
@@ -325,6 +325,7 @@ void Geomipmapping::Render(const glm::vec3& cameraPos,
 	p_Shader.SetFloat("textureScale", m_TextureScale);
 	p_Shader.SetFloat("heightThreshold1", m_HeightThreshold1);
 	p_Shader.SetFloat("heightThreshold2", m_HeightThreshold2);
+	*/
 
 	glBindVertexArray(m_Vao);
 

@@ -2,8 +2,8 @@
 #include "../../Core/Managers/Manager.h"
 #include "../../Core/Shader/Shader.h"
 
-EditorScene::EditorScene(std::shared_ptr<terrain::Terrain> terrain, std::shared_ptr<Camera> camera, std::shared_ptr<Renderer> renderer)
-	: Scene("terrain"), m_Terrain(terrain), m_Camera(camera), m_Renderer(renderer)
+EditorScene::EditorScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSystem> terrainSystem)
+	: Scene("terrain"), m_TerrainSystem(terrainSystem), m_Camera(camera)
 {
 	m_CameraController = std::make_unique<EditorCameraController>(m_Camera);
 	m_EditorSystem = std::make_unique<EditorSystem>(Manager<Shader>::Get("terrainSelector"));
@@ -13,10 +13,10 @@ EditorScene::EditorScene(std::shared_ptr<terrain::Terrain> terrain, std::shared_
 
 void EditorScene::Update(float deltaTime)
 {
-    float velocity = 100.0f * m_Terrain->GetWorldScale() * deltaTime;
+    float velocity = 100.0f * m_TerrainSystem->GetTerrainWorldScale() * deltaTime;
     m_CameraController->Update(deltaTime, velocity);
-    m_EditorSystem->Update(*m_Terrain, *m_Camera);
-	m_EditorInputController->Update(*m_EditorSystem, *m_Terrain, *m_Renderer);
+    m_EditorSystem->Update(m_TerrainSystem->GetTerrain(), *m_Camera);
+	m_EditorInputController->Update(*m_EditorSystem, *m_TerrainSystem);
 }
 
 void EditorScene::Render()
@@ -26,8 +26,9 @@ void EditorScene::Render()
 	glm::mat4 model = glm::mat4(1.0f);
 	//glm::vec3 lightDir = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	Manager<Shader>::Get("terrain").Use();
-	m_Renderer->Render(m_Camera->GetPosition(), &view, &projection, &model);
+	Shader& terrainShader = Manager<Shader>::Get("terrain");
+	terrainShader.Use();
+	m_TerrainSystem->Render(terrainShader, m_Camera->GetPosition(), &projection, &view, &model);
 	model = glm::translate(model, m_EditorSystem->GetWorldPosition());
 	m_EditorSystem->Render(&view, &projection, &model);
 }
