@@ -151,7 +151,7 @@
     <ClCompile Include="src\Renderer\Geomipmapping.cpp" />
     <ClCompile Include="src\Renderer\Cube\CubePointLightRenderer.cpp" />
     <ClCompile Include="src\Renderer\LodManager.cpp" />
-    <ClCompile Include="src\Renderer\SkyBoxRenderer.cpp" />
+    <ClCompile Include="src\Renderer\Skybox\SkyBoxRenderer.cpp" />
     <ClCompile Include="src\Renderer\TriangleRenderer.cpp" />
     <ClCompile Include="src\Scene\Editor\Controllers\EditorCameraController.cpp" />
     <ClCompile Include="src\Scene\Editor\Controllers\EditorInputHandlerController.cpp" />
@@ -160,6 +160,7 @@
     <ClCompile Include="src\Scene\Game\Controllers\GameCameraController.cpp" />
     <ClCompile Include="src\Scene\Game\GameScene.cpp" />
     <ClCompile Include="src\Scene\SceneManager.cpp" />
+    <ClCompile Include="src\Sky\System\SkySystem.cpp" />
     <ClCompile Include="src\Terrain\FaultFormationTerrain.cpp" />
     <ClCompile Include="src\Terrain\HeightMapTerrain.cpp" />
     <ClCompile Include="src\Terrain\MidpointDisplacement.cpp" />
@@ -186,7 +187,7 @@
     <ClInclude Include="src\Renderer\Cube\CubePointLightRenderer.h" />
     <ClInclude Include="src\Renderer\LodManager.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
-    <ClInclude Include="src\Renderer\SkyBoxRenderer.h" />
+    <ClInclude Include="src\Renderer\Skybox\SkyBoxRenderer.h" />
     <ClInclude Include="src\Renderer\TriangleRenderer.h" />
     <ClInclude Include="src\Scene\Editor\Controllers\EditorCameraController.h" />
     <ClInclude Include="src\Scene\Editor\Controllers\EditorInputHandlerController.h" />
@@ -196,6 +197,7 @@
     <ClInclude Include="src\Scene\Game\GameScene.h" />
     <ClInclude Include="src\Scene\Scene.h" />
     <ClInclude Include="src\Scene\SceneManager.h" />
+    <ClInclude Include="src\Sky\System\SkySystem.h" />
     <ClInclude Include="src\Terrain\FaultFormationTerrain.h" />
     <ClInclude Include="src\Terrain\HeightmapTerrain.h" />
     <ClInclude Include="src\Terrain\MidpointDisplacement.h" />

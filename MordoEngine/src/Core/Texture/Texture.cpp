@@ -91,6 +91,10 @@ void Texture::Use() const {
 	glBindTexture(GL_TEXTURE_2D, ID);
 }
 
+void Texture::UseCubeMap() const {
+	glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
+}
+
 Texture::Texture(Texture&& other) noexcept : ID(other.ID)
 {
 	other.ID = 0;

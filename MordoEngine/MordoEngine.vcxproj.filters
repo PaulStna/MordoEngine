@@ -93,7 +93,7 @@
     <ClCompile Include="src\Scene\Game\Controllers\GameCameraController.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\SkyBoxRenderer.cpp">
+    <ClCompile Include="src\Renderer\Skybox\SkyBoxRenderer.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Cube\CubePointLightRenderer.cpp">
@@ -106,6 +106,9 @@
       <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="src\Terrain\System\TerrainSystem.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Sky\System\SkySystem.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>
@@ -188,7 +191,7 @@
     <ClInclude Include="src\Scene\Game\Controllers\GameCameraController.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\SkyBoxRenderer.h">
+    <ClInclude Include="src\Renderer\Skybox\SkyBoxRenderer.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="src\Lighting\PointLight\PointLight.h">
@@ -207,6 +210,9 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="src\Terrain\System\TerrainSystem.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sky\System\SkySystem.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

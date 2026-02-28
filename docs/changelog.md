@@ -130,3 +130,5 @@
 ## 2026-02-28
 - Implemented a TerrainSystem to manage terrain rendering and related functionality.
 - Refactored LightSystem to handle multiple point lights
+- Refactored SkyBoxRenderer  
+- Added a SkySystem to manage skybox rendering and related functionality

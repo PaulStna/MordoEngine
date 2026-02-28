@@ -2,21 +2,18 @@
 #include "../../Core/Managers/Manager.h"
 #include "../../Core/Shader/Shader.h"
 #include "../../Input/Input.h"
-#include "../../Renderer/SkyBoxRenderer.h"
 
 GameScene::GameScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSystem> terrainSystem)
 	: m_Camera(camera),
 	  m_TerrainSystem(terrainSystem),
 	  m_CameraController(std::make_unique<GameCameraController>(m_Camera)),
+	  m_SkySystem(std::make_unique<SkySystem>()),
 	  m_LightSystem(std::make_unique<LightSystem>()),
 	  m_TerrainShaderID("terrain"),
 	  m_CubeLightShaderID("lightCube"),
-	  m_SkyBoxShaderID("skyBox")
+	  m_SkyShaderID("skyBox"),
+	  m_SkyTextureID("skyBox")
 {
-	m_SkyBoxRenderer = std::make_unique<SkyBoxRenderer>(
-		Manager<Shader>::Get("skyBox")
-	);
-
 	glm::vec3 centerTerrainPosition = m_TerrainSystem->GetMiddleTerrainPosition();
 	float yOffset = 0.2f;
 	float scale = m_TerrainSystem->GetTerrainWorldScale();
@@ -45,6 +42,7 @@ void GameScene::Update(float deltaTime)
 	float velocity = 100.0f * m_TerrainSystem->GetTerrainWorldScale() * deltaTime;
 	m_CameraController->Update(deltaTime, velocity, *m_TerrainSystem);
 	m_LightSystem->Update(deltaTime);
+	m_SkySystem->Update(deltaTime);
 }
 
 void GameScene::Render()
@@ -58,7 +56,10 @@ void GameScene::Render()
 	Shader& cubeLightShader = Manager<Shader>::Get(m_CubeLightShaderID);
 	m_LightSystem->Render(terrainShader, cubeLightShader, cameraPos, &projection, &view, &model);
 	m_TerrainSystem->Render(terrainShader, cameraPos, &projection, &view, &model);
-	m_SkyBoxRenderer->Render(&view, &projection, nullptr);
+
+	Shader& skyShader = Manager<Shader>::Get(m_SkyShaderID);
+	Texture& skyTexture = Manager<Texture>::Get(m_SkyTextureID);
+	m_SkySystem->Render(skyShader, skyTexture, &projection, &view, &model);
 }
 
 GameScene::~GameScene()

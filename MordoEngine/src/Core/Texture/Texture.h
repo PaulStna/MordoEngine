@@ -13,5 +13,6 @@ public:
 	Texture& operator=(Texture&& other) noexcept;
 	Texture(const std::string& filePath, const std::vector<std::string>& faces);
 	void Use() const;
+	void UseCubeMap() const;
 	~Texture();
 };
