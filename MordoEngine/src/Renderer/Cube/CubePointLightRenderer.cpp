@@ -16,61 +16,54 @@ void CubePointLightRenderer::CreateGLState()
 	glGenBuffers(1, &m_Vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
 
-	const GLsizei stride = 6 * sizeof(float);
-
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 }
 
 void CubePointLightRenderer::PopulateBuffers()
 {
-	static const float vertices[] = {
-		// positions          // normals
-		// Back face
-		-0.5f,-0.5f,-0.5f,   0.0f, 0.0f,-1.0f,
-		 0.5f,-0.5f,-0.5f,   0.0f, 0.0f,-1.0f,
-		 0.5f, 0.5f,-0.5f,   0.0f, 0.0f,-1.0f,
-		 0.5f, 0.5f,-0.5f,   0.0f, 0.0f,-1.0f,
-		-0.5f, 0.5f,-0.5f,   0.0f, 0.0f,-1.0f,
-		-0.5f,-0.5f,-0.5f,   0.0f, 0.0f,-1.0f,
-		// Front face
-		-0.5f,-0.5f, 0.5f,   0.0f, 0.0f, 1.0f,
-		 0.5f,-0.5f, 0.5f,   0.0f, 0.0f, 1.0f,
-		 0.5f, 0.5f, 0.5f,   0.0f, 0.0f, 1.0f,
-		 0.5f, 0.5f, 0.5f,   0.0f, 0.0f, 1.0f,
-		-0.5f, 0.5f, 0.5f,   0.0f, 0.0f, 1.0f,
-		-0.5f,-0.5f, 0.5f,   0.0f, 0.0f, 1.0f,
-		// Left face
-		-0.5f, 0.5f, 0.5f,  -1.0f, 0.0f, 0.0f,
-		-0.5f, 0.5f,-0.5f,  -1.0f, 0.0f, 0.0f,
-		-0.5f,-0.5f,-0.5f,  -1.0f, 0.0f, 0.0f,
-		-0.5f,-0.5f,-0.5f,  -1.0f, 0.0f, 0.0f,
-		-0.5f,-0.5f, 0.5f,  -1.0f, 0.0f, 0.0f,
-		-0.5f, 0.5f, 0.5f,  -1.0f, 0.0f, 0.0f,
-		// Right face
-		 0.5f, 0.5f, 0.5f,   1.0f, 0.0f, 0.0f,
-		 0.5f, 0.5f,-0.5f,   1.0f, 0.0f, 0.0f,
-		 0.5f,-0.5f,-0.5f,   1.0f, 0.0f, 0.0f,
-		 0.5f,-0.5f,-0.5f,   1.0f, 0.0f, 0.0f,
-		 0.5f,-0.5f, 0.5f,   1.0f, 0.0f, 0.0f,
-		 0.5f, 0.5f, 0.5f,   1.0f, 0.0f, 0.0f,
-		 // Bottom face
-		 -0.5f,-0.5f,-0.5f,   0.0f,-1.0f, 0.0f,
-		  0.5f,-0.5f,-0.5f,   0.0f,-1.0f, 0.0f,
-		  0.5f,-0.5f, 0.5f,   0.0f,-1.0f, 0.0f,
-		  0.5f,-0.5f, 0.5f,   0.0f,-1.0f, 0.0f,
-		 -0.5f,-0.5f, 0.5f,   0.0f,-1.0f, 0.0f,
-		 -0.5f,-0.5f,-0.5f,   0.0f,-1.0f, 0.0f,
-		 // Top face
-		 -0.5f, 0.5f,-0.5f,   0.0f, 1.0f, 0.0f,
-		  0.5f, 0.5f,-0.5f,   0.0f, 1.0f, 0.0f,
-		  0.5f, 0.5f, 0.5f,   0.0f, 1.0f, 0.0f,
-		  0.5f, 0.5f, 0.5f,   0.0f, 1.0f, 0.0f,
-		 -0.5f, 0.5f, 0.5f,   0.0f, 1.0f, 0.0f,
-		 -0.5f, 0.5f,-0.5f,   0.0f, 1.0f, 0.0f,
+	float vertices[] = {
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
 	};
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);

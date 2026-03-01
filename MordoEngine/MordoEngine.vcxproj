@@ -148,9 +148,11 @@
     <ClCompile Include="src\Lighting\DirLight\DirLight.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Renderer\AreaSelectorRenderer.cpp" />
+    <ClCompile Include="src\Renderer\Framebuffer\Framebuffer.cpp" />
     <ClCompile Include="src\Renderer\Geomipmapping.cpp" />
     <ClCompile Include="src\Renderer\Cube\CubePointLightRenderer.cpp" />
     <ClCompile Include="src\Renderer\LodManager.cpp" />
+    <ClCompile Include="src\Renderer\Plane\PlaneRenderer.cpp" />
     <ClCompile Include="src\Renderer\Skybox\SkyBoxRenderer.cpp" />
     <ClCompile Include="src\Renderer\TriangleRenderer.cpp" />
     <ClCompile Include="src\Scene\Editor\Controllers\EditorCameraController.cpp" />
@@ -183,9 +185,11 @@
     <ClInclude Include="src\Lighting\PointLight\PointLightData.h" />
     <ClInclude Include="src\Lighting\DirLight\DirLight.h" />
     <ClInclude Include="src\Renderer\AreaSelectorRenderer.h" />
+    <ClInclude Include="src\Renderer\Framebuffer\Framebuffer.h" />
     <ClInclude Include="src\Renderer\Geomipmapping.h" />
     <ClInclude Include="src\Renderer\Cube\CubePointLightRenderer.h" />
     <ClInclude Include="src\Renderer\LodManager.h" />
+    <ClInclude Include="src\Renderer\Plane\PlaneRenderer.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\Renderer\Skybox\SkyBoxRenderer.h" />
     <ClInclude Include="src\Renderer\TriangleRenderer.h" />

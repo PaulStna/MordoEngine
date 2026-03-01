@@ -132,3 +132,7 @@
 - Refactored LightSystem to handle multiple point lights
 - Refactored SkyBoxRenderer  
 - Added a SkySystem to manage skybox rendering and related functionality
+
+## 2026-03-01
+- Added Framebuffer class to manage OpenGL framebuffer objects (FBOs) for off-screen rendering
+- Added PlaneRenderer to render a fullscreen quad for post-processing effects
