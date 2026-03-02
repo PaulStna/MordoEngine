@@ -178,6 +178,11 @@ int Terrain::GetWorldScale() const noexcept
 	return p_WorldScale;
 }
 
+void Terrain::SetWorldScale(int worldScale) noexcept
+{
+	p_WorldScale = worldScale;
+}
+
 
 void Terrain::RescaleData(float minRange, float maxRange)
 {

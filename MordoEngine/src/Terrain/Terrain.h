@@ -41,6 +41,7 @@ namespace terrain
 
 		std::size_t GetSize() const noexcept;
 		int GetWorldScale() const noexcept;
+		void SetWorldScale(int worldScale) noexcept;
 
 		void MarkVertexAsModified(int x, int z);
 		void ClearModifications();
@@ -50,7 +51,7 @@ namespace terrain
 
 	protected:
 		HeightData p_HeightData;
-		int p_WorldScale = 1.0f;
+		int p_WorldScale = 2.0f;
 		float p_HeightScale = 1.0f;
 		float p_MinHeight = 0.0f;
 		float p_MaxHeight = RAW_HEIGHT_MAX;

@@ -27,5 +27,9 @@ void EditorInputHandlerController::Update(EditorSystem& editorSystem, TerrainSys
 		editorSystem.DecreaseBrushStrenght();
 	}
 
+	if (Input::KeyPressed(GLFW_KEY_O)) {
+		terrainSystem.SaveTerrain();
+	}
+
 	terrainSystem.CheckForModifications();
 }

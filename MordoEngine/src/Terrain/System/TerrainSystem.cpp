@@ -1,13 +1,17 @@
 #include "TerrainSystem.h"
 #include "../../Core/Managers/Manager.h"
 #include "../../Core/Texture/Texture.h"
+#include "../HeightmapTerrain.h"
 #include "../FaultFormationTerrain.h"
+#include "../MidpointDisplacement.h"
 #include <iostream>
 
 TerrainSystem::TerrainSystem() : m_Texture1ID("grass"), m_Texture2ID("dirt"), m_Texture3ID("rock"),
-m_Terrain(std::make_unique<FaultFormationTerrain>(1057, 3.0f, 50, 0, terrain::RAW_HEIGHT_MAX, 0.15f))
+m_Terrain(std::make_unique<HeightMapTerrain>("res/maps/heightmap.raw"))
+//m_Terrain(std::make_unique<FaultFormationTerrain>(1057, 3.0f, 50, 0, terrain::RAW_HEIGHT_MAX, 0.15f))
 {
-	m_Terrain->SetHeightScale(200.0f * m_Terrain->GetWorldScale());
+	m_Terrain->SetWorldScale(4.0f);
+	m_Terrain->SetHeightScale(1000.0f);
 	m_TerrainRenderer = std::make_unique<Geomipmapping>(Manager<Shader>::Get("terrain"), GetTerrain(), 33.0f);
 }
 
@@ -91,6 +95,12 @@ void TerrainSystem::CheckForModifications()
 		m_Terrain->ClearModifications();
 	}
 }
+
+void TerrainSystem::SaveTerrain()
+{
+	m_Terrain->SaveHeightMap("res/maps/heightmap.raw");
+}
+
 TerrainSystem::~TerrainSystem()
 {
 	m_Terrain->UnloadHeightMap();
