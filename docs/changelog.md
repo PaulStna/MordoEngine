@@ -140,3 +140,4 @@
 ## 2026-03-07
 - Implemented a WaterSystem to manage water rendering and related functionality ( Reflection and Refraction using framebuffers not implemented yet)
 - Added water vertex and fragment shaders for basic water rendering 
+- Implemented clipping planes in terrain shader for water reflection and refraction rendering (not fully implemented yet)

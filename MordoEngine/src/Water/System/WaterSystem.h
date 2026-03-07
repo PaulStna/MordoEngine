@@ -2,6 +2,7 @@
 #include "../WaterTile.h"
 #include "../../Core/Shader/Shader.h"
 #include "../../Renderer/Plane/PlaneRenderer.h"
+#include "../../Renderer/Framebuffer/Framebuffer.h"
 #include <vector>
 #include <memory>
 
@@ -10,6 +11,7 @@ class WaterSystem
 private:
 	std::vector<WaterTile> m_WaterTiles;
 	std::unique_ptr<PlaneRenderer> m_Renderer;
+	std::unique_ptr<Framebuffer> m_Framebuffer;
 
 public:
 	WaterSystem();

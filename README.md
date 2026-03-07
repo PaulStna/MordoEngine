@@ -22,9 +22,9 @@ The codebase evolves over time as I learn new concepts, improve the architecture
 - perlin noise
 
 ## Project Status
-Terrain, Skybox, Directional and Multiple Point lighting rendering:
-![CubeMap/SkyBoxRender](imgs/2026-02-28.png)
-
+Terrain clipping rendering for reflection water rendering (Above water/Underwater), currently in progress:
+![Reflection/Abovewater](imgs/2026-03-07-1.png)
+![Reflection/Underwater](imgs/2026-03-07-2.png)
 ## Notes
 This is an educational and personal project focused on learning and experimentation.  
 Expect refactors, breaking changes, and incremental improvements as the project matures.

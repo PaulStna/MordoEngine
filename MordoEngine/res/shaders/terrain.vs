@@ -13,6 +13,7 @@ out vec3 WorldPos;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
+uniform vec4 plane;
 uniform float textureScale;
 
 void main()
@@ -20,6 +21,8 @@ void main()
     vec4 worldPos = model * vec4(a_Pos, 1.0);
     gl_Position = projection * view * worldPos;
     
+    gl_ClipDistance[0] = dot(worldPos, plane);
+
     TexCoord = a_TexCoord * textureScale;
     Height = a_Height;
     WorldPos = worldPos.xyz;

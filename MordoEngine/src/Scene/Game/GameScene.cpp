@@ -67,6 +67,8 @@ void GameScene::Render()
 	Shader& terrainShader = Manager<Shader>::Get(m_TerrainShaderID);
 	Shader& cubeLightShader = Manager<Shader>::Get(m_CubeLightShaderID);
 	m_LightSystem->Render(terrainShader, cubeLightShader, cameraPos, &projection, &view, &model);
+	glEnable(GL_CLIP_DISTANCE0);
+	terrainShader.SetVec4("plane", glm::vec4(0.0f, 1.0f, 0.0f, -1000 * 0.3f));
 	m_TerrainSystem->Render(terrainShader, cameraPos, &projection, &view, &model);
 
 	Shader& skyShader = Manager<Shader>::Get(m_SkyShaderID);

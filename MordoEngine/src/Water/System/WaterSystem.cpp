@@ -1,7 +1,9 @@
 #include "WaterSystem.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-WaterSystem::WaterSystem() : m_Renderer(std::make_unique<PlaneRenderer>())
+WaterSystem::WaterSystem() : 
+	m_Renderer(std::make_unique<PlaneRenderer>()),
+	m_Framebuffer(std::make_unique<Framebuffer>())
 {
 
 }
@@ -20,7 +22,16 @@ void WaterSystem::Render(const Shader& shader,
 						const glm::mat4* view,
 						const glm::mat4* model)
 {
+	m_Framebuffer->BindBuffer();
+	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	m_Framebuffer->UnbindBuffer();
+
 	shader.Use();
+	shader.SetInt("uTexture", 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_Framebuffer->GetTextureID());
+
 	if (projection) {
 		shader.SetMat4("projection", *projection);
 	}
