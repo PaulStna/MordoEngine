@@ -27,6 +27,12 @@ void Manager<Shader>::Init() {
 			FileSystem::getPath("res/shaders/lightCube.vs"),
 			FileSystem::getPath("res/shaders/lightCube.fs"))
 	);
+
+	resources.emplace("water",
+		Shader(
+			FileSystem::getPath("res/shaders/water.vs"),
+			FileSystem::getPath("res/shaders/water.fs"))
+	);
 }
 
 template class Manager<Shader>;

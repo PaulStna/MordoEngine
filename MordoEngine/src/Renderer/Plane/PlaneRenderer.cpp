@@ -16,22 +16,22 @@ void PlaneRenderer::CreateGLState()
     glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
 
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
 void PlaneRenderer::PopulateBuffers()
 {
     float vertices[] = {
-        // X      Y      Z       U     V
-         5.0f, -0.5f,  5.0f,   1.0f, 1.0f,
-        -5.0f, -0.5f,  5.0f,   0.0f, 1.0f,
-        -5.0f, -0.5f, -5.0f,   0.0f, 0.0f,
-         5.0f, -0.5f,  5.0f,   1.0f, 1.0f,
-        -5.0f, -0.5f, -5.0f,   0.0f, 0.0f,
-         5.0f, -0.5f, -5.0f,   1.0f, 0.0f
+        // X      Z      U     V
+         1.0f,  1.0f,  1.0f, 1.0f,
+        -1.0f,  1.0f,  0.0f, 1.0f,
+        -1.0f, -1.0f,  0.0f, 0.0f,
+         1.0f,  1.0f,  1.0f, 1.0f,
+        -1.0f, -1.0f,  0.0f, 0.0f,
+         1.0f, -1.0f,  1.0f, 0.0f
     };
 
     glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);

@@ -4,6 +4,7 @@
 #include "./Controllers/GameCameraController.h"
 #include "../../Lighting/LightSystem.h"
 #include "../../Terrain/System/TerrainSystem.h"
+#include "../../Water/System/WaterSystem.h"
 #include "../../Sky/System/SkySystem.h"
 #include <memory>
 
@@ -15,11 +16,12 @@ private:
 	std::unique_ptr<GameCameraController> m_CameraController;
 	std::unique_ptr<SkySystem> m_SkySystem;
 	std::unique_ptr<LightSystem> m_LightSystem;
+	std::unique_ptr<WaterSystem> m_WaterSystem;
 	std::string m_TerrainShaderID;
 	std::string m_CubeLightShaderID;
 	std::string m_SkyShaderID;
 	std::string m_SkyTextureID;
-
+	std::string m_WaterShaderID;
 
 public:
 	GameScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSystem> terrainSystem);

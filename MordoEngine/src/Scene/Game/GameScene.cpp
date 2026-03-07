@@ -9,10 +9,12 @@ GameScene::GameScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSyst
 	  m_CameraController(std::make_unique<GameCameraController>(m_Camera)),
 	  m_SkySystem(std::make_unique<SkySystem>()),
 	  m_LightSystem(std::make_unique<LightSystem>()),
+	  m_WaterSystem(std::make_unique<WaterSystem>()),
 	  m_TerrainShaderID("terrain"),
 	  m_CubeLightShaderID("lightCube"),
 	  m_SkyShaderID("skyBox"),
-	  m_SkyTextureID("skyBox")
+	  m_SkyTextureID("skyBox"),
+	  m_WaterShaderID("water")
 {
 	glm::vec3 centerTerrainPosition = m_TerrainSystem->GetMiddleTerrainPosition();
 	float yOffset = 0.2f;
@@ -30,6 +32,15 @@ GameScene::GameScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSyst
 	AddLight(50.0f, 50.0f);
 	AddLight(-100.0f, -100.0f);
 	AddLight(-100.0f, -100.0f);
+
+	float waterLevel = m_TerrainSystem->GetTerrainHeightScale() * 0.3;
+	m_WaterSystem->AddWaterTile(
+		glm::vec3(
+			centerTerrainPosition.x,
+			0.0f,
+			centerTerrainPosition.z
+		)
+		, glm::vec3(700.0f, 1.0f, 700.0f), waterLevel);
 }
 
 void GameScene::OnEntry()
@@ -43,6 +54,7 @@ void GameScene::Update(float deltaTime)
 	m_CameraController->Update(deltaTime, velocity, *m_TerrainSystem);
 	m_LightSystem->Update(deltaTime);
 	m_SkySystem->Update(deltaTime);
+	m_WaterSystem->Update(deltaTime);
 }
 
 void GameScene::Render()
@@ -60,6 +72,9 @@ void GameScene::Render()
 	Shader& skyShader = Manager<Shader>::Get(m_SkyShaderID);
 	Texture& skyTexture = Manager<Texture>::Get(m_SkyTextureID);
 	m_SkySystem->Render(skyShader, skyTexture, &projection, &view, &model);
+
+	Shader& waterShader = Manager<Shader>::Get(m_WaterShaderID);
+	m_WaterSystem->Render(waterShader, cameraPos, &projection, &view, nullptr);
 }
 
 GameScene::~GameScene()

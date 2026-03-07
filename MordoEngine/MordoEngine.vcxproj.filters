@@ -117,6 +117,12 @@
     <ClCompile Include="src\Renderer\Plane\PlaneRenderer.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="src\Water\WaterTile.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Water\System\WaterSystem.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\API\OpenGL\OpenGLBackend.h">
@@ -227,6 +233,15 @@
     <ClInclude Include="src\Renderer\Plane\PlaneRenderer.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="src\Water\WaterTile.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Water\WaterTileData.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Water\System\WaterSystem.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\terrain.vs" />
@@ -238,6 +253,8 @@
     <None Include="res\shaders\skyBox.vs" />
     <None Include="res\shaders\lightCube.vs" />
     <None Include="res\shaders\lightCube.fs" />
+    <None Include="res\shaders\water.vs" />
+    <None Include="res\shaders\water.fs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\dirt_mid.png">

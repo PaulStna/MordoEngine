@@ -168,6 +168,8 @@
     <ClCompile Include="src\Terrain\MidpointDisplacement.cpp" />
     <ClCompile Include="src\Terrain\Terrain.cpp" />
     <ClCompile Include="src\Terrain\System\TerrainSystem.cpp" />
+    <ClCompile Include="src\Water\System\WaterSystem.cpp" />
+    <ClCompile Include="src\Water\WaterTile.cpp" />
     <ClCompile Include="vendor\glad\src\glad.c" />
   </ItemGroup>
   <ItemGroup>
@@ -207,6 +209,9 @@
     <ClInclude Include="src\Terrain\MidpointDisplacement.h" />
     <ClInclude Include="src\Terrain\Terrain.h" />
     <ClInclude Include="src\Terrain\System\TerrainSystem.h" />
+    <ClInclude Include="src\Water\System\WaterSystem.h" />
+    <ClInclude Include="src\Water\WaterTileData.h" />
+    <ClInclude Include="src\Water\WaterTile.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\maps\heightmap.raw" />
@@ -218,6 +223,8 @@
     <None Include="res\shaders\terrain.vs" />
     <None Include="res\shaders\terrainSelector.fs" />
     <None Include="res\shaders\terrainSelector.vs" />
+    <None Include="res\shaders\water.fs" />
+    <None Include="res\shaders\water.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\dirt_mid.jpg" />

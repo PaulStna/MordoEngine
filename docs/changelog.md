@@ -136,3 +136,7 @@
 ## 2026-03-01
 - Added Framebuffer class to manage OpenGL framebuffer objects (FBOs) for off-screen rendering
 - Added PlaneRenderer to render a fullscreen quad for post-processing effects
+
+## 2026-03-07
+- Implemented a WaterSystem to manage water rendering and related functionality ( Reflection and Refraction using framebuffers not implemented yet)
+- Added water vertex and fragment shaders for basic water rendering 
