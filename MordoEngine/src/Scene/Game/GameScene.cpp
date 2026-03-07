@@ -28,10 +28,10 @@ GameScene::GameScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSyst
 			m_LightSystem->AddPointLight(PointLight(glm::vec3(x, y, z)));
 		};
 
-	AddLight(0.0f, 0.0f);
+	//AddLight(0.0f, 0.0f);
 	AddLight(50.0f, 50.0f);
 	AddLight(-100.0f, -100.0f);
-	AddLight(-100.0f, -100.0f);
+	//AddLight(-100.0f, -100.0f);
 
 	float waterLevel = m_TerrainSystem->GetTerrainHeightScale() * 0.3;
 	m_WaterSystem->AddWaterTile(
@@ -66,17 +66,27 @@ void GameScene::Render()
 
 	Shader& terrainShader = Manager<Shader>::Get(m_TerrainShaderID);
 	Shader& cubeLightShader = Manager<Shader>::Get(m_CubeLightShaderID);
-	m_LightSystem->Render(terrainShader, cubeLightShader, cameraPos, &projection, &view, &model);
-	glEnable(GL_CLIP_DISTANCE0);
-	terrainShader.SetVec4("plane", glm::vec4(0.0f, 1.0f, 0.0f, -1000 * 0.3f));
-	m_TerrainSystem->Render(terrainShader, cameraPos, &projection, &view, &model);
-
 	Shader& skyShader = Manager<Shader>::Get(m_SkyShaderID);
 	Texture& skyTexture = Manager<Texture>::Get(m_SkyTextureID);
+	Shader& waterShader = Manager<Shader>::Get(m_WaterShaderID);
+
+	glEnable(GL_CLIP_DISTANCE0);
+	m_LightSystem->Render(terrainShader, cubeLightShader, cameraPos, &projection, &view, &model);
+	m_TerrainSystem->Render(terrainShader, cameraPos, &projection, &view, &model);
 	m_SkySystem->Render(skyShader, skyTexture, &projection, &view, &model);
 
-	Shader& waterShader = Manager<Shader>::Get(m_WaterShaderID);
-	m_WaterSystem->Render(waterShader, cameraPos, &projection, &view, nullptr);
+	m_WaterSystem->Render(
+		terrainShader, waterShader, *m_Camera, &projection, nullptr,
+		[&](float waterY, const glm::mat4& reflectedView) {
+			glm::vec3 reflectedCameraPos = m_Camera->GetPosition();
+			reflectedCameraPos.y = 2.0f * waterY - reflectedCameraPos.y;
+			terrainShader.SetVec4("plane", glm::vec4(0.0f, 1.0f, 0.0f, -waterY));
+
+			m_LightSystem->Render(terrainShader, cubeLightShader, reflectedCameraPos, &projection, &reflectedView, &model);
+			m_TerrainSystem->Render(terrainShader, reflectedCameraPos, &projection, &reflectedView, &model);
+			m_SkySystem->Render(skyShader, skyTexture, &projection, &reflectedView, &model);
+		}
+	);
 }
 
 GameScene::~GameScene()

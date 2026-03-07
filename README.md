@@ -22,9 +22,9 @@ The codebase evolves over time as I learn new concepts, improve the architecture
 - perlin noise
 
 ## Project Status
-Terrain clipping rendering for reflection water rendering (Above water/Underwater), currently in progress:
+Terrain rendering, reflection water rendering test (without reflection/with reflection):
 ![Reflection/Abovewater](imgs/2026-03-07-1.png)
-![Reflection/Underwater](imgs/2026-03-07-2.png)
+![Reflection/Underwater](imgs/2026-03-07-3.png)
 ## Notes
 This is an educational and personal project focused on learning and experimentation.  
 Expect refactors, breaking changes, and incremental improvements as the project matures.

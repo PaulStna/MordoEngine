@@ -1,9 +1,9 @@
 #include "WaterSystem.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-WaterSystem::WaterSystem() : 
+WaterSystem::WaterSystem() :
 	m_Renderer(std::make_unique<PlaneRenderer>()),
-	m_Framebuffer(std::make_unique<Framebuffer>())
+	m_ReflectionFramebuffer(std::make_unique<Framebuffer>())
 {
 
 }
@@ -16,36 +16,53 @@ void WaterSystem::Update(float deltaTime)
 	}
 }
 
-void WaterSystem::Render(const Shader& shader,
-						const glm::vec3& cameraPos,
-						const glm::mat4* projection,
-						const glm::mat4* view,
-						const glm::mat4* model)
+void WaterSystem::Render(const Shader& terrainShader,
+	const Shader& waterShader,
+	Camera& camera,
+	const glm::mat4* projection,
+	const glm::mat4* model,
+	std::function<void(float waterY, const glm::mat4& reflectedView)> renderCallback)
 {
-	m_Framebuffer->BindBuffer();
-	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	m_Framebuffer->UnbindBuffer();
-
-	shader.Use();
-	shader.SetInt("uTexture", 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_Framebuffer->GetTextureID());
-
-	if (projection) {
-		shader.SetMat4("projection", *projection);
-	}
-	if (view) {
-		shader.SetMat4("view", *view);
-	}
+	//Reflection
 	for (const WaterTile& waterTile : m_WaterTiles)
 	{
-		const WaterTileData& waterTileData = waterTile.GetData();
-		glm::mat4 newModel = glm::mat4(1.0f);
-		newModel = glm::translate(newModel, waterTileData.position);
-		newModel = glm::scale(newModel, waterTileData.scale);
-		shader.SetMat4("model", newModel);
-		shader.SetFloat("yPos", waterTileData.yPos);
+		const WaterTileData& data = waterTile.GetData();
+		glm::vec3 camPos = camera.GetPosition();
+		glm::vec3 camForward = camera.GetForward();
+		glm::vec3 camRight = camera.GetRight();
+
+		glm::vec3 reflectedPos = glm::vec3(camPos.x, 2.0f * data.yPos - camPos.y, camPos.z);
+		glm::vec3 reflectedForward = glm::vec3(camForward.x, -camForward.y, camForward.z);
+		glm::vec3 reflectedUp = glm::cross(camRight, reflectedForward);
+
+		glm::mat4 reflectedView = glm::lookAt(
+			reflectedPos,
+			reflectedPos + reflectedForward,
+			reflectedUp
+		);
+
+		m_ReflectionFramebuffer->BindBuffer();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		terrainShader.Use();
+		renderCallback(data.yPos, reflectedView);
+
+		m_ReflectionFramebuffer->UnbindBuffer();
+
+		glm::mat4 currentView = camera.GetViewMatrix();
+
+		waterShader.Use();
+		if (projection) waterShader.SetMat4("projection", *projection);
+		waterShader.SetMat4("view", currentView);
+
+		glm::mat4 newModel = glm::translate(glm::mat4(1.0f), data.position);
+		newModel = glm::scale(newModel, data.scale);
+		waterShader.SetMat4("model", newModel);
+		waterShader.SetFloat("yPos", data.yPos);
+		waterShader.SetInt("uTexture", 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_ReflectionFramebuffer->GetTextureID());
+
 		m_Renderer->Render();
 	}
 }
