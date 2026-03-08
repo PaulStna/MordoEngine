@@ -5,16 +5,16 @@
 
 GameScene::GameScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSystem> terrainSystem)
 	: m_Camera(camera),
-	  m_TerrainSystem(terrainSystem),
-	  m_CameraController(std::make_unique<GameCameraController>(m_Camera)),
-	  m_SkySystem(std::make_unique<SkySystem>()),
-	  m_LightSystem(std::make_unique<LightSystem>()),
-	  m_WaterSystem(std::make_unique<WaterSystem>()),
-	  m_TerrainShaderID("terrain"),
-	  m_CubeLightShaderID("lightCube"),
-	  m_SkyShaderID("skyBox"),
-	  m_SkyTextureID("skyBox"),
-	  m_WaterShaderID("water")
+	m_TerrainSystem(terrainSystem),
+	m_CameraController(std::make_unique<GameCameraController>(m_Camera)),
+	m_SkySystem(std::make_unique<SkySystem>()),
+	m_LightSystem(std::make_unique<LightSystem>()),
+	m_WaterSystem(std::make_unique<WaterSystem>()),
+	m_TerrainShaderID("terrain"),
+	m_CubeLightShaderID("lightCube"),
+	m_SkyShaderID("skyBox"),
+	m_SkyTextureID("skyBox"),
+	m_WaterShaderID("water")
 {
 	glm::vec3 centerTerrainPosition = m_TerrainSystem->GetMiddleTerrainPosition();
 	float yOffset = 0.2f;
@@ -71,22 +71,33 @@ void GameScene::Render()
 	Shader& waterShader = Manager<Shader>::Get(m_WaterShaderID);
 
 	glEnable(GL_CLIP_DISTANCE0);
+	m_WaterSystem->Render(
+		terrainShader, waterShader, *m_Camera, &projection, nullptr,
+		[&](float waterY, const glm::mat4* reflectedView) {
+			if (reflectedView) {
+				glm::vec3 reflectedCameraPos = m_Camera->GetPosition();
+				reflectedCameraPos.y = 2.0f * waterY - reflectedCameraPos.y;
+
+				terrainShader.SetVec4("plane", glm::vec4(0.0f, 1.0f, 0.0f, -waterY));
+				m_LightSystem->Render(terrainShader, cubeLightShader, reflectedCameraPos, &projection, reflectedView, &model);
+				m_TerrainSystem->Render(terrainShader, reflectedCameraPos, &projection, reflectedView, &model);
+				m_SkySystem->Render(skyShader, skyTexture, &projection, reflectedView, &model);
+			}
+			else {
+				terrainShader.SetVec4("plane", glm::vec4(0.0f, -1.0f, 0.0f, waterY));
+				m_LightSystem->Render(terrainShader, cubeLightShader, cameraPos, &projection, &view, &model);
+				m_TerrainSystem->Render(terrainShader, cameraPos, &projection, &view, &model);
+				m_SkySystem->Render(skyShader, skyTexture, &projection, &view, &model);
+			}
+
+		}
+	);
+
+	terrainShader.Use();
+	terrainShader.SetVec4("plane", glm::vec4(0.0f, 1.0f, 0.0f, 0));
 	m_LightSystem->Render(terrainShader, cubeLightShader, cameraPos, &projection, &view, &model);
 	m_TerrainSystem->Render(terrainShader, cameraPos, &projection, &view, &model);
 	m_SkySystem->Render(skyShader, skyTexture, &projection, &view, &model);
-
-	m_WaterSystem->Render(
-		terrainShader, waterShader, *m_Camera, &projection, nullptr,
-		[&](float waterY, const glm::mat4& reflectedView) {
-			glm::vec3 reflectedCameraPos = m_Camera->GetPosition();
-			reflectedCameraPos.y = 2.0f * waterY - reflectedCameraPos.y;
-			terrainShader.SetVec4("plane", glm::vec4(0.0f, 1.0f, 0.0f, -waterY));
-
-			m_LightSystem->Render(terrainShader, cubeLightShader, reflectedCameraPos, &projection, &reflectedView, &model);
-			m_TerrainSystem->Render(terrainShader, reflectedCameraPos, &projection, &reflectedView, &model);
-			m_SkySystem->Render(skyShader, skyTexture, &projection, &reflectedView, &model);
-		}
-	);
 }
 
 GameScene::~GameScene()

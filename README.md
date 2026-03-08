@@ -22,9 +22,11 @@ The codebase evolves over time as I learn new concepts, improve the architecture
 - perlin noise
 
 ## Project Status
-Terrain rendering, reflection water rendering test (without reflection/with reflection):
-![Reflection/Abovewater](imgs/2026-03-07-1.png)
-![Reflection/Underwater](imgs/2026-03-07-3.png)
+Water rendering test (water no-effect/water reflection/water refraction):
+![Water/NoEffect](imgs/2026-03-07-1.png)
+![Water/Reflection](imgs/2026-03-07-3.png)
+![Water/Refraction](imgs/2026-03-07-4.png)
+
 ## Notes
 This is an educational and personal project focused on learning and experimentation.  
 Expect refactors, breaking changes, and incremental improvements as the project matures.

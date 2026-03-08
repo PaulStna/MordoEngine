@@ -3,7 +3,8 @@
 
 WaterSystem::WaterSystem() :
 	m_Renderer(std::make_unique<PlaneRenderer>()),
-	m_ReflectionFramebuffer(std::make_unique<Framebuffer>())
+	m_ReflectionFramebuffer(std::make_unique<Framebuffer>()),
+	m_RefractionFramebuffer(std::make_unique<Framebuffer>())
 {
 
 }
@@ -21,34 +22,21 @@ void WaterSystem::Render(const Shader& terrainShader,
 	Camera& camera,
 	const glm::mat4* projection,
 	const glm::mat4* model,
-	std::function<void(float waterY, const glm::mat4& reflectedView)> renderCallback)
+	std::function<void(float waterY, const glm::mat4* reflectedView)> renderCallback)
 {
-	//Reflection
+
 	for (const WaterTile& waterTile : m_WaterTiles)
 	{
 		const WaterTileData& data = waterTile.GetData();
-		glm::vec3 camPos = camera.GetPosition();
-		glm::vec3 camForward = camera.GetForward();
-		glm::vec3 camRight = camera.GetRight();
-
-		glm::vec3 reflectedPos = glm::vec3(camPos.x, 2.0f * data.yPos - camPos.y, camPos.z);
-		glm::vec3 reflectedForward = glm::vec3(camForward.x, -camForward.y, camForward.z);
-		glm::vec3 reflectedUp = glm::cross(camRight, reflectedForward);
-
-		glm::mat4 reflectedView = glm::lookAt(
-			reflectedPos,
-			reflectedPos + reflectedForward,
-			reflectedUp
-		);
-
-		m_ReflectionFramebuffer->BindBuffer();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+		//Refraction
 		terrainShader.Use();
-		renderCallback(data.yPos, reflectedView);
+		RenderRefraction(data, renderCallback);
 
-		m_ReflectionFramebuffer->UnbindBuffer();
+		//Reflection
+		//RenderReflection(data, camera, renderCallback);
 
+
+		//Water Plane
 		glm::mat4 currentView = camera.GetViewMatrix();
 
 		waterShader.Use();
@@ -59,12 +47,52 @@ void WaterSystem::Render(const Shader& terrainShader,
 		newModel = glm::scale(newModel, data.scale);
 		waterShader.SetMat4("model", newModel);
 		waterShader.SetFloat("yPos", data.yPos);
-		waterShader.SetInt("uTexture", 0);
+
+		/*
+		waterShader.SetInt("uReflectionTexture", 0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m_ReflectionFramebuffer->GetTextureID());
+		*/
+
+		waterShader.SetInt("uRefractionTexture", 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_RefractionFramebuffer->GetTextureID());
 
 		m_Renderer->Render();
 	}
+}
+
+void WaterSystem::RenderRefraction(const WaterTileData& waterTile,
+	std::function<void(float waterY, const glm::mat4* reflectedView)> renderCallback)
+{
+	m_RefractionFramebuffer->BindBuffer();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	renderCallback(waterTile.yPos, nullptr);
+	m_RefractionFramebuffer->UnbindBuffer();
+}
+
+void WaterSystem::RenderReflection(const WaterTileData& waterTile,
+	Camera& camera,
+	std::function<void(float waterY, const glm::mat4* reflectedView)> renderCallback)
+{
+	glm::vec3 camPos = camera.GetPosition();
+	glm::vec3 camForward = camera.GetForward();
+	glm::vec3 camRight = camera.GetRight();
+
+	glm::vec3 reflectedPos = glm::vec3(camPos.x, 2.0f * waterTile.yPos - camPos.y, camPos.z);
+	glm::vec3 reflectedForward = glm::vec3(camForward.x, -camForward.y, camForward.z);
+	glm::vec3 reflectedUp = glm::cross(camRight, reflectedForward);
+
+	const glm::mat4 reflectedView = glm::lookAt(
+		reflectedPos,
+		reflectedPos + reflectedForward,
+		reflectedUp
+	);
+
+	m_ReflectionFramebuffer->BindBuffer();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	renderCallback(waterTile.yPos, &reflectedView);
+	m_ReflectionFramebuffer->UnbindBuffer();
 }
 
 void WaterSystem::AddWaterTile(const WaterTile waterTile)

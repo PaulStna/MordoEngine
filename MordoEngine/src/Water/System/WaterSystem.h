@@ -14,6 +14,7 @@ private:
 	std::vector<WaterTile> m_WaterTiles;
 	std::unique_ptr<PlaneRenderer> m_Renderer;
 	std::unique_ptr<Framebuffer> m_ReflectionFramebuffer;
+	std::unique_ptr<Framebuffer> m_RefractionFramebuffer;
 
 public:
 	WaterSystem();
@@ -23,7 +24,9 @@ public:
 		Camera& camera,
 		const glm::mat4* projection,
 		const glm::mat4* model,
-		std::function<void(float waterY, const glm::mat4& reflectedView)> renderCallback);
+		std::function<void(float waterY, const glm::mat4* reflectedView)> renderCallback);
+	void RenderReflection(const WaterTileData& waterTile, Camera& camera, std::function<void(float waterY, const glm::mat4* reflectedView)> renderCallback);
+	void RenderRefraction(const WaterTileData& waterTile, std::function<void(float waterY, const glm::mat4* reflectedView)> renderCallback);
 	void AddWaterTile(const WaterTile waterTile);
 	void AddWaterTile(const glm::vec3 position, const glm::vec3 scale, const float yPos);
 	~WaterSystem() = default;

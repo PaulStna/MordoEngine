@@ -138,7 +138,8 @@
 - Added PlaneRenderer to render a fullscreen quad for post-processing effects
 
 ## 2026-03-07
-- Implemented a WaterSystem to manage water rendering and related functionality (Refraction using framebuffers not implemented yet)
-- Implemented water reflection rendering using a framebuffer and clipping planes to render the scene from the water's perspective
-- Added water vertex and fragment shaders for basic water rendering 
-- Implemented clipping planes in terrain shader for water reflection and refraction rendering (not fully implemented yet)
+- Implemented a WaterSystem to manage water rendering and related functionality 
+- Implemented water reflection rendering using a framebuffer and clipping planes to render the scene from the water's perspective in WaterSystem
+- Implemented water refraction rendering using a framebuffer and clipping planes to render the scene from below the water's perspective in WaterSystem
+- Added water vertex and fragment shaders for plane water rendering 
+- Implemented clipping planes in terrain shader for water reflection and refraction rendering
