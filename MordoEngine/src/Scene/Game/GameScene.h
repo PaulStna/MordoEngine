@@ -22,6 +22,7 @@ private:
 	std::string m_SkyShaderID;
 	std::string m_SkyTextureID;
 	std::string m_WaterShaderID;
+	std::string m_WaterDuDvMapID;
 
 public:
 	GameScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSystem> terrainSystem);

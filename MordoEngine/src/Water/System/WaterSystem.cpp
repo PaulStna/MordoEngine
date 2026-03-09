@@ -19,6 +19,7 @@ void WaterSystem::Update(float deltaTime)
 
 void WaterSystem::Render(
 	const Shader& waterShader,
+	const Texture& waterDuDvMapTexture,
 	Camera& camera,
 	const glm::mat4* projection,
 	const glm::mat4* model,
@@ -47,6 +48,9 @@ void WaterSystem::Render(
 		waterShader.SetMat4("model", newModel);
 		waterShader.SetFloat("yPos", data.yPos);
 
+		waterShader.SetFloat("waveStrength", data.waveStrength);
+		waterShader.SetFloat("moveFactor", data.moveFactor);
+
 		waterShader.SetInt("reflectionTexture", 0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m_ReflectionFramebuffer->GetTextureID());
@@ -54,6 +58,10 @@ void WaterSystem::Render(
 		waterShader.SetInt("refractionTexture", 1);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, m_RefractionFramebuffer->GetTextureID());
+
+		waterShader.SetInt("dudvMap", 2);
+		glActiveTexture(GL_TEXTURE2);
+		waterDuDvMapTexture.Use();
 
 		m_Renderer->Render();
 	}
@@ -64,7 +72,7 @@ void WaterSystem::RenderRefraction(const WaterTileData& waterTile,
 {
 	m_RefractionFramebuffer->BindBuffer();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	renderCallback(waterTile.yPos, nullptr);
+	renderCallback(waterTile.yPos + offSet, nullptr);
 	m_RefractionFramebuffer->UnbindBuffer();
 }
 
@@ -88,7 +96,7 @@ void WaterSystem::RenderReflection(const WaterTileData& waterTile,
 
 	m_ReflectionFramebuffer->BindBuffer();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	renderCallback(waterTile.yPos, &reflectedView);
+	renderCallback(waterTile.yPos + offSet, &reflectedView);
 	m_ReflectionFramebuffer->UnbindBuffer();
 }
 

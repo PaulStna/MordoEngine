@@ -22,8 +22,8 @@ The codebase evolves over time as I learn new concepts, improve the architecture
 - perlin noise
 
 ## Project Status
-Water rendering test (water reflection and refraction) (quality should be improved in the future):
-![Water/ReflectionAndRefraction](imgs/2026-03-08.png)
+Water rendering test (water reflection and refraction with distortion) (quality should be improved in the future):
+![Water/ReflectionAndRefractionDistortion](imgs/2026-03-08-2.png)
 
 ## Notes
 This is an educational and personal project focused on learning and experimentation.  

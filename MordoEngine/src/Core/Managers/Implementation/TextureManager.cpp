@@ -20,6 +20,7 @@ void Manager<Texture>::Init() {
 	resources.emplace("dirt", Texture(FileSystem::getPath("res/textures/dirt_mid.jpg")));
 	resources.emplace("rock", Texture(FileSystem::getPath("res/textures/rock_high.png")));
 	resources.emplace("skyBox", Texture(FileSystem::getPath("res/textures/cubemap/"), cubeMapFaces));
+    resources.emplace("dudvMap", Texture(FileSystem::getPath("res/textures/water/dudvMap.png")));
 }
 
 template class Manager<Texture>;

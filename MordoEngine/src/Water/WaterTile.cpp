@@ -9,5 +9,7 @@ WaterTile::WaterTile(const glm::vec3 position, const glm::vec3 scale, const floa
 
 void WaterTile::Update(float deltaTime)
 {
-	//
+	m_Data.moveFactor += 0.03f * deltaTime;
+	if (m_Data.moveFactor >= 1.0f)
+		m_Data.moveFactor -= 1.0f;  
 }

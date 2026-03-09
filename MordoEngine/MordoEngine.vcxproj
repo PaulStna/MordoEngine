@@ -227,10 +227,17 @@
     <None Include="res\shaders\water.vs" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\textures\cubemap\back.tga" />
+    <Image Include="res\textures\cubemap\bottom.tga" />
+    <Image Include="res\textures\cubemap\front.tga" />
+    <Image Include="res\textures\cubemap\left.tga" />
+    <Image Include="res\textures\cubemap\right.tga" />
+    <Image Include="res\textures\cubemap\top.tga" />
     <Image Include="res\textures\dirt_mid.jpg" />
     <Image Include="res\textures\dirt_mid.png" />
     <Image Include="res\textures\grass_low.png" />
     <Image Include="res\textures\rock_high.png" />
+    <Image Include="res\textures\water\dudvMap.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

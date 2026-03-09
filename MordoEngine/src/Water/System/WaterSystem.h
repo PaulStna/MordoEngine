@@ -1,6 +1,7 @@
 #pragma once
 #include "../WaterTile.h"
 #include "../../Core/Shader/Shader.h"
+#include "../../Core/Texture/Texture.h"
 #include "../../Renderer/Plane/PlaneRenderer.h"
 #include "../../Renderer/Framebuffer/Framebuffer.h"
 #include "../../Camera/Camera.h"
@@ -15,12 +16,14 @@ private:
 	std::unique_ptr<PlaneRenderer> m_Renderer;
 	std::unique_ptr<Framebuffer> m_ReflectionFramebuffer;
 	std::unique_ptr<Framebuffer> m_RefractionFramebuffer;
+	float offSet = 10.f;
 
 public:
 	WaterSystem();
 	void Update(float deltaTime);
 	void Render(
 		const Shader& waterShader,
+		const Texture& waterDuDvMapTexture,
 		Camera& camera,
 		const glm::mat4* projection,
 		const glm::mat4* model,

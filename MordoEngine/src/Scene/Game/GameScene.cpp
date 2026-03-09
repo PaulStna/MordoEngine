@@ -14,7 +14,8 @@ GameScene::GameScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSyst
 	m_CubeLightShaderID("lightCube"),
 	m_SkyShaderID("skyBox"),
 	m_SkyTextureID("skyBox"),
-	m_WaterShaderID("water")
+	m_WaterShaderID("water"),
+	m_WaterDuDvMapID("dudvMap")
 {
 	glm::vec3 centerTerrainPosition = m_TerrainSystem->GetMiddleTerrainPosition();
 	float yOffset = 0.2f;
@@ -69,10 +70,11 @@ void GameScene::Render()
 	Shader& skyShader = Manager<Shader>::Get(m_SkyShaderID);
 	Texture& skyTexture = Manager<Texture>::Get(m_SkyTextureID);
 	Shader& waterShader = Manager<Shader>::Get(m_WaterShaderID);
+	Texture& waterDuDvMap = Manager<Texture>::Get(m_WaterDuDvMapID);
 
 	glEnable(GL_CLIP_DISTANCE0);
 	m_WaterSystem->Render(
-		waterShader, *m_Camera, &projection, nullptr,
+		waterShader, waterDuDvMap, *m_Camera, &projection, nullptr,
 		[&](float waterY, const glm::mat4* reflectedView) {
 			terrainShader.Use();
 
