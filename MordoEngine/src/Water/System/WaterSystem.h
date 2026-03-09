@@ -19,7 +19,7 @@ private:
 public:
 	WaterSystem();
 	void Update(float deltaTime);
-	void Render(const Shader& terrainShader,
+	void Render(
 		const Shader& waterShader,
 		Camera& camera,
 		const glm::mat4* projection,

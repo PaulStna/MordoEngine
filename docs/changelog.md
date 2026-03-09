@@ -143,3 +143,7 @@
 - Implemented water refraction rendering using a framebuffer and clipping planes to render the scene from below the water's perspective in WaterSystem
 - Added water vertex and fragment shaders for plane water rendering 
 - Implemented clipping planes in terrain shader for water reflection and refraction rendering
+
+## 2026-03-08
+- Implemented refraction and reflection texture blending in the water shader for realistic water surface rendering
+- WaterSystem now handle the reflection and refraction water rendering 

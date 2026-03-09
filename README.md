@@ -22,10 +22,8 @@ The codebase evolves over time as I learn new concepts, improve the architecture
 - perlin noise
 
 ## Project Status
-Water rendering test (water no-effect/water reflection/water refraction):
-![Water/NoEffect](imgs/2026-03-07-1.png)
-![Water/Reflection](imgs/2026-03-07-3.png)
-![Water/Refraction](imgs/2026-03-07-4.png)
+Water rendering test (water reflection and refraction) (quality should be improved in the future):
+![Water/ReflectionAndRefraction](imgs/2026-03-08.png)
 
 ## Notes
 This is an educational and personal project focused on learning and experimentation.  

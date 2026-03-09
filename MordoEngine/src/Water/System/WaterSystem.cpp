@@ -17,7 +17,7 @@ void WaterSystem::Update(float deltaTime)
 	}
 }
 
-void WaterSystem::Render(const Shader& terrainShader,
+void WaterSystem::Render(
 	const Shader& waterShader,
 	Camera& camera,
 	const glm::mat4* projection,
@@ -28,13 +28,12 @@ void WaterSystem::Render(const Shader& terrainShader,
 	for (const WaterTile& waterTile : m_WaterTiles)
 	{
 		const WaterTileData& data = waterTile.GetData();
-		//Refraction
-		terrainShader.Use();
-		RenderRefraction(data, renderCallback);
 
 		//Reflection
-		//RenderReflection(data, camera, renderCallback);
+		RenderReflection(data, camera, renderCallback);
 
+		//Refraction
+		RenderRefraction(data, renderCallback);
 
 		//Water Plane
 		glm::mat4 currentView = camera.GetViewMatrix();
@@ -48,14 +47,12 @@ void WaterSystem::Render(const Shader& terrainShader,
 		waterShader.SetMat4("model", newModel);
 		waterShader.SetFloat("yPos", data.yPos);
 
-		/*
-		waterShader.SetInt("uReflectionTexture", 0);
+		waterShader.SetInt("reflectionTexture", 0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m_ReflectionFramebuffer->GetTextureID());
-		*/
-
-		waterShader.SetInt("uRefractionTexture", 0);
-		glActiveTexture(GL_TEXTURE0);
+		
+		waterShader.SetInt("refractionTexture", 1);
+		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, m_RefractionFramebuffer->GetTextureID());
 
 		m_Renderer->Render();

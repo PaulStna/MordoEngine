@@ -72,12 +72,13 @@ void GameScene::Render()
 
 	glEnable(GL_CLIP_DISTANCE0);
 	m_WaterSystem->Render(
-		terrainShader, waterShader, *m_Camera, &projection, nullptr,
+		waterShader, *m_Camera, &projection, nullptr,
 		[&](float waterY, const glm::mat4* reflectedView) {
+			terrainShader.Use();
+
 			if (reflectedView) {
 				glm::vec3 reflectedCameraPos = m_Camera->GetPosition();
 				reflectedCameraPos.y = 2.0f * waterY - reflectedCameraPos.y;
-
 				terrainShader.SetVec4("plane", glm::vec4(0.0f, 1.0f, 0.0f, -waterY));
 				m_LightSystem->Render(terrainShader, cubeLightShader, reflectedCameraPos, &projection, reflectedView, &model);
 				m_TerrainSystem->Render(terrainShader, reflectedCameraPos, &projection, reflectedView, &model);
