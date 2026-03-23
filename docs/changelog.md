@@ -149,3 +149,6 @@
 - WaterSystem now handle the reflection and refraction water rendering 
 - Added dudv map texture for animated water surface distortion in the water shader
 - Updated water shader to use the dudv map for animated water surface and some distortions
+
+## 2026-03-22
+- Added fesnel reflectance calculation to the water shader for more realistic water reflections based on view angle

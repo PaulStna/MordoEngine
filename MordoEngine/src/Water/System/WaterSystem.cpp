@@ -50,6 +50,7 @@ void WaterSystem::Render(
 
 		waterShader.SetFloat("waveStrength", data.waveStrength);
 		waterShader.SetFloat("moveFactor", data.moveFactor);
+		waterShader.SetVec3("cameraPosition", camera.GetPosition());
 
 		waterShader.SetInt("reflectionTexture", 0);
 		glActiveTexture(GL_TEXTURE0);

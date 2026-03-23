@@ -7,9 +7,11 @@ uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
 uniform float yPos;
+uniform vec3 cameraPosition;
 
 out vec4 ClipSpace;
 out vec2 TextureCoords;
+out vec3 CameraVector;
 
 const float TEXTURE_SCALE = 6.0;
 
@@ -19,4 +21,5 @@ void main()
     ClipSpace = projection * view * worldPos;
     gl_Position = ClipSpace;
     TextureCoords = vec2(a_Pos.x * 0.5 + 0.5, a_Pos.y * 0.5 + 0.5) * TEXTURE_SCALE;
+    CameraVector = cameraPosition - worldPos.xyz;
 }

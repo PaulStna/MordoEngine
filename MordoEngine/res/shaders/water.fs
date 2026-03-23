@@ -2,6 +2,7 @@
 
 in vec4 ClipSpace;
 in vec2 TextureCoords;
+in vec3 CameraVector;
 
 uniform sampler2D reflectionTexture;
 uniform sampler2D refractionTexture;
@@ -12,6 +13,7 @@ uniform float moveFactor;
 out vec4 FragColor;
 
 const vec4 BLUE_TINT = vec4(0.0, 0.3, 0.5, 1.0);
+const float REFRACTIVE_STRENGHT_FACTOR = 2.0;
 
 void main()
 {
@@ -35,6 +37,10 @@ void main()
     vec4 reflectColor = texture(reflectionTexture, reflectCoords);
     vec4 refractColor = texture(refractionTexture, refractCoords);
 
-    FragColor = mix(reflectColor, refractColor, 0.5);
+    vec3 normalizedViewVector = normalize(CameraVector);
+    float refractiveFactor = dot(normalizedViewVector, vec3(0.0, 1.0, 0.0));
+    refractiveFactor = pow(refractiveFactor, REFRACTIVE_STRENGHT_FACTOR);
+
+    FragColor = mix(reflectColor, refractColor, refractiveFactor);
     FragColor = mix(FragColor, BLUE_TINT, 0.2);
 }
