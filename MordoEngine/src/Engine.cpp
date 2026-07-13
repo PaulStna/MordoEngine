@@ -4,8 +4,8 @@
 #include "Core/Managers/Manager.h"
 #include "Core/Texture/Texture.h"
 #include "Core/Shader/Shader.h"
+#include "Core/EngineContext.h"
 #include "Scene/SceneManager.h"
-#include <memory>
 
 void Engine::Run()
 {
@@ -13,37 +13,31 @@ void Engine::Run()
 	Input::Init(OpenGLBackend::GetGLFWwindow());
 	Manager<Texture>::Init();
 	Manager<Shader>::Init();
-	std::unique_ptr<SceneManager> sceneManager = std::make_unique<SceneManager>();
 
-	float lastTime = 0.0f;
-	while (!OpenGLBackend::WindowShouldClose())
 	{
-		static bool drawModeInLines = false;
-		float currentTime = glfwGetTime();
-		float deltaTime = currentTime - lastTime;
-		lastTime = currentTime;
+		EngineContext context(OpenGLBackend::SCR_WIDTH, OpenGLBackend::SCR_HEIGHT);
+		SceneManager  sceneManager(context);
 
-		OpenGLBackend::Update();
+		float lastTime = 0.0f;
+		while (!OpenGLBackend::WindowShouldClose())
+		{
+			static bool drawModeInLines = false;
+			float currentTime = glfwGetTime();
+			float deltaTime = currentTime - lastTime;
+			lastTime = currentTime;
 
-		Input::Update();
-		if (Input::KeyPressed(GLFW_KEY_ESCAPE)) {
-			OpenGLBackend::CloseWindow();
+			OpenGLBackend::Update();
+
+			Input::Update();
+			if (Input::KeyPressed(GLFW_KEY_ESCAPE)) OpenGLBackend::CloseWindow();
+			if (Input::KeyPressed(GLFW_KEY_SPACE))  drawModeInLines = !drawModeInLines;
+
+			glPolygonMode(GL_FRONT_AND_BACK, drawModeInLines ? GL_LINE : GL_FILL);
+
+			sceneManager.Update(deltaTime);
+			sceneManager.Render();
+			OpenGLBackend::SwapBuffers();
 		}
-
-		if (Input::KeyPressed(GLFW_KEY_SPACE)) {
-			drawModeInLines = !drawModeInLines;
-		}
-
-		if (drawModeInLines) {
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		}
-		else {
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		}
-
-		sceneManager->Update(deltaTime);
-		sceneManager->Render();
-		OpenGLBackend::SwapBuffers();
 	}
 
 	Manager<Texture>::Clear();

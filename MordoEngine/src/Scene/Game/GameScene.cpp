@@ -1,109 +1,31 @@
 #include "GameScene.h"
-#include "../../Core/Managers/Manager.h"
-#include "../../Core/Shader/Shader.h"
-#include "../../Input/Input.h"
 
-GameScene::GameScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSystem> terrainSystem)
-	: m_Camera(camera),
-	m_TerrainSystem(terrainSystem),
-	m_CameraController(std::make_unique<GameCameraController>(m_Camera)),
-	m_SkySystem(std::make_unique<SkySystem>()),
-	m_LightSystem(std::make_unique<LightSystem>()),
-	m_WaterSystem(std::make_unique<WaterSystem>()),
-	m_TerrainShaderID("terrain"),
-	m_CubeLightShaderID("lightCube"),
-	m_SkyShaderID("skyBox"),
-	m_SkyTextureID("skyBox"),
-	m_WaterShaderID("water"),
-	m_WaterDuDvMapID("dudvMap")
+GameScene::GameScene(EngineContext& ctx)
+    : m_Ctx(ctx),
+    m_CameraController(std::make_unique<GameCameraController>(ctx.GetWorld().GetCamera()))
 {
-	glm::vec3 centerTerrainPosition = m_TerrainSystem->GetMiddleTerrainPosition();
-	float yOffset = 0.2f;
-	float scale = m_TerrainSystem->GetTerrainWorldScale();
-
-	auto AddLight = [&](float offsetX, float offsetZ)
-		{
-			float x = centerTerrainPosition.x + offsetX * scale;
-			float z = centerTerrainPosition.z + offsetZ * scale;
-			float y = m_TerrainSystem->GetTerrainInterpolatedHeightAt(x, z, yOffset);
-			m_LightSystem->AddPointLight(PointLight(glm::vec3(x, y, z)));
-		};
-
-	//AddLight(0.0f, 0.0f);
-	AddLight(50.0f, 50.0f);
-	AddLight(-100.0f, -100.0f);
-	//AddLight(-100.0f, -100.0f);
-
-	float waterLevel = m_TerrainSystem->GetTerrainHeightScale() * 0.3;
-	m_WaterSystem->AddWaterTile(
-		glm::vec3(
-			centerTerrainPosition.x,
-			0.0f,
-			centerTerrainPosition.z
-		)
-		, glm::vec3(700.0f, 1.0f, 700.0f), waterLevel);
 }
 
 void GameScene::OnEntry()
 {
-	m_CameraController->TouchTerrain(*m_TerrainSystem);
+    m_CameraController->TouchTerrain(m_Ctx.GetWorld().GetTerrain());
 }
 
 void GameScene::Update(float deltaTime)
 {
-	float velocity = 100.0f * m_TerrainSystem->GetTerrainWorldScale() * deltaTime;
-	m_CameraController->Update(deltaTime, velocity, *m_TerrainSystem);
-	m_LightSystem->Update(deltaTime);
-	m_SkySystem->Update(deltaTime);
-	m_WaterSystem->Update(deltaTime);
+    World& world = m_Ctx.GetWorld();
+    float velocity = 100.0f * world.GetTerrain().GetTerrainWorldScale() * deltaTime;
+    m_CameraController->Update(deltaTime, velocity, world.GetTerrain());
+    world.Update(deltaTime);
 }
 
 void GameScene::Render()
 {
-	glm::mat4 projection = m_Camera->GetProjectionMatrix();
-	glm::mat4 view = m_Camera->GetViewMatrix();
-	glm::mat4 model = glm::mat4(1.0f);
-	glm::vec3 cameraPos = m_Camera->GetPosition();
-
-	Shader& terrainShader = Manager<Shader>::Get(m_TerrainShaderID);
-	Shader& cubeLightShader = Manager<Shader>::Get(m_CubeLightShaderID);
-	Shader& skyShader = Manager<Shader>::Get(m_SkyShaderID);
-	Texture& skyTexture = Manager<Texture>::Get(m_SkyTextureID);
-	Shader& waterShader = Manager<Shader>::Get(m_WaterShaderID);
-	Texture& waterDuDvMap = Manager<Texture>::Get(m_WaterDuDvMapID);
-
-	glEnable(GL_CLIP_DISTANCE0);
-	m_WaterSystem->Render(
-		waterShader, waterDuDvMap, *m_Camera, &projection, nullptr,
-		[&](float waterY, const glm::mat4* reflectedView) {
-			terrainShader.Use();
-
-			if (reflectedView) {
-				glm::vec3 reflectedCameraPos = m_Camera->GetPosition();
-				reflectedCameraPos.y = 2.0f * waterY - reflectedCameraPos.y;
-				terrainShader.SetVec4("plane", glm::vec4(0.0f, 1.0f, 0.0f, -waterY));
-				m_LightSystem->Render(terrainShader, cubeLightShader, reflectedCameraPos, &projection, reflectedView, &model);
-				m_TerrainSystem->Render(terrainShader, reflectedCameraPos, &projection, reflectedView, &model);
-				m_SkySystem->Render(skyShader, skyTexture, &projection, reflectedView, &model);
-			}
-			else {
-				terrainShader.SetVec4("plane", glm::vec4(0.0f, -1.0f, 0.0f, waterY));
-				m_LightSystem->Render(terrainShader, cubeLightShader, cameraPos, &projection, &view, &model);
-				m_TerrainSystem->Render(terrainShader, cameraPos, &projection, &view, &model);
-				m_SkySystem->Render(skyShader, skyTexture, &projection, &view, &model);
-			}
-
-		}
-	);
-
-	terrainShader.Use();
-	terrainShader.SetVec4("plane", glm::vec4(0.0f, 1.0f, 0.0f, 0));
-	m_LightSystem->Render(terrainShader, cubeLightShader, cameraPos, &projection, &view, &model);
-	m_TerrainSystem->Render(terrainShader, cameraPos, &projection, &view, &model);
-	m_SkySystem->Render(skyShader, skyTexture, &projection, &view, &model);
+    World& world = m_Ctx.GetWorld();
+    RenderContext ctx = world.MakeRenderContext();
+    world.Render(ctx);
 }
 
 GameScene::~GameScene()
 {
-
 }

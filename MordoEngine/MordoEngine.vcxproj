@@ -170,11 +170,13 @@
     <ClCompile Include="src\Terrain\System\TerrainSystem.cpp" />
     <ClCompile Include="src\Water\System\WaterSystem.cpp" />
     <ClCompile Include="src\Water\WaterTile.cpp" />
+    <ClCompile Include="src\World\World.cpp" />
     <ClCompile Include="vendor\glad\src\glad.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\API\OpenGL\OpenGLBackend.h" />
     <ClInclude Include="src\Camera\Camera.h" />
+    <ClInclude Include="src\Core\EngineContext.h" />
     <ClInclude Include="src\Core\FileSystem\FileSystem.h" />
     <ClInclude Include="src\Core\Managers\Manager.h" />
     <ClInclude Include="src\Core\Shader\Shader.h" />
@@ -192,6 +194,7 @@
     <ClInclude Include="src\Renderer\Cube\CubePointLightRenderer.h" />
     <ClInclude Include="src\Renderer\LodManager.h" />
     <ClInclude Include="src\Renderer\Plane\PlaneRenderer.h" />
+    <ClInclude Include="src\Renderer\RenderContext.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\Renderer\Skybox\SkyBoxRenderer.h" />
     <ClInclude Include="src\Renderer\TriangleRenderer.h" />
@@ -212,6 +215,7 @@
     <ClInclude Include="src\Water\System\WaterSystem.h" />
     <ClInclude Include="src\Water\WaterTileData.h" />
     <ClInclude Include="src\Water\WaterTile.h" />
+    <ClInclude Include="src\World\World.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\maps\heightmap.raw" />
@@ -238,6 +242,7 @@
     <Image Include="res\textures\grass_low.png" />
     <Image Include="res\textures\rock_high.png" />
     <Image Include="res\textures\water\dudvMap.png" />
+    <Image Include="res\textures\water\normalMap.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

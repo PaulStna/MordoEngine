@@ -123,6 +123,9 @@
     <ClCompile Include="src\Water\System\WaterSystem.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="src\World\World.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\API\OpenGL\OpenGLBackend.h">
@@ -242,6 +245,15 @@
     <ClInclude Include="src\Water\System\WaterSystem.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="src\Renderer\RenderContext.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="src\World\World.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\EngineContext.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\terrain.vs" />
@@ -278,5 +290,8 @@
     <Image Include="res\textures\cubemap\front.tga" />
     <Image Include="res\textures\cubemap\bottom.tga" />
     <Image Include="res\textures\cubemap\back.tga" />
+    <Image Include="res\textures\water\normalMap.png">
+      <Filter>Archivos de recursos</Filter>
+    </Image>
   </ItemGroup>
 </Project>

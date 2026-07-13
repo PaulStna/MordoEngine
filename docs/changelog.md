@@ -152,3 +152,12 @@
 
 ## 2026-03-22
 - Added fesnel reflectance calculation to the water shader for more realistic water reflections based on view angle
+
+## 2026-07-13
+(Long time, huh?)
+- Encapsulated all matrix (mat4) and vector (vec3) data required for rendering into a single RenderContext structure, reducing the number of parameters passed to renderers.
+- Created a World class to manage all data shared between scenes, including the RenderContext and engine systems such as terrain, lighting, sky, and water.
+- Added an EngineContext class that owns the World and serves as the foundation for future global resources and input systems.
+- Refactored GameCameraController and EditorCameraController to access the Camera through the RenderContext instead of holding weak_ptr references.
+- Cleaned up GameScene and EditorScene to use the new World and EngineContext classes, eliminating the need for shared_ptr references to Terrain, LightSystem, SkySystem, WaterSystem, and other shared systems.
+- Reorganized the Engine initialization and shutdown flow with explicit handling of the EngineContext, SceneManager, and the main loop, ensuring proper cleanup of scene resources (FBOs, VAOs, etc.) and preventing memory leaks.

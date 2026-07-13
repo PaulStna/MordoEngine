@@ -1,33 +1,19 @@
 #pragma once
 #include "../Scene.h"
-#include "../../Camera/Camera.h"
+#include "../../Core/EngineContext.h"
 #include "./Controllers/GameCameraController.h"
-#include "../../Lighting/LightSystem.h"
-#include "../../Terrain/System/TerrainSystem.h"
-#include "../../Water/System/WaterSystem.h"
-#include "../../Sky/System/SkySystem.h"
 #include <memory>
 
 class GameScene : public Scene
 {
 private:
-	std::shared_ptr<Camera> m_Camera;
-	std::shared_ptr<TerrainSystem> m_TerrainSystem;
-	std::unique_ptr<GameCameraController> m_CameraController;
-	std::unique_ptr<SkySystem> m_SkySystem;
-	std::unique_ptr<LightSystem> m_LightSystem;
-	std::unique_ptr<WaterSystem> m_WaterSystem;
-	std::string m_TerrainShaderID;
-	std::string m_CubeLightShaderID;
-	std::string m_SkyShaderID;
-	std::string m_SkyTextureID;
-	std::string m_WaterShaderID;
-	std::string m_WaterDuDvMapID;
+    EngineContext& m_Ctx;
+    std::unique_ptr<GameCameraController> m_CameraController;
 
 public:
-	GameScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSystem> terrainSystem);
-	void Render() override;
-	void Update(float deltaTime) override;
-	void OnEntry() override;
-	~GameScene() override;
+    GameScene(EngineContext& ctx);
+    void Render() override;
+    void Update(float deltaTime) override;
+    void OnEntry() override;
+    ~GameScene() override;
 };

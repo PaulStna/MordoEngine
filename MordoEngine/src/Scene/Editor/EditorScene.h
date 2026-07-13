@@ -1,27 +1,23 @@
 #pragma once
-#include "./Controllers/EditorCameraController.h"
-#include "./System/EditorSystem.h"
 #include "../Scene.h"
-#include "../../Camera/Camera.h"
+#include "../../Core/EngineContext.h"
+#include "./Controllers/EditorCameraController.h"
 #include "./Controllers/EditorInputHandlerController.h"
-#include "../../Terrain/System/TerrainSystem.h"
+#include "./System/EditorSystem.h"
 #include <memory>
 
 class EditorScene : public Scene
 {
 private:
-	std::shared_ptr<Camera> m_Camera;
-	std::shared_ptr<TerrainSystem> m_TerrainSystem;
+	EngineContext& m_Ctx;
 	std::unique_ptr<EditorCameraController> m_CameraController;
 	std::unique_ptr<EditorSystem> m_EditorSystem;
 	std::unique_ptr<EditorInputHandlerController> m_EditorInputController;
 
 public:
-	EditorScene(std::shared_ptr<Camera> camera, std::shared_ptr<TerrainSystem> terrainSystem);
+	EditorScene(EngineContext& ctx);
 	void Render() override;
 	void Update(float deltaTime) override;
-	void OnEntry() override {
-		//
-	}
+	void OnEntry() override {}
 	~EditorScene() override;
 };
