@@ -36,19 +36,10 @@
     <ClCompile Include="src\Core\Texture\Texture.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Managers\Implementation\TextureManager.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Managers\Implementation\ShaderManager.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
     <ClCompile Include="src\Camera\Camera.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="src\Terrain\Terrain.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Renderer\TriangleRenderer.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene\Game\GameScene.cpp">
@@ -126,6 +117,9 @@
     <ClCompile Include="src\World\World.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Resources\ResourceLoader.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\API\OpenGL\OpenGLBackend.h">
@@ -146,16 +140,10 @@
     <ClInclude Include="src\Core\FileSystem\FileSystem.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Managers\Manager.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="src\Camera\Camera.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="src\Terrain\Terrain.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Renderer\TriangleRenderer.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\Renderer.h">
@@ -252,6 +240,12 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\EngineContext.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Resources\ResourceLibrary.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Resources\ResourceLoader.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

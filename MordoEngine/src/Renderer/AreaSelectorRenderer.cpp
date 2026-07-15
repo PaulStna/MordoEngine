@@ -1,5 +1,4 @@
 #include "AreaSelectorRenderer.h"
-#include "../Core/Managers/Manager.h"
 #include "../Core/Shader/Shader.h"
 #include <iostream>
 

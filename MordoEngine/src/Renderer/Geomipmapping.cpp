@@ -1,6 +1,5 @@
 #include "Geomipmapping.h"
 #include "../Core/Texture/Texture.h"
-#include "../Core/Managers/Manager.h"
 #include "../Lighting/PointLight/PointLightData.h"
 
 #define ENABLE_TERRAIN_DEBUG 1 
@@ -307,26 +306,7 @@ void Geomipmapping::Render(const glm::vec3& cameraPos,
 	const glm::mat4* projection,
 	const glm::mat4* model)
 {
-	//Renderer::Render(view, projection, model);
 	m_LodManager.Update(cameraPos);
-	/*
-	p_Shader.SetInt("texture1", 0);
-	glActiveTexture(GL_TEXTURE0);
-	Manager<Texture>::Get(m_Texture1ID).Use();
-
-	p_Shader.SetInt("texture2", 1);
-	glActiveTexture(GL_TEXTURE1);
-	Manager<Texture>::Get(m_Texture2ID).Use();
-
-	p_Shader.SetInt("texture3", 2);
-	glActiveTexture(GL_TEXTURE2);
-	Manager<Texture>::Get(m_Texture3ID).Use();
-
-	p_Shader.SetFloat("textureScale", m_TextureScale);
-	p_Shader.SetFloat("heightThreshold1", m_HeightThreshold1);
-	p_Shader.SetFloat("heightThreshold2", m_HeightThreshold2);
-	*/
-
 	glBindVertexArray(m_Vao);
 
 	for (int patchZ = 0; patchZ < m_NumPatchesZ; patchZ++) {

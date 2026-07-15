@@ -161,3 +161,8 @@
 - Refactored GameCameraController and EditorCameraController to access the Camera through the RenderContext instead of holding weak_ptr references.
 - Cleaned up GameScene and EditorScene to use the new World and EngineContext classes, eliminating the need for shared_ptr references to Terrain, LightSystem, SkySystem, WaterSystem, and other shared systems.
 - Reorganized the Engine initialization and shutdown flow with explicit handling of the EngineContext, SceneManager, and the main loop, ensuring proper cleanup of scene resources (FBOs, VAOs, etc.) and preventing memory leaks.
+
+## 2026-07-15
+- Removed the old Manager classes and introduced a generic ResourceLibrary<T> template to handle resource management (textures, shaders, etc.) in a more reusable and extensible way.
+- Updated EngineContext to own a ResourceLibrary instance for each resource type, centralizing resource storage and providing shared access across the engine.
+- Refactored the engine's resource loading and access flow to fully adopt the new ResourceLibrary system, removing dependencies on the previous Manager-based architecture.
