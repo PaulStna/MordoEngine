@@ -225,6 +225,8 @@
     <None Include="res\shaders\terrain.vs" />
     <None Include="res\shaders\terrainSelector.fs" />
     <None Include="res\shaders\terrainSelector.vs" />
+    <None Include="res\shaders\underwater.fs" />
+    <None Include="res\shaders\underwater.vs" />
     <None Include="res\shaders\water.fs" />
     <None Include="res\shaders\water.vs" />
   </ItemGroup>

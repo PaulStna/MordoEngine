@@ -21,13 +21,18 @@ private:
 public:
 	WaterSystem();
 	void Update(float deltaTime);
-	void Render(
+	// Captures the reflection/refraction textures into the framebuffers.
+	// Must run before the main opaque scene is drawn.
+	void CaptureReflectionRefraction(
+		Camera& camera,
+		std::function<void(float waterY, const glm::mat4* reflectedView)> renderCallback);
+	// Draws the water surface plane(s). Must run after the opaque scene so it can
+	// blend over the terrain when the camera is submerged.
+	void RenderSurface(
 		const Shader& waterShader,
 		const Texture& waterDuDvMapTexture,
 		Camera& camera,
-		const glm::mat4* projection,
-		const glm::mat4* model,
-		std::function<void(float waterY, const glm::mat4* reflectedView)> renderCallback);
+		const glm::mat4* projection);
 	void RenderReflection(const WaterTileData& waterTile, Camera& camera, std::function<void(float waterY, const glm::mat4* reflectedView)> renderCallback);
 	void RenderRefraction(const WaterTileData& waterTile, std::function<void(float waterY, const glm::mat4* reflectedView)> renderCallback);
 	void AddWaterTile(const WaterTile waterTile);

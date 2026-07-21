@@ -17,14 +17,12 @@ void WaterSystem::Update(float deltaTime)
 	}
 }
 
-void WaterSystem::Render(
-	const Shader& waterShader,
-	const Texture& waterDuDvMapTexture,
+void WaterSystem::CaptureReflectionRefraction(
 	Camera& camera,
-	const glm::mat4* projection,
-	const glm::mat4* model,
 	std::function<void(float waterY, const glm::mat4* reflectedView)> renderCallback)
 {
+	// Clipping is only needed while capturing the reflection/refraction halves.
+	glEnable(GL_CLIP_DISTANCE0);
 
 	for (const WaterTile& waterTile : m_WaterTiles)
 	{
@@ -35,8 +33,25 @@ void WaterSystem::Render(
 
 		//Refraction
 		RenderRefraction(data, renderCallback);
+	}
 
-		//Water Plane
+	// The main scene and the water plane itself must not be clipped.
+	glDisable(GL_CLIP_DISTANCE0);
+}
+
+void WaterSystem::RenderSurface(
+	const Shader& waterShader,
+	const Texture& waterDuDvMapTexture,
+	Camera& camera,
+	const glm::mat4* projection)
+{
+	for (const WaterTile& waterTile : m_WaterTiles)
+	{
+		const WaterTileData& data = waterTile.GetData();
+
+		// Whether the camera is below the water surface.
+		const bool underwater = camera.GetPosition().y <= data.yPos;
+
 		glm::mat4 currentView = camera.GetViewMatrix();
 
 		waterShader.Use();
@@ -51,11 +66,12 @@ void WaterSystem::Render(
 		waterShader.SetFloat("waveStrength", data.waveStrength);
 		waterShader.SetFloat("moveFactor", data.moveFactor);
 		waterShader.SetVec3("cameraPosition", camera.GetPosition());
+		waterShader.SetInt("underwater", underwater ? 1 : 0);
 
 		waterShader.SetInt("reflectionTexture", 0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m_ReflectionFramebuffer->GetTextureID());
-		
+
 		waterShader.SetInt("refractionTexture", 1);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, m_RefractionFramebuffer->GetTextureID());
@@ -64,7 +80,24 @@ void WaterSystem::Render(
 		glActiveTexture(GL_TEXTURE2);
 		waterDuDvMapTexture.Use();
 
-		m_Renderer->Render();
+		if (underwater)
+		{
+			// From below, draw the surface as a translucent sheet that does not
+			// write depth, so the submerged terrain stays visible through and
+			// around it instead of being hidden behind the reflected sky.
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glDepthMask(GL_FALSE);
+
+			m_Renderer->Render();
+
+			glDepthMask(GL_TRUE);
+			glDisable(GL_BLEND);
+		}
+		else
+		{
+			m_Renderer->Render();
+		}
 	}
 }
 

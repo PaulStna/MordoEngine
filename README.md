@@ -24,6 +24,7 @@ The codebase evolves over time as I learn new concepts, improve the architecture
 ## Project Status
 Water rendering test (water reflection and refraction with distortion) (quality should be improved in the future):
 ![Water/ReflectionAndRefractionDistortion](imgs/2026-03-08-2.png)
+![Water/ReflectionAndRefractionDistortion](imgs/2026-07-20.png)
 
 ## Notes
 This is an educational and personal project focused on learning and experimentation.  

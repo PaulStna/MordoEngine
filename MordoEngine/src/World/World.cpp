@@ -14,8 +14,13 @@ World::World(unsigned int screenWidth, unsigned int screenHeight,
     m_CubeLightShader(shaders.Get("lightCube")),
     m_SkyShader(shaders.Get("skyBox")),
     m_WaterShader(shaders.Get("water")),
+    m_UnderwaterShader(shaders.Get("underwater")),
     m_SkyTexture(textures.Get("skyBox")),
-    m_WaterDuDv(textures.Get("dudvMap"))
+    m_WaterDuDv(textures.Get("dudvMap")),
+    m_SceneBuffer(std::make_unique<Framebuffer>()),
+    m_ScreenQuad(std::make_unique<PlaneRenderer>()),
+    m_ScreenWidth(screenWidth),
+    m_ScreenHeight(screenHeight)
 {
     // Lights
     glm::vec3 center = m_Terrain.GetMiddleTerrainPosition();
@@ -33,16 +38,17 @@ World::World(unsigned int screenWidth, unsigned int screenHeight,
     addLight(50.0f, 50.0f);
     addLight(-100.0f, -100.0f);
 
-    // Water 
-    float waterLevel = m_Terrain.GetTerrainHeightScale() * 0.3f;
+    // Water
+    m_WaterLevel = m_Terrain.GetTerrainHeightScale() * 0.3f;
     m_Water.AddWaterTile(
         glm::vec3(center.x, 0.0f, center.z),
         glm::vec3(700.0f, 1.0f, 700.0f),
-        waterLevel);
+        m_WaterLevel);
 }
 
 void World::Update(float deltaTime)
 {
+    m_Time += deltaTime;
     m_Terrain.Update(deltaTime);
     m_Lights.Update(deltaTime);
     m_Sky.Update(deltaTime);
@@ -77,9 +83,10 @@ void World::Render(const RenderContext& ctx)
 {
     glm::mat4 projection = ctx.projection;
 
-    glEnable(GL_CLIP_DISTANCE0);
-    m_Water.Render(
-        m_WaterShader, m_WaterDuDv, m_Camera, &projection, nullptr,
+    // 1) Capture the reflection/refraction textures. WaterSystem manages
+    // GL_CLIP_DISTANCE0 around these passes and leaves it disabled afterwards.
+    m_Water.CaptureReflectionRefraction(
+        m_Camera,
         [&](float waterY, const glm::mat4* reflectedView)
         {
             RenderContext pass = ctx;
@@ -94,7 +101,53 @@ void World::Render(const RenderContext& ctx)
             RenderOpaque(pass);
         });
 
+    // 2) Render the whole scene into an offscreen buffer so it can be
+    // post-processed (needed for the full-screen underwater effect).
+    m_SceneBuffer->BindBuffer();
+    glViewport(0, 0, m_ScreenWidth, m_ScreenHeight);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Main opaque scene without clipping: shows terrain above and below water.
     RenderContext mainPass = ctx;
     mainPass.clipPlane = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
     RenderOpaque(mainPass);
+
+    // Water surface last, so it can blend over the terrain when submerged.
+    m_Water.RenderSurface(m_WaterShader, m_WaterDuDv, m_Camera, &projection);
+
+    m_SceneBuffer->UnbindBuffer();
+
+    // 3) Draw the scene to the screen through the underwater post-process.
+    RenderPostProcess();
+}
+
+void World::RenderPostProcess()
+{
+    const bool underwater = m_Camera.GetPosition().y <= m_WaterLevel;
+
+    // How deep below the surface the camera is, normalized to [0, 1].
+    float submergence = 0.0f;
+    if (underwater)
+        submergence = glm::clamp((m_WaterLevel - m_Camera.GetPosition().y) / 300.0f, 0.0f, 1.0f);
+
+    glViewport(0, 0, m_ScreenWidth, m_ScreenHeight);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_DEPTH_TEST);
+
+    m_UnderwaterShader.Use();
+    m_UnderwaterShader.SetInt("sceneTexture", 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_SceneBuffer->GetTextureID());
+
+    m_UnderwaterShader.SetInt("dudvMap", 1);
+    glActiveTexture(GL_TEXTURE1);
+    m_WaterDuDv.Use();
+
+    m_UnderwaterShader.SetInt("underwater", underwater ? 1 : 0);
+    m_UnderwaterShader.SetFloat("time", m_Time);
+    m_UnderwaterShader.SetFloat("submergence", submergence);
+
+    m_ScreenQuad->Render();
+
+    glEnable(GL_DEPTH_TEST);
 }

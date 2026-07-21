@@ -261,6 +261,8 @@
     <None Include="res\shaders\lightCube.fs" />
     <None Include="res\shaders\water.vs" />
     <None Include="res\shaders\water.fs" />
+    <None Include="res\shaders\underwater.fs" />
+    <None Include="res\shaders\underwater.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\dirt_mid.png">

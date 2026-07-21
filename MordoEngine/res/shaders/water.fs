@@ -9,6 +9,7 @@ uniform sampler2D refractionTexture;
 uniform sampler2D dudvMap;
 uniform float waveStrength;
 uniform float moveFactor;
+uniform int underwater;
 
 out vec4 FragColor;
 
@@ -36,6 +37,15 @@ void main()
 
     vec4 reflectColor = texture(reflectionTexture, reflectCoords);
     vec4 refractColor = texture(refractionTexture, refractCoords);
+
+    if (underwater == 1)
+    {
+        // Seen from below the surface: a translucent blue sheet with a little
+        // shimmer. Alpha < 1 lets the submerged terrain show through it.
+        vec3 col = mix(reflectColor.rgb, BLUE_TINT.rgb, 0.6);
+        FragColor = vec4(col, 0.5);
+        return;
+    }
 
     vec3 normalizedViewVector = normalize(CameraVector);
     float refractiveFactor = dot(normalizedViewVector, vec3(0.0, 1.0, 0.0));
