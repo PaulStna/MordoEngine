@@ -196,3 +196,10 @@
 - Nested HeightData inside Terrain as a protected type and RAW_HEIGHT_MAX as a public static constant, so both left the global scope with the namespace instead of leaking into it.
 - Updated every terrain reference across the engine, mapping terrain::Terrain to Terrain, terrain::Vertex to TerrainVertex, terrain::HeightData to Terrain::HeightData and terrain::RAW_HEIGHT_MAX to Terrain::RAW_HEIGHT_MAX, and dropped the using directives that were pulling the namespace in.
 - Dropped the glm includes from Terrain.h, which were only needed by the vertex struct that had already moved out, and added the glm/vec2 include to FaultFormationTerrain.h, which had been relying on Terrain.h to provide it.
+- Moved the underwater post-process out of World and into WaterSystem, which now owns the fullscreen pass that resolves the offscreen scene through the underwater shader.
+- Made the underwater effect conditional on submergence: the scene is only captured into the offscreen buffer and run through the post-process when the camera is below the surface, and is otherwise drawn straight to the screen.
+- Tracked the submerged state inside WaterSystem, computed once per frame from the camera position in Update and exposed through GetIsUnderwater, so callers no longer recompute it against the water level themselves.
+- Removed all raw OpenGL from World: the viewport and clear moved into Framebuffer, and the above-water case now relies on the per-frame screen clear the backend already performs.
+- Gave Framebuffer its own width and height instead of the hardcoded 800x800, and folded the viewport and clear into BindBuffer so binding a framebuffer also prepares it to be drawn into.
+- Changed World::Render to take no parameters and build the frame RenderContext itself, since World owns the camera, and updated GameScene accordingly.
+- Extracted the shared opaque-scene-plus-water-surface pass into World::RenderSceneAndWater, reused by both the submerged and above-water paths.

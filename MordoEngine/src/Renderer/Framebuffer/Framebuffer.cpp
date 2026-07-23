@@ -1,7 +1,8 @@
 #include "Framebuffer.h"
 #include <iostream>
 
-Framebuffer::Framebuffer()
+Framebuffer::Framebuffer(int width, int height)
+    : m_Width(width), m_Height(height)
 {
 	CreateGLState();
 }
@@ -13,7 +14,7 @@ void Framebuffer::CreateGLState()
 
     glGenTextures(1, &m_TextureColorBuffer);
     glBindTexture(GL_TEXTURE_2D, m_TextureColorBuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 800, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -22,8 +23,8 @@ void Framebuffer::CreateGLState()
 
     glGenRenderbuffers(1, &m_Rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, m_Rbo);
-    
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 800);
+
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_Width, m_Height);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_Rbo);
@@ -38,6 +39,8 @@ void Framebuffer::CreateGLState()
 void Framebuffer::BindBuffer()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_Fbo);
+	glViewport(0, 0, m_Width, m_Height);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Framebuffer::UnbindBuffer()

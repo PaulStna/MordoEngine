@@ -21,15 +21,13 @@ public:
 
     void Update(float deltaTime);
     void RenderOpaque(const RenderContext& renderContext);
-    void Render(const RenderContext& renderContext);
+    void Render();
     RenderContext MakeRenderContext() const;
 
     Camera& GetCamera() { return m_Camera; }
     TerrainSystem& GetTerrain() { return m_Terrain; }
 
 private:
-    void RenderPostProcess();
-
     TerrainSystem m_Terrain;   
     Camera        m_Camera;
     LightSystem   m_Lights;
@@ -48,6 +46,7 @@ private:
     std::unique_ptr<Framebuffer> m_SceneBuffer;
     std::unique_ptr<PlaneRenderer> m_ScreenQuad;
 
+    void RenderSceneAndWater(const RenderContext& renderContext);
     unsigned int m_ScreenWidth;
     unsigned int m_ScreenHeight;
     float m_WaterLevel = 0.0f;

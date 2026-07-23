@@ -22,8 +22,7 @@ void GameScene::Update(float deltaTime)
 void GameScene::Render()
 {
     World& world = m_Ctx.GetWorld();
-    RenderContext ctx = world.MakeRenderContext();
-    world.Render(ctx);
+    world.Render();
 }
 
 GameScene::~GameScene()

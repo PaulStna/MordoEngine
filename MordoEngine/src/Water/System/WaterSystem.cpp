@@ -9,12 +9,13 @@ WaterSystem::WaterSystem() :
 
 }
 
-void WaterSystem::Update(float deltaTime)
+void WaterSystem::Update(float deltaTime, const glm::vec3& cameraPosition)
 {
 	for (WaterTile& waterTile : m_WaterTiles)
 	{
 		waterTile.Update(deltaTime);
 	}
+	m_IsUnderwater = cameraPosition.y <= m_WaterLevel;
 }
 
 void WaterSystem::CaptureReflectionRefraction(
@@ -110,7 +111,6 @@ void WaterSystem::RenderRefraction(const WaterTileData& waterTile,
 	pass.clipPlane = glm::vec4(0.0f, -1.0f, 0.0f, clipY);
 
 	m_RefractionFramebuffer->BindBuffer();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	renderPass(pass);
 	m_RefractionFramebuffer->UnbindBuffer();
 }
@@ -137,9 +137,41 @@ void WaterSystem::RenderReflection(const WaterTileData& waterTile,
 	pass.clipPlane = glm::vec4(0.0f, 1.0f, 0.0f, -clipY);
 
 	m_ReflectionFramebuffer->BindBuffer();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	renderPass(pass);
 	m_ReflectionFramebuffer->UnbindBuffer();
+}
+
+void WaterSystem::RenderUnderwater(
+	const Shader& underwaterShader,
+	const Texture& waterDuDvMapTexture,
+	const RenderContext& renderContext,
+	const GLuint textureId,
+	const float deltaTime,
+	const unsigned int screenWidth, const unsigned int screenHeight)
+{
+	float submergence = 0.0f;
+	if (m_IsUnderwater)
+		submergence = glm::clamp((m_WaterLevel - renderContext.cameraPos.y) / 300.0f, 0.0f, 1.0f);
+
+	glViewport(0, 0, screenWidth, screenHeight);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDisable(GL_DEPTH_TEST);
+
+	underwaterShader.Use();
+	underwaterShader.SetInt("sceneTexture", 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+
+	underwaterShader.SetInt("dudvMap", 1);
+	glActiveTexture(GL_TEXTURE1);
+	waterDuDvMapTexture.Use();
+
+	underwaterShader.SetInt("underwater", m_IsUnderwater ? 1 : 0);
+	underwaterShader.SetFloat("time", deltaTime);
+	underwaterShader.SetFloat("submergence", submergence);
+
+	m_Renderer->Render();
+	glEnable(GL_DEPTH_TEST);
 }
 
 void WaterSystem::AddWaterTile(const WaterTile waterTile)

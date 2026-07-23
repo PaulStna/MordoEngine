@@ -20,9 +20,12 @@ public:
 private:
 	std::vector<WaterTile> m_WaterTiles;
 	std::unique_ptr<PlaneRenderer> m_Renderer;
+	std::unique_ptr<Framebuffer> m_UnderWaterFramebuffer;
 	std::unique_ptr<Framebuffer> m_ReflectionFramebuffer;
 	std::unique_ptr<Framebuffer> m_RefractionFramebuffer;
 	float offSet = 10.f;
+	float m_WaterLevel = 0.0f;
+	bool m_IsUnderwater = false;
 
 	void RenderReflection(const WaterTileData& waterTile,
 		const RenderContext& renderContext,
@@ -34,7 +37,7 @@ private:
 
 public:
 	WaterSystem();
-	void Update(float deltaTime);
+	void Update(float deltaTime, const glm::vec3& cameraPosistio);
 	// Captures the reflection/refraction textures into the framebuffers.
 	// Must run before the main opaque scene is drawn.
 	void CaptureReflectionRefraction(const RenderContext& renderContext,
@@ -47,5 +50,15 @@ public:
 		const RenderContext& renderContext);
 	void AddWaterTile(const WaterTile waterTile);
 	void AddWaterTile(const glm::vec3 position, const glm::vec3 scale, const float yPos);
+	void RenderUnderwater(
+		const Shader& underwaterShader,
+		const Texture& waterDuDvMapTexture,
+		const RenderContext& renderContext,
+		const GLuint textureId,
+		const float deltaTime,
+		const unsigned int screenWidth, 
+		const unsigned int screenHeight);
+	void const SetWaterLevel (const float waterLevel) { m_WaterLevel = waterLevel; }
+	bool const GetIsUnderwater() { return m_IsUnderwater; }
 	~WaterSystem() = default;
 };
