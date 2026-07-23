@@ -23,17 +23,16 @@ void EditorScene::Update(float deltaTime)
 void EditorScene::Render()
 {
 	World& world = m_Ctx.GetWorld();
-	Camera& camera = world.GetCamera();
-
-	glm::mat4 projection = camera.GetProjectionMatrix();
-	glm::mat4 view = camera.GetViewMatrix();
-	glm::mat4 model = glm::mat4(1.0f);
+	const RenderContext renderContext = world.MakeRenderContext();
 
 	Shader& terrainShader = m_Ctx.Shaders().Get("terrain");
-	world.GetTerrain().Render(terrainShader, camera.GetPosition(), &projection, &view, &model);
+	world.GetTerrain().Render(terrainShader, renderContext);
 
-	model = glm::translate(model, m_EditorSystem->GetWorldPosition());
-	m_EditorSystem->Render(&view, &projection, &model);
+	// The selector is the one thing here with its own transform, so it gets a
+	// copy of the pass context with the model matrix moved to the cursor.
+	RenderContext selectorPass = renderContext;
+	selectorPass.model = glm::translate(renderContext.model, m_EditorSystem->GetWorldPosition());
+	m_EditorSystem->Render(selectorPass);
 }
 
 EditorScene::~EditorScene()

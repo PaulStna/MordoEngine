@@ -301,12 +301,9 @@ void Geomipmapping::CalculateSmoothNormals(std::vector<terrain::Vertex>& vertice
 	}
 }
 
-void Geomipmapping::Render(const glm::vec3& cameraPos,
-	const glm::mat4* view,
-	const glm::mat4* projection,
-	const glm::mat4* model)
+void Geomipmapping::Render(const RenderContext& renderContext)
 {
-	m_LodManager.Update(cameraPos);
+	m_LodManager.Update(renderContext.cameraPos);
 	glBindVertexArray(m_Vao);
 
 	for (int patchZ = 0; patchZ < m_NumPatchesZ; patchZ++) {

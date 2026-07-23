@@ -20,16 +20,12 @@ void TerrainSystem::Update(float deltaTime)
 	//
 }
 
-void TerrainSystem::Render(const Shader& shader,
-	const glm::vec3& cameraPos,
-	const glm::mat4* projection,
-	const glm::mat4* view,
-	const glm::mat4* model)
+void TerrainSystem::Render(const Shader& shader, const RenderContext& renderContext)
 {
 	shader.Use();
-	if (projection) shader.SetMat4("projection", *projection);
-	if (view)       shader.SetMat4("view", *view);
-	if (model)      shader.SetMat4("model", *model);
+	shader.SetMat4("projection", renderContext.projection);
+	shader.SetMat4("view", renderContext.view);
+	shader.SetMat4("model", renderContext.model);
 
 	shader.SetInt("texture1", 0);
 	glActiveTexture(GL_TEXTURE0);
@@ -47,7 +43,7 @@ void TerrainSystem::Render(const Shader& shader,
 	shader.SetFloat("heightThreshold1", m_HeightThreshold1);
 	shader.SetFloat("heightThreshold2", m_HeightThreshold2);
 
-	m_TerrainRenderer->Render(cameraPos, view, projection, model);
+	m_TerrainRenderer->Render(renderContext);
 }
 
 glm::vec3 TerrainSystem::GetMiddleTerrainPosition() const

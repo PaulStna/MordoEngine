@@ -1,15 +1,16 @@
 #pragma once
 #include "../../../Terrain/Terrain.h"
 #include "../../../Camera/Camera.h"
-#include "../../../Renderer/Renderer.h"
+#include "../../../Renderer/AreaSelectorRenderer.h"
+#include "../../../Renderer/RenderContext.h"
 #include "../../../Core/Shader/Shader.h"
 #include <glm/vec3.hpp>
 #include <memory>
 
-class EditorSystem 
+class EditorSystem
 {
 private:
-	std::unique_ptr<Renderer> m_Renderer;
+	std::unique_ptr<AreaSelectorRenderer> m_Renderer;
 	int m_Segments = 256;
 	float m_Radius = 25.0f;
 	int m_HeightOffSet = 12.0f;
@@ -28,9 +29,7 @@ private:
 public:
 	EditorSystem(Shader& areaSelectorShader);
 	void Update(const terrain::Terrain& terrain, const Camera& camera);
-	void Render(glm::mat4* view,
-				glm::mat4* projection,
-				glm::mat4* model);
+	void Render(const RenderContext& renderContext);
 	glm::vec3 GetWorldPosition() const;
 	void IncreaseSelector();
 	void DecreaseSelector();

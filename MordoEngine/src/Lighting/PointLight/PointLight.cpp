@@ -17,18 +17,12 @@ void PointLight::Update(float deltaTime)
 	//
 }
 
-void PointLight::Render(const Shader& shader,
-						const glm::mat4* projection,
-						const glm::mat4* view,
-						const glm::mat4* model)
+void PointLight::Render(const Shader& shader, const RenderContext& renderContext)
 {
 	shader.Use();
-	if (projection) {
-		shader.SetMat4("projection", *projection);
-	}
-	if (view) {
-		shader.SetMat4("view", *view);
-	}
+	shader.SetMat4("projection", renderContext.projection);
+	shader.SetMat4("view", renderContext.view);
+
 	glm::mat4 newModel = glm::mat4(1.0f);
 	newModel = glm::translate(newModel, m_Data.position);
 	newModel = glm::scale(newModel, glm::vec3(20.f));

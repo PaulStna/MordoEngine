@@ -64,7 +64,7 @@ namespace terrain
 
 	private:
 		std::vector<int> m_ModifiedVertexIndices;
-		bool m_HasModifications;
+		bool m_HasModifications = false;
 		std::size_t index(std::size_t x, std::size_t z) const noexcept;
 	};
 

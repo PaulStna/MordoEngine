@@ -12,19 +12,15 @@ void SkySystem::Update(float deltaTime)
 
 void SkySystem::Render(const Shader& shader,
 						const Texture& texture,
-						const glm::mat4* projection,
-						const glm::mat4* view,
-						const glm::mat4* model)
+						const RenderContext& renderContext)
 {
 	shader.Use();
-	if (view) {
-		glm::mat4 skyboxView = glm::mat4(glm::mat3(*view));
-		shader.SetMat4("view", skyboxView);
-	}
-	if (projection) {
-		shader.SetMat4("projection", *projection);
-	}
-	
+
+	// Strip the translation so the skybox stays centred on the camera.
+	glm::mat4 skyboxView = glm::mat4(glm::mat3(renderContext.view));
+	shader.SetMat4("view", skyboxView);
+	shader.SetMat4("projection", renderContext.projection);
+
 	shader.SetInt("skybox", 0);
 	glActiveTexture(GL_TEXTURE0);
 	texture.UseCubeMap();

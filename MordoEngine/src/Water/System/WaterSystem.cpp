@@ -18,8 +18,9 @@ void WaterSystem::Update(float deltaTime)
 }
 
 void WaterSystem::CaptureReflectionRefraction(
-	Camera& camera,
-	std::function<void(float waterY, const glm::mat4* reflectedView)> renderCallback)
+	const RenderContext& renderContext,
+	const Camera& camera,
+	const RenderPass& renderPass)
 {
 	// Clipping is only needed while capturing the reflection/refraction halves.
 	glEnable(GL_CLIP_DISTANCE0);
@@ -29,10 +30,10 @@ void WaterSystem::CaptureReflectionRefraction(
 		const WaterTileData& data = waterTile.GetData();
 
 		//Reflection
-		RenderReflection(data, camera, renderCallback);
+		RenderReflection(data, renderContext, camera, renderPass);
 
 		//Refraction
-		RenderRefraction(data, renderCallback);
+		RenderRefraction(data, renderContext, renderPass);
 	}
 
 	// The main scene and the water plane itself must not be clipped.
@@ -42,21 +43,18 @@ void WaterSystem::CaptureReflectionRefraction(
 void WaterSystem::RenderSurface(
 	const Shader& waterShader,
 	const Texture& waterDuDvMapTexture,
-	Camera& camera,
-	const glm::mat4* projection)
+	const RenderContext& renderContext)
 {
 	for (const WaterTile& waterTile : m_WaterTiles)
 	{
 		const WaterTileData& data = waterTile.GetData();
 
 		// Whether the camera is below the water surface.
-		const bool underwater = camera.GetPosition().y <= data.yPos;
-
-		glm::mat4 currentView = camera.GetViewMatrix();
+		const bool underwater = renderContext.cameraPos.y <= data.yPos;
 
 		waterShader.Use();
-		if (projection) waterShader.SetMat4("projection", *projection);
-		waterShader.SetMat4("view", currentView);
+		waterShader.SetMat4("projection", renderContext.projection);
+		waterShader.SetMat4("view", renderContext.view);
 
 		glm::mat4 newModel = glm::translate(glm::mat4(1.0f), data.position);
 		newModel = glm::scale(newModel, data.scale);
@@ -65,7 +63,7 @@ void WaterSystem::RenderSurface(
 
 		waterShader.SetFloat("waveStrength", data.waveStrength);
 		waterShader.SetFloat("moveFactor", data.moveFactor);
-		waterShader.SetVec3("cameraPosition", camera.GetPosition());
+		waterShader.SetVec3("cameraPosition", renderContext.cameraPos);
 		waterShader.SetInt("underwater", underwater ? 1 : 0);
 
 		waterShader.SetInt("reflectionTexture", 0);
@@ -102,35 +100,45 @@ void WaterSystem::RenderSurface(
 }
 
 void WaterSystem::RenderRefraction(const WaterTileData& waterTile,
-	std::function<void(float waterY, const glm::mat4* reflectedView)> renderCallback)
+	const RenderContext& renderContext,
+	const RenderPass& renderPass)
 {
+	const float clipY = waterTile.yPos + offSet;
+
+	// Keep only what is below the surface.
+	RenderContext pass = renderContext;
+	pass.clipPlane = glm::vec4(0.0f, -1.0f, 0.0f, clipY);
+
 	m_RefractionFramebuffer->BindBuffer();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	renderCallback(waterTile.yPos + offSet, nullptr);
+	renderPass(pass);
 	m_RefractionFramebuffer->UnbindBuffer();
 }
 
 void WaterSystem::RenderReflection(const WaterTileData& waterTile,
-	Camera& camera,
-	std::function<void(float waterY, const glm::mat4* reflectedView)> renderCallback)
+	const RenderContext& renderContext,
+	const Camera& camera,
+	const RenderPass& renderPass)
 {
-	glm::vec3 camPos = camera.GetPosition();
-	glm::vec3 camForward = camera.GetForward();
-	glm::vec3 camRight = camera.GetRight();
+	const glm::vec3 camPos = camera.GetPosition();
+	const glm::vec3 camForward = camera.GetForward();
+	const glm::vec3 camRight = camera.GetRight();
 
-	glm::vec3 reflectedPos = glm::vec3(camPos.x, 2.0f * waterTile.yPos - camPos.y, camPos.z);
-	glm::vec3 reflectedForward = glm::vec3(camForward.x, -camForward.y, camForward.z);
-	glm::vec3 reflectedUp = glm::cross(camRight, reflectedForward);
+	const glm::vec3 reflectedPos = glm::vec3(camPos.x, 2.0f * waterTile.yPos - camPos.y, camPos.z);
+	const glm::vec3 reflectedForward = glm::vec3(camForward.x, -camForward.y, camForward.z);
+	const glm::vec3 reflectedUp = glm::cross(camRight, reflectedForward);
 
-	const glm::mat4 reflectedView = glm::lookAt(
-		reflectedPos,
-		reflectedPos + reflectedForward,
-		reflectedUp
-	);
+	const float clipY = waterTile.yPos + offSet;
+
+	// Mirror the camera across the surface and keep only what is above it.
+	RenderContext pass = renderContext;
+	pass.view = glm::lookAt(reflectedPos, reflectedPos + reflectedForward, reflectedUp);
+	pass.cameraPos.y = 2.0f * clipY - renderContext.cameraPos.y;
+	pass.clipPlane = glm::vec4(0.0f, 1.0f, 0.0f, -clipY);
 
 	m_ReflectionFramebuffer->BindBuffer();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	renderCallback(waterTile.yPos + offSet, &reflectedView);
+	renderPass(pass);
 	m_ReflectionFramebuffer->UnbindBuffer();
 }
 

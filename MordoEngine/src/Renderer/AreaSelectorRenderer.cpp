@@ -91,12 +91,13 @@ void AreaSelectorRenderer::SetRadio(float radius)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void AreaSelectorRenderer::Render(const glm::mat4* view,
-								  const glm::mat4* projection,
-								  const glm::mat4* model)
+void AreaSelectorRenderer::Render(const RenderContext& renderContext)
 {
 	p_Shader.Use();
-	Renderer::Render(view, projection, model);
+	p_Shader.SetMat4("projection", renderContext.projection);
+	p_Shader.SetMat4("view", renderContext.view);
+	p_Shader.SetMat4("model", renderContext.model);
+
 	glBindVertexArray(m_Vao);
 	glLineWidth(10.0f);
 	glDrawArrays(GL_LINE_LOOP, 0, m_Segments);

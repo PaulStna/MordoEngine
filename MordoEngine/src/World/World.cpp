@@ -66,40 +66,24 @@ RenderContext World::MakeRenderContext() const
     return ctx;
 }
 
-void World::RenderOpaque(const RenderContext& ctx)
+void World::RenderOpaque(const RenderContext& renderContext)
 {
     m_TerrainShader.Use();
-    m_TerrainShader.SetVec4("plane", ctx.clipPlane);
+    m_TerrainShader.SetVec4("plane", renderContext.clipPlane);
 
-    m_Lights.Render(m_TerrainShader, m_CubeLightShader, ctx.cameraPos,
-        &ctx.projection, &ctx.view, &ctx.model);
-    m_Terrain.Render(m_TerrainShader, ctx.cameraPos,
-        &ctx.projection, &ctx.view, &ctx.model);
-    m_Sky.Render(m_SkyShader, m_SkyTexture,
-        &ctx.projection, &ctx.view, &ctx.model);
+    m_Lights.Render(m_TerrainShader, m_CubeLightShader, renderContext);
+    m_Terrain.Render(m_TerrainShader, renderContext);
+    m_Sky.Render(m_SkyShader, m_SkyTexture, renderContext);
 }
 
-void World::Render(const RenderContext& ctx)
+void World::Render(const RenderContext& renderContext)
 {
-    glm::mat4 projection = ctx.projection;
-
-    // 1) Capture the reflection/refraction textures. WaterSystem manages
-    // GL_CLIP_DISTANCE0 around these passes and leaves it disabled afterwards.
+    // 1) Capture the reflection/refraction textures. WaterSystem derives the
+    // context for each pass and manages GL_CLIP_DISTANCE0 around them.
     m_Water.CaptureReflectionRefraction(
+        renderContext,
         m_Camera,
-        [&](float waterY, const glm::mat4* reflectedView)
-        {
-            RenderContext pass = ctx;
-            if (reflectedView) {
-                pass.view = *reflectedView;
-                pass.cameraPos.y = 2.0f * waterY - ctx.cameraPos.y;
-                pass.clipPlane = glm::vec4(0.0f, 1.0f, 0.0f, -waterY);
-            }
-            else {
-                pass.clipPlane = glm::vec4(0.0f, -1.0f, 0.0f, waterY);
-            }
-            RenderOpaque(pass);
-        });
+        [this](const RenderContext& pass) { RenderOpaque(pass); });
 
     // 2) Render the whole scene into an offscreen buffer so it can be
     // post-processed (needed for the full-screen underwater effect).
@@ -108,12 +92,12 @@ void World::Render(const RenderContext& ctx)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Main opaque scene without clipping: shows terrain above and below water.
-    RenderContext mainPass = ctx;
+    RenderContext mainPass = renderContext;
     mainPass.clipPlane = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
     RenderOpaque(mainPass);
 
     // Water surface last, so it can blend over the terrain when submerged.
-    m_Water.RenderSurface(m_WaterShader, m_WaterDuDv, m_Camera, &projection);
+    m_Water.RenderSurface(m_WaterShader, m_WaterDuDv, mainPass);
 
     m_SceneBuffer->UnbindBuffer();
 

@@ -2,6 +2,7 @@
 #include "../../Core/Shader/Shader.h"
 #include "../../Core/Texture/Texture.h"
 #include "../../Renderer/Skybox/SkyBoxRenderer.h"
+#include "../../Renderer/RenderContext.h"
 #include <memory>
 
 class SkySystem 
@@ -14,7 +15,5 @@ public:
 	void Update(float deltaTime);
 	void Render(const Shader& shader,
 		        const Texture& texture,
-				const glm::mat4* projection,
-				const glm::mat4* view,
-				const glm::mat4* model);
+				const RenderContext& renderContext);
 };

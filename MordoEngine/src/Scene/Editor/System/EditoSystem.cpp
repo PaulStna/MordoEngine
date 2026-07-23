@@ -68,11 +68,9 @@ glm::vec3 EditorSystem::RaycastToTerrain(
 	return glm::vec3(rayOrigin.x, 0.0f, rayOrigin.z);
 }
 
-void EditorSystem::Render(glm::mat4* view,
-	glm::mat4* projection,
-	glm::mat4* model)
+void EditorSystem::Render(const RenderContext& renderContext)
 {
-	m_Renderer->Render(view, projection, model);
+	m_Renderer->Render(renderContext);
 }
 
 glm::vec3 EditorSystem::GetWorldPosition() const
@@ -101,8 +99,7 @@ void EditorSystem::ModyfySelector(float radius)
 		m_Radius = 5.f;
 	}
 
-	auto* castedRenderer = static_cast<AreaSelectorRenderer*>(m_Renderer.get());
-	castedRenderer->SetRadio(m_Radius);
+	m_Renderer->SetRadio(m_Radius);
 }
 
 void EditorSystem::IncreaseTerrain(terrain::Terrain& terrain)

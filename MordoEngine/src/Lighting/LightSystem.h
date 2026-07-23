@@ -2,6 +2,7 @@
 #include "./PointLight/PointLight.h"
 #include "./DirLight/DirLight.h"
 #include "../Core/Shader/Shader.h"
+#include "../Renderer/RenderContext.h"
 #include <vector>
 #include <memory>
 
@@ -12,20 +13,15 @@ private:
 	std::vector<PointLight> m_PointLights;
 	std::unique_ptr<DirLight> m_DirLight;
 
-	void RenderLights(const Shader& lightCubeShader,
-					  const glm::mat4* projection,
-					  const glm::mat4* view);
+	void RenderLights(const Shader& lightCubeShader, const RenderContext& renderContext);
 
-	void ApplyUniforms(const Shader& shader, const glm::vec3& cameraPos);
+	void ApplyUniforms(const Shader& shader, const RenderContext& renderContext);
 public:
 	LightSystem();
 	void Update(float deltaTime);
 	void Render(const Shader& terrainShader,
-				const Shader& cubeLightShader,		
-				const glm::vec3& cameraPos, 
-				const glm::mat4* projection,
-				const glm::mat4* view,
-				const glm::mat4* model);
+				const Shader& cubeLightShader,
+				const RenderContext& renderContext);
 	void AddPointLight(PointLight&& pointLight);
 	~LightSystem();
 };

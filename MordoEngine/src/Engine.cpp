@@ -11,7 +11,7 @@ void Engine::Run()
 
 	{
 		EngineContext context(OpenGLBackend::SCR_WIDTH, OpenGLBackend::SCR_HEIGHT);
-		SceneManager  sceneManager(context);
+		SceneManager sceneManager(context);
 
 		float lastTime = 0.0f;
 		while (!OpenGLBackend::WindowShouldClose())

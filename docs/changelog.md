@@ -169,3 +169,14 @@
 
 ## 2026-07-20
 - Implemented a new water rendering system that includes reflection and refraction with distortion, improving the visual quality of water surfaces in the engine.
+
+## 2026-07-22
+- Propagated RenderContext through every system and renderer, removing the nullable matrix pointers that were passed around as separate parameters.
+- Reduced the Renderer base class to a single pure virtual Render(const RenderContext&), dropping the empty virtual overloads and the UpdateBuffers/SetHeights methods that most subclasses never implemented.
+- Removed the duplicated Render implementation left in Geomipmapping and turned UpdateBuffers into a regular member function.
+- Refactored LightSystem, PointLight, SkySystem, WaterSystem, EditorSystem and AreaSelectorRenderer to take the RenderContext instead of individual matrix, camera and clip plane parameters.
+- Changed the WaterSystem capture callback to receive a RenderContext, so the system now derives the reflection and refraction pass contexts itself instead of leaving that logic to World.
+- Made RenderReflection and RenderRefraction private, as they are internal steps of CaptureReflectionRefraction.
+- Removed the Camera dependency from WaterSystem::RenderSurface, which now reads the view matrix and camera position from the RenderContext.
+- Changed EditorSystem to hold an AreaSelectorRenderer directly instead of a base Renderer pointer, removing the static_cast needed to reach the derived interface.
+- Restored terrain rendering in EditorScene and updated it to build the selector transform by copying the pass context and overriding its model matrix.

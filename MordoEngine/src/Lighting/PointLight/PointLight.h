@@ -1,6 +1,7 @@
     #pragma once
     #include "PointLightData.h"
     #include "../../Renderer/Cube/CubePointLightRenderer.h"
+    #include "../../Renderer/RenderContext.h"
     #include "../../Core/Shader/Shader.h"
     #include <memory>
 
@@ -32,10 +33,9 @@
         }
 
 	    void Update(float deltaTime);
-	    void Render(const Shader& shader, 
-				    const glm::mat4* projection,
-				    const glm::mat4* view, 
-				    const glm::mat4* model);
+	    // The light owns its transform, so it builds its own model matrix and
+	    // ignores renderContext.model.
+	    void Render(const Shader& shader, const RenderContext& renderContext);
 
         void SetPosition(const glm::vec3& position);
 	    const PointLightData& GetData() const { return m_Data; }

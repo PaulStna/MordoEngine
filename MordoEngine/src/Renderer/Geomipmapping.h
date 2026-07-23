@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_set>
 #include <unordered_map>
+#include "../Renderer/RenderContext.h"
 
 class Geomipmapping : public Renderer
 {
@@ -62,12 +63,9 @@ private:
 
 public:
     Geomipmapping(Shader& shader, const terrain::Terrain& terrain, int patchSize);
+    void Render(const RenderContext& renderContext) override;
     void SetTextureScale(float scale);
     void SetHeightThresholds(float threshold1, float threshold2);
-    void Render(const glm::vec3& cameraPos,
-        const glm::mat4* view,
-        const glm::mat4* projection,
-        const glm::mat4* model) override;
-    void UpdateBuffers(const terrain::Terrain& terrain) override;
+    void UpdateBuffers(const terrain::Terrain& terrain);
     ~Geomipmapping();
 };

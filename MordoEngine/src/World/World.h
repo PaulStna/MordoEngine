@@ -20,8 +20,8 @@ public:
         ResourceLibrary<Shader>& shaders, ResourceLibrary<Texture>& textures);
 
     void Update(float deltaTime);
-    void RenderOpaque(const RenderContext& ctx);
-    void Render(const RenderContext& ctx);
+    void RenderOpaque(const RenderContext& renderContext);
+    void Render(const RenderContext& renderContext);
     RenderContext MakeRenderContext() const;
 
     Camera& GetCamera() { return m_Camera; }

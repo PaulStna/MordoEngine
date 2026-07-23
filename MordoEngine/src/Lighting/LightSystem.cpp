@@ -14,28 +14,23 @@ void LightSystem::Update(float deltaTime)
 
 void LightSystem::Render(const Shader& terrainShader,
 	 					 const Shader& cubeLightShader,
-						 const glm::vec3& cameraPos,
-						 const glm::mat4* projection,
-						 const glm::mat4* view,
-						 const glm::mat4* model)
+						 const RenderContext& renderContext)
 {
-	RenderLights(cubeLightShader, projection, view);
-	ApplyUniforms(terrainShader, cameraPos);
+	RenderLights(cubeLightShader, renderContext);
+	ApplyUniforms(terrainShader, renderContext);
 }
 
-void LightSystem::RenderLights(const Shader& lightCubeShader,
-							   const glm::mat4* projection,
-							   const glm::mat4* view)
+void LightSystem::RenderLights(const Shader& lightCubeShader, const RenderContext& renderContext)
 {
 	for (int i = 0; i < m_PointLights.size(); i++) {
-		m_PointLights[i].Render(lightCubeShader, projection, view, nullptr);
+		m_PointLights[i].Render(lightCubeShader, renderContext);
 	}
 }
 
-void LightSystem::ApplyUniforms(const Shader& shader, const glm::vec3& cameraPos)
+void LightSystem::ApplyUniforms(const Shader& shader, const RenderContext& renderContext)
 {
 	shader.Use();
-	shader.SetVec3("viewPos", cameraPos);
+	shader.SetVec3("viewPos", renderContext.cameraPos);
 
 	const DirLightData& dirLight = m_DirLight->GetData();
 	shader.SetVec3("dirLight.direction", dirLight.direction);

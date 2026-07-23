@@ -3,6 +3,7 @@
 #include "../../Core/Texture/Texture.h"
 #include "../../Core/Resources/ResourceLibrary.h"
 #include "../../Renderer/Geomipmapping.h"
+#include "../../Renderer/RenderContext.h"
 #include "../Terrain.h"
 #include <memory>
 
@@ -21,11 +22,7 @@ private:
 public:
 	TerrainSystem(ResourceLibrary<Shader>& shaders, ResourceLibrary<Texture>& textures);
 	void Update(float deltaTime);
-	void Render(const Shader& shader,
-		const glm::vec3& cameraPos,
-		const glm::mat4* projection,
-		const glm::mat4* view,
-		const glm::mat4* model);
+	void Render(const Shader& shader, const RenderContext& renderContext);
 	glm::vec3 GetMiddleTerrainPosition() const;
 	int GetTerrainWorldScale() const;
 	float GetTerrainHeightScale() const;
