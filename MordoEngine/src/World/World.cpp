@@ -5,7 +5,7 @@
 
 World::World(unsigned int screenWidth, unsigned int screenHeight,
     ResourceLibrary<Shader>& shaders, ResourceLibrary<Texture>& textures)
-    : m_Terrain(shaders, textures),
+    : m_Terrain(textures),
     m_Camera(m_Terrain.GetMiddleTerrainPosition(), screenWidth, screenHeight),
     m_Lights(),
     m_Water(),

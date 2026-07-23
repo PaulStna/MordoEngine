@@ -4,7 +4,7 @@
 #include "../MidpointDisplacement.h"
 #include <iostream>
 
-TerrainSystem::TerrainSystem(ResourceLibrary<Shader>& shaders, ResourceLibrary<Texture>& textures)
+TerrainSystem::TerrainSystem(ResourceLibrary<Texture>& textures)
 	: m_Texture1(textures.Get("grass")),
 	m_Texture2(textures.Get("dirt")),
 	m_Texture3(textures.Get("rock")),
@@ -12,7 +12,10 @@ TerrainSystem::TerrainSystem(ResourceLibrary<Shader>& shaders, ResourceLibrary<T
 {
 	m_Terrain->SetWorldScale(4.0f);
 	m_Terrain->SetHeightScale(1000.0f);
-	m_TerrainRenderer = std::make_unique<Geomipmapping>(shaders.Get("terrain"), GetTerrain(), 33.0f);
+
+	m_Mesh = std::make_unique<Geomipmapping>(GetTerrain(), 33);
+	m_MeshRenderer = std::make_unique<TerrainMeshRenderer>();
+	m_MeshRenderer->Upload(m_Mesh->GetVertices(), m_Mesh->GetIndices());
 }
 
 void TerrainSystem::Update(float deltaTime)
@@ -43,7 +46,8 @@ void TerrainSystem::Render(const Shader& shader, const RenderContext& renderCont
 	shader.SetFloat("heightThreshold1", m_HeightThreshold1);
 	shader.SetFloat("heightThreshold2", m_HeightThreshold2);
 
-	m_TerrainRenderer->Render(renderContext);
+	m_Mesh->SelectLods(renderContext.cameraPos);
+	m_MeshRenderer->Render(m_Mesh->GetDrawCalls());
 }
 
 glm::vec3 TerrainSystem::GetMiddleTerrainPosition() const
@@ -75,10 +79,13 @@ terrain::Terrain& TerrainSystem::GetTerrain() const
 
 void TerrainSystem::CheckForModifications()
 {
-	if (m_Terrain->HasModifications()) {
-		m_TerrainRenderer->UpdateBuffers(GetTerrain());
-		m_Terrain->ClearModifications();
+	if (!m_Terrain->HasModifications()) {
+		return;
 	}
+
+	const std::vector<int>& changed = m_Mesh->RebuildModifiedVertices(*m_Terrain);
+	m_MeshRenderer->UpdateVertices(m_Mesh->GetVertices(), changed);
+	m_Terrain->ClearModifications();
 }
 
 void TerrainSystem::SaveTerrain()

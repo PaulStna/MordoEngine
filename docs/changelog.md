@@ -180,3 +180,15 @@
 - Removed the Camera dependency from WaterSystem::RenderSurface, which now reads the view matrix and camera position from the RenderContext.
 - Changed EditorSystem to hold an AreaSelectorRenderer directly instead of a base Renderer pointer, removing the static_cast needed to reach the derived interface.
 - Restored terrain rendering in EditorScene and updated it to build the selector transform by copying the pass context and overriding its model matrix.
+
+## 2026-07-23
+- Split Geomipmapping into a meshing technique and a GL renderer, separating the level-of-detail calculations from the OpenGL calls that draw their result.
+- Moved Geomipmapping and LodManager to Terrain/Mesh, where the technique now holds no GL state and issues no draw calls, so its index and LOD arithmetic can be exercised without a rendering context.
+- Added TerrainMeshRenderer under Renderer/Terrain to own the terrain VAO, VBO and EBO, the vertex layout, and the full, partial and draw operations on those buffers.
+- Extracted the terrain vertex out of Terrain.h into its own TerrainVertex header, and moved the InitVertex logic into Geomipmapping so the vertex no longer depends on the Terrain class.
+- Added a technique-neutral MeshDrawCall struct in Renderer, describing a single indexed draw, so replacing geomipmapping with another technique reuses the same renderer untouched.
+- Reworked TerrainSystem to drive the terrain data, the meshing technique and the mesh renderer together, and to own the terrain material uniforms.
+- Preserved the incremental edit path: the technique recomputes only the vertices affected by a terrain modification and returns their indices, and the renderer re-uploads just those.
+- Removed six dead members from Geomipmapping (the three texture id strings, the texture scale and the two height thresholds) along with their setters, as the values actually in use always lived in TerrainSystem.
+- Removed the shader library parameter from the TerrainSystem constructor, since neither the technique nor the mesh renderer owns a shader anymore.
+- Cleaned up AreaSelectorRenderer, which was including Terrain and Camera headers it no longer used.

@@ -1,9 +1,8 @@
 #pragma once
 #include "Renderer.h"
-#include "../Camera/Camera.h"
-#include "../Terrain/Terrain.h"
-#include <memory>
-#include <string>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <vector>
 
 class AreaSelectorRenderer : public Renderer
 {

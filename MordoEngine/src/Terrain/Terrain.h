@@ -67,13 +67,4 @@ namespace terrain
 		bool m_HasModifications = false;
 		std::size_t index(std::size_t x, std::size_t z) const noexcept;
 	};
-
-	struct Vertex
-	{
-		glm::vec3 pos;
-		glm::vec2 texCoord;
-		glm::vec3 normal = glm::vec3(0.f);
-		float height;
-		void InitVertex(const Terrain& terrain, std::size_t x, std::size_t z);
-	};
 }

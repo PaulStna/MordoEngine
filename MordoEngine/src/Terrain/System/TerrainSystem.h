@@ -2,11 +2,15 @@
 #include "../../Core/Shader/Shader.h"
 #include "../../Core/Texture/Texture.h"
 #include "../../Core/Resources/ResourceLibrary.h"
-#include "../../Renderer/Geomipmapping.h"
 #include "../../Renderer/RenderContext.h"
+#include "../../Renderer/Terrain/TerrainMeshRenderer.h"
+#include "../Mesh/Geomipmapping.h"
 #include "../Terrain.h"
 #include <memory>
 
+// Owns the terrain height data, the meshing technique that turns it into
+// geometry, and the GL renderer that draws it. Drives the three together and
+// applies the terrain material uniforms.
 class TerrainSystem
 {
 private:
@@ -16,11 +20,12 @@ private:
 	Texture& m_Texture1;
 	Texture& m_Texture2;
 	Texture& m_Texture3;
-	std::unique_ptr<terrain::Terrain> m_Terrain;
-	std::unique_ptr<Geomipmapping> m_TerrainRenderer;
+	std::unique_ptr<terrain::Terrain>    m_Terrain;
+	std::unique_ptr<Geomipmapping>       m_Mesh;
+	std::unique_ptr<TerrainMeshRenderer> m_MeshRenderer;
 
 public:
-	TerrainSystem(ResourceLibrary<Shader>& shaders, ResourceLibrary<Texture>& textures);
+	TerrainSystem(ResourceLibrary<Texture>& textures);
 	void Update(float deltaTime);
 	void Render(const Shader& shader, const RenderContext& renderContext);
 	glm::vec3 GetMiddleTerrainPosition() const;

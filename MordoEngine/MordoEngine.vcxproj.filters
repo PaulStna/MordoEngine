@@ -57,10 +57,13 @@
     <ClCompile Include="src\Lighting\DirLight\DirLight.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\Geomipmapping.cpp">
+    <ClCompile Include="src\Renderer\Terrain\TerrainMeshRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Terrain\Mesh\Geomipmapping.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\LodManager.cpp">
+    <ClCompile Include="src\Terrain\Mesh\LodManager.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene\Editor\EditorScene.cpp">
@@ -167,10 +170,19 @@
     <ClInclude Include="src\Lighting\DirLight\DirLight.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\Geomipmapping.h">
+    <ClInclude Include="src\Renderer\Terrain\TerrainMeshRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\MeshDrawCall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Terrain\TerrainVertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Terrain\Mesh\Geomipmapping.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\LodManager.h">
+    <ClInclude Include="src\Terrain\Mesh\LodManager.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene\Editor\EditorScene.h">

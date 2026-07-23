@@ -20,23 +20,6 @@ void Terrain::Initialize(std::size_t size, int worldScale, float minH, float max
 	p_IsScaled = false;
 }
 
-void Vertex::InitVertex(const Terrain& terrain, std::size_t x, std::size_t z)
-{
-	pos = glm::vec3{
-		static_cast<float>(x) * terrain.GetWorldScale(),
-		terrain.GetScaledHeightAt(x, z),
-		static_cast<float>(z) * terrain.GetWorldScale(),
-	};
-
-	std::size_t terrainSize = terrain.GetSize();
-	texCoord = glm::vec2{
-		static_cast<float>(x) / static_cast<float>(terrainSize - 1),
-		static_cast<float>(z) / static_cast<float>(terrainSize - 1)
-	};
-
-	height = terrain.GetNormalizedHeightAt(x, z);
-}
-
 bool Terrain::LoadHeightMap(const std::string& filename)
 {
 	std::ifstream file(FileSystem::getPath(filename), std::ios::binary);

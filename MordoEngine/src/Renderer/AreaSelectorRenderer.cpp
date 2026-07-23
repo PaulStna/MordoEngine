@@ -1,5 +1,6 @@
 #include "AreaSelectorRenderer.h"
 #include "../Core/Shader/Shader.h"
+#include <glm/gtc/constants.hpp>
 #include <iostream>
 
 
