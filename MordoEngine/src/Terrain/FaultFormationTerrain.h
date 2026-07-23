@@ -1,7 +1,8 @@
-#pragma once
+﻿#pragma once
 #include "Terrain.h"
+#include <glm/vec2.hpp>
 
-class FaultFormationTerrain : public terrain::Terrain
+class FaultFormationTerrain : public Terrain
 {
 public:
 	FaultFormationTerrain(std::size_t terrainSize, int worldScale,  int iterations,

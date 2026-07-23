@@ -1,4 +1,4 @@
-#include "Geomipmapping.h"
+﻿#include "Geomipmapping.h"
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
@@ -10,17 +10,17 @@
 #include <chrono>
 #endif
 
-Geomipmapping::Geomipmapping(const terrain::Terrain& terrain, int patchSize)
+Geomipmapping::Geomipmapping(const Terrain& terrain, int patchSize)
 {
 	m_PatchSize = patchSize;
 	Build(terrain);
 }
 
-void Geomipmapping::Build(const terrain::Terrain& terrain)
+void Geomipmapping::Build(const Terrain& terrain)
 {
 	ValidateGrid(terrain);
 
-	m_Vertices.assign(static_cast<std::size_t>(m_Width) * m_Depth, terrain::Vertex{});
+	m_Vertices.assign(static_cast<std::size_t>(m_Width) * m_Depth, TerrainVertex{});
 	InitVertices(terrain);
 
 	m_Indices.assign(CalcNumIndices(), 0u);
@@ -33,7 +33,7 @@ void Geomipmapping::Build(const terrain::Terrain& terrain)
 	m_DrawCalls.reserve(static_cast<std::size_t>(m_NumPatchesX) * m_NumPatchesZ);
 }
 
-void Geomipmapping::ValidateGrid(const terrain::Terrain& terrain)
+void Geomipmapping::ValidateGrid(const Terrain& terrain)
 {
 	m_Width = terrain.GetSize();
 	m_Depth = terrain.GetSize();
@@ -72,7 +72,7 @@ void Geomipmapping::ValidateGrid(const terrain::Terrain& terrain)
 	m_LodInfo.resize(m_MaxLOD + 1);
 }
 
-void Geomipmapping::InitVertex(terrain::Vertex& vertex, const terrain::Terrain& terrain,
+void Geomipmapping::InitVertex(TerrainVertex& vertex, const Terrain& terrain,
 	std::size_t x, std::size_t z) const
 {
 	vertex.pos = glm::vec3{
@@ -90,7 +90,7 @@ void Geomipmapping::InitVertex(terrain::Vertex& vertex, const terrain::Terrain& 
 	vertex.height = terrain.GetNormalizedHeightAt(x, z);
 }
 
-void Geomipmapping::InitVertices(const terrain::Terrain& terrain)
+void Geomipmapping::InitVertices(const Terrain& terrain)
 {
 	int index = 0;
 
@@ -310,7 +310,7 @@ void Geomipmapping::SelectLods(const glm::vec3& cameraPos)
 	}
 }
 
-const std::vector<int>& Geomipmapping::RebuildModifiedVertices(const terrain::Terrain& terrain)
+const std::vector<int>& Geomipmapping::RebuildModifiedVertices(const Terrain& terrain)
 {
 	m_AffectedIndices.clear();
 

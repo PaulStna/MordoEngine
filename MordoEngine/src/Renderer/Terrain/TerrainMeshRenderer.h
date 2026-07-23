@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <glad/glad.h>
 #include "../MeshDrawCall.h"
 #include "../../Terrain/TerrainVertex.h"
@@ -13,11 +13,11 @@ public:
 	~TerrainMeshRenderer();
 
 	// Full (re)upload of the mesh.
-	void Upload(const std::vector<terrain::Vertex>& vertices,
+	void Upload(const std::vector<TerrainVertex>& vertices,
 		const std::vector<unsigned int>& indices);
 
 	// Re-uploads just the listed vertices, leaving the rest of the buffer alone.
-	void UpdateVertices(const std::vector<terrain::Vertex>& vertices,
+	void UpdateVertices(const std::vector<TerrainVertex>& vertices,
 		const std::vector<int>& modifiedIndices);
 
 	void Render(const std::vector<MeshDrawCall>& drawCalls) const;

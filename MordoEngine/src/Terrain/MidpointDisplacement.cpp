@@ -37,7 +37,7 @@ static float RandomFloatRange(float minValue, float maxValue)
 
 MidpointDisplacement::MidpointDisplacement(
 	std::size_t terrainSize, int worldScale, float roughness, std::size_t minHeight = 0,
-	std::size_t maxHeight = terrain::RAW_HEIGHT_MAX)
+	std::size_t maxHeight = Terrain::RAW_HEIGHT_MAX)
 {
 	if (roughness < 0.0f) {
 		exit(-99);

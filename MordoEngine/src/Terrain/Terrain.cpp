@@ -1,4 +1,4 @@
-#include "Terrain.h"
+﻿#include "Terrain.h"
 #include "../Core/FileSystem/FileSystem.h"
 #include <fstream>
 #include <cassert>
@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <cmath>
 
-using namespace terrain;
 
 void Terrain::Initialize(std::size_t size, int worldScale, float minH, float maxH)
 {

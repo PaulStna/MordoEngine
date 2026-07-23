@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "LodManager.h"
 #include "../Terrain.h"
 #include "../TerrainVertex.h"
@@ -9,11 +9,11 @@
 class Geomipmapping
 {
 public:
-    Geomipmapping(const terrain::Terrain& terrain, int patchSize);
+    Geomipmapping(const Terrain& terrain, int patchSize);
 
-    void Build(const terrain::Terrain& terrain);
-    const std::vector<int>& RebuildModifiedVertices(const terrain::Terrain& terrain);
-    const std::vector<terrain::Vertex>& GetVertices() const { return m_Vertices; }
+    void Build(const Terrain& terrain);
+    const std::vector<int>& RebuildModifiedVertices(const Terrain& terrain);
+    const std::vector<TerrainVertex>& GetVertices() const { return m_Vertices; }
     const std::vector<unsigned int>&    GetIndices()  const { return m_Indices; }
     void SelectLods(const glm::vec3& cameraPos);
     const std::vector<MeshDrawCall>& GetDrawCalls() const { return m_DrawCalls; }
@@ -38,17 +38,17 @@ private:
     LodManager m_LodManager;
     std::vector<LodInfo> m_LodInfo;
 
-    std::vector<terrain::Vertex> m_Vertices;
+    std::vector<TerrainVertex> m_Vertices;
     std::vector<unsigned int>    m_Indices;
     std::vector<MeshDrawCall>    m_DrawCalls;
 
     // Reused across modification updates so no allocation happens per edit.
     std::vector<int> m_AffectedIndices;
 
-    void ValidateGrid(const terrain::Terrain& terrain);
-    void InitVertex(terrain::Vertex& vertex, const terrain::Terrain& terrain,
+    void ValidateGrid(const Terrain& terrain);
+    void InitVertex(TerrainVertex& vertex, const Terrain& terrain,
         std::size_t x, std::size_t z) const;
-    void InitVertices(const terrain::Terrain& terrain);
+    void InitVertices(const Terrain& terrain);
     int  InitIndices();
     void CalculateSmoothNormals();
     void RecalculateNormalAt(int index);

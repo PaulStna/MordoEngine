@@ -1,4 +1,4 @@
-#include "TerrainSystem.h"
+﻿#include "TerrainSystem.h"
 #include "../HeightmapTerrain.h"
 #include "../FaultFormationTerrain.h"
 #include "../MidpointDisplacement.h"
@@ -72,7 +72,7 @@ float TerrainSystem::GetTerrainInterpolatedHeightAt(float x, float z, float yOff
 	return m_Terrain->GetHeightInterpolated(x, z) + yOffSet * m_Terrain->GetHeightScale();
 }
 
-terrain::Terrain& TerrainSystem::GetTerrain() const
+Terrain& TerrainSystem::GetTerrain() const
 {
 	return *m_Terrain;
 }

@@ -5,7 +5,7 @@
 #include <algorithm>
 
 FaultFormationTerrain::FaultFormationTerrain(std::size_t terrainSize, int worldScale, int iterations,
-	uint16_t minHeight = 0, uint16_t maxHeight = terrain::RAW_HEIGHT_MAX, float filter = 0.2f)
+	uint16_t minHeight = 0, uint16_t maxHeight = Terrain::RAW_HEIGHT_MAX, float filter = 0.2f)
 {
 	Initialize(terrainSize, worldScale, minHeight, maxHeight);
 	m_Filter = filter;

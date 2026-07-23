@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 #include "Terrain.h"
 
-class MidpointDisplacement : public terrain::Terrain {
+class MidpointDisplacement : public Terrain {
 public:
 	MidpointDisplacement(std::size_t terrainSize, int worldScale, float roughness, std::size_t minHeight, std::size_t maxHeight);
 private:

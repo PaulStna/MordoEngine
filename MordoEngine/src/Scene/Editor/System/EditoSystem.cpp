@@ -1,4 +1,4 @@
-#include "EditorSystem.h"
+﻿#include "EditorSystem.h"
 #include "../../../Renderer/AreaSelectorRenderer.h"
 #include <iostream>
 #include <glm/glm.hpp>
@@ -9,7 +9,7 @@ EditorSystem::EditorSystem(Shader& areaSelectorShader)
 	m_LastWorldPosition = glm::vec3(0.0f);
 }
 
-void EditorSystem::Update(const terrain::Terrain& terrain, const Camera& camera)
+void EditorSystem::Update(const Terrain& terrain, const Camera& camera)
 {
 	glm::vec3 m_WorldPosition = RaycastToTerrain(
 		camera.GetPosition(),
@@ -43,7 +43,7 @@ void EditorSystem::Update(const terrain::Terrain& terrain, const Camera& camera)
 glm::vec3 EditorSystem::RaycastToTerrain(
 	const glm::vec3& rayOrigin,
 	const glm::vec3& rayDir,
-	const terrain::Terrain& terrain)
+	const Terrain& terrain)
 {
 	float terrainSize = terrain.GetSize() * terrain.GetWorldScale();
 
@@ -102,17 +102,17 @@ void EditorSystem::ModyfySelector(float radius)
 	m_Renderer->SetRadio(m_Radius);
 }
 
-void EditorSystem::IncreaseTerrain(terrain::Terrain& terrain)
+void EditorSystem::IncreaseTerrain(Terrain& terrain)
 {
 	ModifyTerrain(terrain, m_BrushStrenght);
 }
 
-void EditorSystem::DecreaseTerrain(terrain::Terrain& terrain)
+void EditorSystem::DecreaseTerrain(Terrain& terrain)
 {
 	ModifyTerrain(terrain, -m_BrushStrenght);
 }
 
-void EditorSystem::ModifyTerrain(terrain::Terrain& terrain, float heightFactor)
+void EditorSystem::ModifyTerrain(Terrain& terrain, float heightFactor)
 {
 	float worldScale = terrain.GetWorldScale();
 	int centerX = (int)(m_LastWorldPosition.x / worldScale);

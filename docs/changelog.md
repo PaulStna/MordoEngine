@@ -192,3 +192,7 @@
 - Removed six dead members from Geomipmapping (the three texture id strings, the texture scale and the two height thresholds) along with their setters, as the values actually in use always lived in TerrainSystem.
 - Removed the shader library parameter from the TerrainSystem constructor, since neither the technique nor the mesh renderer owns a shader anymore.
 - Cleaned up AreaSelectorRenderer, which was including Terrain and Camera headers it no longer used.
+- Removed the terrain namespace, which was the only namespace left in the engine and wrapped a single class hierarchy that was already unambiguous on its own.
+- Nested HeightData inside Terrain as a protected type and RAW_HEIGHT_MAX as a public static constant, so both left the global scope with the namespace instead of leaking into it.
+- Updated every terrain reference across the engine, mapping terrain::Terrain to Terrain, terrain::Vertex to TerrainVertex, terrain::HeightData to Terrain::HeightData and terrain::RAW_HEIGHT_MAX to Terrain::RAW_HEIGHT_MAX, and dropped the using directives that were pulling the namespace in.
+- Dropped the glm includes from Terrain.h, which were only needed by the vertex struct that had already moved out, and added the glm/vec2 include to FaultFormationTerrain.h, which had been relying on Terrain.h to provide it.

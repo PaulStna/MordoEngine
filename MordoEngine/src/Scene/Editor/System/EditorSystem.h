@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "../../../Terrain/Terrain.h"
 #include "../../../Camera/Camera.h"
 #include "../../../Renderer/AreaSelectorRenderer.h"
@@ -21,21 +21,21 @@ private:
 	glm::vec3 RaycastToTerrain(
 		const glm::vec3& rayOrigin,
 		const glm::vec3& rayDir,
-		const terrain::Terrain& terrain);
+		const Terrain& terrain);
 	void ModyfySelector(float radius);
-	void ModifyTerrain(terrain::Terrain& terrain, float heightFactor);
+	void ModifyTerrain(Terrain& terrain, float heightFactor);
 	void ModifyBrushStrenght(float strenghtFactor);
 
 public:
 	EditorSystem(Shader& areaSelectorShader);
-	void Update(const terrain::Terrain& terrain, const Camera& camera);
+	void Update(const Terrain& terrain, const Camera& camera);
 	void Render(const RenderContext& renderContext);
 	glm::vec3 GetWorldPosition() const;
 	void IncreaseSelector();
 	void DecreaseSelector();
 
-	void IncreaseTerrain(terrain::Terrain& terrain);
-	void DecreaseTerrain(terrain::Terrain& terrain);
+	void IncreaseTerrain(Terrain& terrain);
+	void DecreaseTerrain(Terrain& terrain);
 
 	void IncreaseBrushStrenght();
 	void DecreaseBrushStrenght();

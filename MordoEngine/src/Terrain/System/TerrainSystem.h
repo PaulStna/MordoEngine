@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "../../Core/Shader/Shader.h"
 #include "../../Core/Texture/Texture.h"
 #include "../../Core/Resources/ResourceLibrary.h"
@@ -20,7 +20,7 @@ private:
 	Texture& m_Texture1;
 	Texture& m_Texture2;
 	Texture& m_Texture3;
-	std::unique_ptr<terrain::Terrain>    m_Terrain;
+	std::unique_ptr<Terrain>    m_Terrain;
 	std::unique_ptr<Geomipmapping>       m_Mesh;
 	std::unique_ptr<TerrainMeshRenderer> m_MeshRenderer;
 
@@ -32,7 +32,7 @@ public:
 	int GetTerrainWorldScale() const;
 	float GetTerrainHeightScale() const;
 	float GetTerrainInterpolatedHeightAt(float x, float z, float yOffSet = 0) const;
-	terrain::Terrain& GetTerrain() const;
+	Terrain& GetTerrain() const;
 	void CheckForModifications();
 	void SaveTerrain();
 	~TerrainSystem();

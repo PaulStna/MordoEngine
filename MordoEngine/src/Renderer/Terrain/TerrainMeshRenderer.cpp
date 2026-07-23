@@ -1,4 +1,4 @@
-#include "TerrainMeshRenderer.h"
+﻿#include "TerrainMeshRenderer.h"
 
 TerrainMeshRenderer::TerrainMeshRenderer()
 {
@@ -21,23 +21,23 @@ void TerrainMeshRenderer::CreateGLState()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ebo);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(terrain::Vertex),
-		(const void*)offsetof(terrain::Vertex, pos));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex),
+		(const void*)offsetof(TerrainVertex, pos));
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(terrain::Vertex),
-		(const void*)offsetof(terrain::Vertex, texCoord));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex),
+		(const void*)offsetof(TerrainVertex, texCoord));
 
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(terrain::Vertex),
-		(const void*)offsetof(terrain::Vertex, normal));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex),
+		(const void*)offsetof(TerrainVertex, normal));
 
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(terrain::Vertex),
-		(const void*)offsetof(terrain::Vertex, height));
+	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(TerrainVertex),
+		(const void*)offsetof(TerrainVertex, height));
 }
 
-void TerrainMeshRenderer::Upload(const std::vector<terrain::Vertex>& vertices,
+void TerrainMeshRenderer::Upload(const std::vector<TerrainVertex>& vertices,
 	const std::vector<unsigned int>& indices)
 {
 	if (vertices.empty() || indices.empty()) {
@@ -59,7 +59,7 @@ void TerrainMeshRenderer::Upload(const std::vector<terrain::Vertex>& vertices,
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void TerrainMeshRenderer::UpdateVertices(const std::vector<terrain::Vertex>& vertices,
+void TerrainMeshRenderer::UpdateVertices(const std::vector<TerrainVertex>& vertices,
 	const std::vector<int>& modifiedIndices)
 {
 	if (modifiedIndices.empty()) {
@@ -70,8 +70,8 @@ void TerrainMeshRenderer::UpdateVertices(const std::vector<terrain::Vertex>& ver
 
 	for (int index : modifiedIndices) {
 		glBufferSubData(GL_ARRAY_BUFFER,
-			index * sizeof(terrain::Vertex),
-			sizeof(terrain::Vertex),
+			index * sizeof(TerrainVertex),
+			sizeof(TerrainVertex),
 			&vertices[index]);
 	}
 
