@@ -15,13 +15,17 @@ private:
 
 	void RenderLights(const Shader& lightCubeShader, const RenderContext& renderContext);
 
-	void ApplyUniforms(const Shader& shader, const RenderContext& renderContext);
 public:
 	LightSystem();
 	void Update(float deltaTime);
 	void Render(const Shader& terrainShader,
 				const Shader& cubeLightShader,
 				const RenderContext& renderContext);
+
+	// Feeds the light uniforms into any shader that declares the same
+	// DirLight/PointLight structs.
+	void ApplyUniforms(const Shader& shader, const RenderContext& renderContext);
+
 	void AddPointLight(PointLight&& pointLight);
 	~LightSystem();
 };

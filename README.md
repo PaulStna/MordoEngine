@@ -18,13 +18,13 @@ The codebase evolves over time as I learn new concepts, improve the architecture
 - GLFW
 - GLM
 - glad
+- Assimp
 - stb_image
 - perlin noise
 
 ## Project Status
-Water rendering test (water reflection and refraction with distortion) (quality should be improved in the future):
-![Water/ReflectionAndRefractionDistortion](imgs/2026-03-08-2.png)
-![Water/ReflectionAndRefractionDistortion](imgs/2026-07-20.png)
+Water rendering test demonstrating real-time reflection, refraction, distortion, and animated scene rendering. Both the animated fox model and an animated object are correctly reflected on the water surface. Rendering quality is a work in progress and will be improved in future updates  .
+![Water/ReflectionAndRefractionDistortion/AnimatedScene](imgs/2026-07-29.gif)
 
 ## Notes
 This is an educational and personal project focused on learning and experimentation.  

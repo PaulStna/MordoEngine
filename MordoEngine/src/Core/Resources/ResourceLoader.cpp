@@ -23,6 +23,9 @@ void LoadShaders(ResourceLibrary<Shader>& shaders)
 	shaders.Load("underwater",
 		FileSystem::getPath("res/shaders/underwater.vs"),
 		FileSystem::getPath("res/shaders/underwater.fs"));
+	shaders.Load("model",
+		FileSystem::getPath("res/shaders/model.vs"),
+		FileSystem::getPath("res/shaders/model.fs"));
 }
 
 void LoadTextures(ResourceLibrary<Texture>& textures)

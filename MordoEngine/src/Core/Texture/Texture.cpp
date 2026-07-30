@@ -63,7 +63,7 @@ Texture::Texture(const std::string& filePath, const std::vector<std::string>& fa
 			else if (nrChannels == 4)
 				format = GL_RGBA;
 			else {
-				std::cout << "Formato no soportado: " << nrChannels << " canales" << std::endl;
+				std::cout << "Unsupported format: " << nrChannels << " channels" << std::endl;
 				stbi_image_free(data);
 				return;
 			}

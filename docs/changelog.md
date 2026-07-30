@@ -203,3 +203,25 @@
 - Gave Framebuffer its own width and height instead of the hardcoded 800x800, and folded the viewport and clear into BindBuffer so binding a framebuffer also prepares it to be drawn into.
 - Changed World::Render to take no parameters and build the frame RenderContext itself, since World owns the camera, and updated GameScene accordingly.
 - Extracted the shared opaque-scene-plus-water-surface pass into World::RenderSceneAndWater, reused by both the submerged and above-water paths.
+
+## 2026-07-27
+- Vendored Assimp v6.0.5 under MordoEngine/vendor/assimp, following the same include and lib layout already used by GLFW, glad, glm, perlin and stb.
+- Built it as a shared library and wired it into Debug|x64 and Release|x64, with the ASSIMP_DLL define and a post-build step that copies the DLL next to the executable.
+
+## 2026-07-28
+- Added a model loading pipeline following the same split as the terrain: a loader that produces plain CPU data with no GL calls, a renderer that owns the GPU buffers, and a system that drives them.
+- Implemented LoadModel on top of Assimp, resolving texture paths against the model file's own folder so the working directory stops mattering, and reading the PBR base colour slot with the legacy diffuse one as a fallback. Deliberately without aiProcess_FlipUVs, since Texture already flips through stb and applying both cancels out.
+- Added ModelRenderer, which packs every submesh into a single VBO and EBO and draws each one as a slice through glDrawElementsBaseVertex.
+- Added the model shaders, using the terrain's clip plane so models show up in the water reflection and refraction passes, and made LightSystem::ApplyUniforms public: it was private and only ever applied to the terrain shader, which left any model rendering completely black.
+- Registered the model shader in ResourceLoader; model textures stay out of LoadTextures and are loaded on demand instead, keyed by the path Assimp returns.
+
+## 2026-07-29
+- Extracted a Model class out of ModelSystem: a Model owns one model's buffers, the draw call and texture of each submesh and its place in the world, while ModelSystem became the director of a std::vector<Model>. Model holds its renderer through a unique_ptr because ModelRenderer is neither copyable nor movable, and that indirection is the only thing making Model storable in a vector at all.
+- Split the shader uniforms by scope: ModelSystem sets projection, view, plane and texture1 once for the whole pass, and each Model sets only its own model matrix. World's optional prop unique_ptr became a plain ModelSystem member, since a system holding zero models is a valid state and needs no null checks.
+- Added a Transform class under Core/Transform holding position, rotation in degrees and scale, with SetHeight, a uniform SetScale and SetYaw, and a dirty-flag matrix cache because the water passes ask each object for its matrix several times per frame. Model now holds one instead of a raw glm::mat4.
+- Added skeletal and rigid-node animation: bone ids and weights in the vertex layout, and the node hierarchy, the bones with their inverse bind matrices and the keyframe channels in ModelData.
+- Made LoadModel choose its post-processing flags per file, reading once with no post-processing to check for animation first: PreTransformVertices and OptimizeMeshes for static models, LimitBoneWeights for animated ones. The first two bake away the node hierarchy the animation drives, so the same set cannot serve both.
+- Added an Animator under Core/Model/Animation that samples the playing clip, resolves the node globals in a single forward pass -- the loader flattens the hierarchy depth first, so a parent always precedes its children -- and produces one final matrix per bone. It supports named clip lookup, looping and non-looping playback, and falls back to the rest pose so a file with no clips draws its bind pose instead of collapsing.
+- Added the skinning path to the model vertex shader, blending up to four bone matrices per vertex and normalising by the total weight; the bone ids go through glVertexAttribIPointer so they arrive as integers rather than floats. Added Shader::SetMat4Array to upload a whole skeleton in one call.
+- Added the Khronos Lantern and Fox sample models under res/models to exercise the pipeline end to end. The Lantern is CC0; the Fox is CC0 for the model but CC BY 4.0 for its rigging, animation and glTF conversion, so its README and LICENSE are kept alongside it.
+- Split the documentation into loading-blender-models.md and model-animation.md, both in English with an index, explaining how each piece works and linking to the source instead of pasting it. Morph target animation is documented as not implemented: it needs per-vertex blending rather than node transforms, so it would be a separate path.

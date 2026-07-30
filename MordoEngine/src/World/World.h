@@ -4,6 +4,7 @@
 #include "../Water/System/WaterSystem.h"
 #include "../Lighting/LightSystem.h"
 #include "../Sky/System/SkySystem.h"
+#include "../Core/Model/System/ModelSystem.h"
 #include "../Renderer/RenderContext.h"
 #include "../Renderer/Framebuffer/Framebuffer.h"
 #include "../Renderer/Plane/PlaneRenderer.h"
@@ -34,11 +35,15 @@ private:
     WaterSystem   m_Water;
     SkySystem     m_Sky;
 
+    // Empty until a model is dropped into res/models. See docs/loading-blender-models.md.
+    ModelSystem   m_Models;
+
     Shader& m_TerrainShader;
     Shader& m_CubeLightShader;
     Shader& m_SkyShader;
     Shader& m_WaterShader;
     Shader& m_UnderwaterShader;
+    Shader& m_ModelShader;
     Texture& m_SkyTexture;
     Texture& m_WaterDuDv;
 
