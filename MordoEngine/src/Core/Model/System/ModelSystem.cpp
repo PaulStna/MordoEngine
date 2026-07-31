@@ -4,17 +4,17 @@ Model& ModelSystem::Add(const std::string& path,
 	ResourceLibrary<Texture>& textures,
 	const Transform& transform)
 {
-	Model& model = m_Models.emplace_back(path, textures);
-	model.GetTransform() = transform;
-	return model;
+	std::unique_ptr<Model> model = std::make_unique<Model>(path, textures);
+	model->GetTransform() = transform;
+	return *m_Models.emplace_back(std::move(model));
 }
 
 void ModelSystem::Update(float deltaTime)
 {
 	// Only the animated ones actually do anything here.
-	for (Model& model : m_Models)
+	for (const std::unique_ptr<Model>& model : m_Models)
 	{
-		model.Update(deltaTime);
+		model->Update(deltaTime);
 	}
 }
 
@@ -30,8 +30,8 @@ void ModelSystem::Render(const Shader& shader, const RenderContext& renderContex
 	shader.SetVec4("plane", renderContext.clipPlane);
 	shader.SetInt("texture1", 0);
 
-	for (const Model& model : m_Models)
+	for (const std::unique_ptr<Model>& model : m_Models)
 	{
-		model.Render(shader);
+		model->Render(shader);
 	}
 }

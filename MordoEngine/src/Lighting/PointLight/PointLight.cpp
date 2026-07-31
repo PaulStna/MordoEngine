@@ -1,7 +1,8 @@
 #include "PointLight.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-PointLight::PointLight(const glm::vec3 position) : m_Renderer(std::make_unique<CubePointLightRenderer>())
+PointLight::PointLight(const glm::vec3 position, bool debugCube)
+	: m_Renderer(debugCube ? std::make_unique<CubePointLightRenderer>() : nullptr)
 {
 	m_Data.position = position;
 	m_Data.ambient = glm::vec3(0.05f);
@@ -19,6 +20,10 @@ void PointLight::Update(float deltaTime)
 
 void PointLight::Render(const Shader& shader, const RenderContext& renderContext)
 {
+	// A light that lives inside a lamp has nothing to draw of its own.
+	if (!m_Renderer)
+		return;
+
 	shader.Use();
 	shader.SetMat4("projection", renderContext.projection);
 	shader.SetMat4("view", renderContext.view);

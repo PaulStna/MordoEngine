@@ -2,6 +2,7 @@
 #include "../Core/Shader/Shader.h"
 #include "../Core/Texture/Texture.h"
 #include "../Core/FileSystem/FileSystem.h"
+#include "../Actor/ActorContext.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <filesystem>
 #include <iostream>
@@ -21,6 +22,10 @@ namespace
 	const glm::vec2 LANTERN_WORLD_XZ{ 524.0f, 700.0f };
 	const float LANTERN_SCALE = 10.0f;
 	const float LANTERN_YAW = 60.f;
+
+	// Where the lamp head sits inside the model, taken from the LanternPole_Lantern
+	// node in the glTF. Model space, so the actor's scale and yaw carry it.
+	const glm::vec3 LANTERN_LIGHT_OFFSET{ -9.582f, 18.009f, 0.0f };
 }
 
 World::World(unsigned int screenWidth, unsigned int screenHeight,
@@ -43,17 +48,17 @@ World::World(unsigned int screenWidth, unsigned int screenHeight,
 	m_ScreenWidth(screenWidth),
 	m_ScreenHeight(screenHeight)
 {
-	// Lights
+	// Bare lights, no body: they keep the debug cube so they can still be found
+	// by eye while placing things.
 	glm::vec3 center = m_Terrain.GetMiddleTerrainPosition();
 	float yOffset = 0.2f;
 	float scale = m_Terrain.GetTerrainWorldScale();
 
 	auto addLight = [&](float offsetX, float offsetZ)
 		{
-			float x = center.x + offsetX * scale;
-			float z = center.z + offsetZ * scale;
-			float y = m_Terrain.GetTerrainInterpolatedHeightAt(x, z, yOffset);
-			m_Lights.AddPointLight(PointLight(glm::vec3(x, y, z)));
+			LightActor& light = m_Actors.Spawn<LightActor>(m_Lights, glm::vec3(0.0f), true);
+			light.PlaceOnTerrain(m_Terrain,
+				{ center.x + offsetX * scale, center.z + offsetZ * scale }, yOffset);
 		};
 
 	addLight(50.0f, 50.0f);
@@ -67,56 +72,64 @@ World::World(unsigned int screenWidth, unsigned int screenHeight,
 		glm::vec3(700.0f, 1.0f, 700.0f),
 		m_WaterLevel);
 
-	// Models. All optional: a file that is not there just means the scene renders
-	// without it.
-	//
-	// The clip name is taken here rather than returned to the caller on purpose.
-	// Add invalidates any reference it handed out earlier, so nothing that points
-	// into the vector is allowed to outlive the next call.
-	auto dropOnTerrain = [&](const char* relativePath, const glm::vec2& xz,
-		float uniformScale, float yawDegrees, const char* clip = nullptr)
+	// Bodies. All optional: a file that is not there just means the scene renders
+	// without it, so this hands back null rather than throwing.
+	auto loadModel = [&](const char* relativePath) -> Model*
 		{
 			const std::string path = FileSystem::getPath(relativePath);
 			if (!std::filesystem::exists(path))
 			{
 				std::cout << "No model at " << path << ", skipping.\n";
-				return;
+				return nullptr;
 			}
-
-			Model& model = m_Models.Add(path, textures);
-
-			// Both models have their pivot at the base, so the terrain height is
-			// the position with no vertical correction.
-			Transform& transform = model.GetTransform();
-			transform.SetPosition({ xz.x,
-				m_Terrain.GetTerrainInterpolatedHeightAt(xz.x, xz.y),
-				xz.y });
-			transform.SetScale(uniformScale);
-			transform.SetYaw(yawDegrees);
-
-			std::cout << relativePath << " at y=" << transform.GetPosition().y
-				<< ", scale " << uniformScale;
-
-			if (const Animator* animator = model.GetAnimator())
-			{
-				std::cout << ", clips:";
-				for (size_t i = 0; i < animator->GetAnimationCount(); i++)
-				{
-					std::cout << " " << animator->GetAnimationName(i);
-				}
-
-				if (clip && !model.PlayAnimation(clip))
-				{
-					std::cout << " (no clip named '" << clip << "')";
-				}
-			}
-
-			std::cout << "\n";
+			return &m_Models.Add(path, textures);
 		};
 
+	// Everything in the scene is an actor from here on. What each one is comes
+	// from its type, not from a pile of setup living in this constructor: the
+	// lantern is a light that happens to have a body, the fox is a creature that
+	// switches clips. A new object is a new type, and this stays a list.
+	//
+	// The player carries no model: the camera is the view, so a body would only
+	// hang in the air below it. SetModel is all it takes to give it one.
+	m_Player = &m_Actors.Spawn<PlayerActor>();
+
 	std::cout << "Water level " << m_WaterLevel << ".\n";
-	dropOnTerrain(LANTERN_MODEL_PATH, LANTERN_WORLD_XZ, LANTERN_SCALE, LANTERN_YAW);
-	dropOnTerrain(FOX_MODEL_PATH, FOX_WORLD_XZ, FOX_SCALE, FOX_YAW, "Walk");
+
+	if (Model* model = loadModel(LANTERN_MODEL_PATH))
+	{
+		LightActor& lantern = m_Actors.Spawn<LightActor>(m_Lights, LANTERN_LIGHT_OFFSET);
+		lantern.SetName("lantern");
+		lantern.SetModel(model);
+
+		// The model's pivot is at its base, so terrain height needs no correction.
+		lantern.PlaceOnTerrain(m_Terrain, LANTERN_WORLD_XZ);
+		lantern.GetTransform().SetScale(LANTERN_SCALE);
+		lantern.GetTransform().SetYaw(LANTERN_YAW);
+
+		std::cout << "lantern at y=" << lantern.GetTransform().GetPosition().y
+			<< ", light at y=" << lantern.GetLightPosition().y << "\n";
+	}
+
+	if (Model* model = loadModel(FOX_MODEL_PATH))
+	{
+		AnimalActor& fox = m_Actors.Spawn<AnimalActor>(
+			AnimalActor::Clips{ "Survey", "Walk", "Run" });
+		fox.SetName("fox");
+		fox.SetModel(model);
+		fox.PlaceOnTerrain(m_Terrain, FOX_WORLD_XZ);
+		fox.GetTransform().SetScale(FOX_SCALE);
+		fox.GetTransform().SetYaw(FOX_YAW);
+
+		std::cout << "fox at y=" << fox.GetTransform().GetPosition().y
+			<< ", walking: " << std::boolalpha
+			<< fox.SetState(AnimalActor::State::Walking) << "\n";
+	}
+
+	// One zero-length tick so every actor has pushed its transform into its
+	// model and its light before the first frame is drawn.
+	ActorContext actorContext{ m_Terrain, m_Camera, m_Actors };
+	m_Actors.Update(0.0f, actorContext);
 }
 
 void World::Update(float deltaTime)
@@ -126,6 +139,11 @@ void World::Update(float deltaTime)
 	m_Lights.Update(deltaTime);
 	m_Sky.Update(deltaTime);
 	m_Water.Update(deltaTime, m_Camera.GetPosition());
+
+	// Actors first: they decide where things are, and the models follow.
+	ActorContext actorContext{ m_Terrain, m_Camera, m_Actors };
+	m_Actors.Update(deltaTime, actorContext);
+
 	m_Models.Update(deltaTime);
 }
 

@@ -51,9 +51,18 @@ void LightSystem::ApplyUniforms(const Shader& shader, const RenderContext& rende
 	}
 }
 
-void LightSystem::AddPointLight(PointLight&& pointLight)
+std::size_t LightSystem::AddPointLight(PointLight&& pointLight)
 {
 	m_PointLights.push_back(std::move(pointLight));
+	return m_PointLights.size() - 1;
+}
+
+void LightSystem::SetPointLightPosition(std::size_t index, const glm::vec3& position)
+{
+	if (index < m_PointLights.size())
+	{
+		m_PointLights[index].SetPosition(position);
+	}
 }
 
 LightSystem::~LightSystem()

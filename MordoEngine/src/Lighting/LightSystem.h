@@ -26,6 +26,15 @@ public:
 	// DirLight/PointLight structs.
 	void ApplyUniforms(const Shader& shader, const RenderContext& renderContext);
 
-	void AddPointLight(PointLight&& pointLight);
+	// Returns the light's index, which an actor keeps so it can move it later.
+	// Indices are stable because lights are only ever appended.
+	std::size_t AddPointLight(PointLight&& pointLight);
+
+	// Only the first MAX_POINT_IGHTS reach the shaders. Adding more is not an
+	// error, they just do not light anything until this picks the nearest ones
+	// instead of the first ones.
+	std::size_t GetPointLightCount() const { return m_PointLights.size(); }
+	void SetPointLightPosition(std::size_t index, const glm::vec3& position);
+
 	~LightSystem();
 };

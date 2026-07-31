@@ -5,22 +5,26 @@
 #include "../../Resources/ResourceLibrary.h"
 #include "../../../Renderer/RenderContext.h"
 #include <glm/glm.hpp>
+#include <memory>
 #include <string>
 #include <vector>
 
 // Owns every model in the scene and draws them all in one pass, sharing the
-// shader and its per-pass uniforms. 
+// shader and its per-pass uniforms.
 // (Same role TerrainSystem plays for the terrain:
 // the models themselves know nothing about the pass they are in.)
 class ModelSystem
 {
 private:
-	std::vector<Model> m_Models;
+	// Held by pointer so the models keep their address when the vector grows.
+	// Actors point at them, and a reference that moves under an actor is a
+	// dangling pointer waiting to happen.
+	std::vector<std::unique_ptr<Model>> m_Models;
 
 public:
-	// Loads a model and places it. Throws std::runtime_error if the file cannot// be read. 
-	// The returned reference is invalidated by a later Add, same
-	// contract as std::vector, so use it right away or not at all:
+	// Loads a model and places it. Throws std::runtime_error if the file cannot
+	// be read. The returned reference stays valid for as long as the system
+	// lives, so it is safe to hold on to:
 	// IMPORTANT (Usage) -> m_Models.Add(path, textures).GetTransform().SetScale(2.0f);
 	Model& Add(const std::string& path,
 			   ResourceLibrary<Texture>& textures,

@@ -1,0 +1,39 @@
+#pragma once
+#include "../Actor.h"
+
+// A creature: a model with a skeleton and a handful of clips it switches
+// between.
+//
+// It decides nothing yet. Something else sets the state, and this turns that
+// into the right clip on the right model. That split is the point: when the AI
+// arrives it only has to call SetState, and when the same fox needs to take
+// damage it only has to gain a Health member. Neither has to learn how the
+// animation system is wired.
+class AnimalActor : public Actor
+{
+public:
+	// Clip names exactly as the file spells them. Leave one empty when the
+	// model does not have it and the state will be ignored.
+	struct Clips
+	{
+		std::string idle;
+		std::string walk;
+		std::string run;
+	};
+
+	enum class State { Idle, Walking, Running };
+
+	explicit AnimalActor(Clips clips);
+
+	// Returns false if the model has no clip for that state, leaving whatever
+	// is playing alone. Set the model first: with none attached there is
+	// nothing to play on.
+	bool SetState(State state);
+	State GetState() const { return m_State; }
+
+private:
+	Clips m_Clips;
+	State m_State = State::Idle;
+
+	const std::string& ClipFor(State state) const;
+};

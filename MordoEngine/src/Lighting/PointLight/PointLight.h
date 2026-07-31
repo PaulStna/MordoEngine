@@ -12,7 +12,10 @@
 	    std::unique_ptr<CubePointLightRenderer> m_Renderer;
 
     public:
-	    PointLight(const glm::vec3 position);
+	    // debugCube draws the white marker at the light's position. Wanted while
+	    // placing lights by hand, not wanted on a lamp that already has a body,
+	    // and when it is off no cube geometry is built at all.
+	    PointLight(const glm::vec3 position, bool debugCube = true);
         PointLight(const PointLight&) = delete;
         PointLight& operator=(const PointLight&) = delete;
 
