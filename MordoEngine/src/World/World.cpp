@@ -1,24 +1,23 @@
 #include "World.h"
 #include "../Core/Shader/Shader.h"
 #include "../Core/Texture/Texture.h"
-#include "../Core/FileSystem/FileSystem.h"
+#include "../Core/Model/Model.h"
 #include "../Actor/ActorContext.h"
 #include <glm/gtc/matrix_transform.hpp>
-#include <filesystem>
 #include <iostream>
 
 // Namespace for the test animation (fox) and model (lantern)
 namespace
 {
-	// glTF Separate (.gltf + .bin + textures), never .glb: Texture only builds
-	// from a file path, so embedded textures cannot be read.
+	// Ids as ResourceLoader registered them, not paths: the files are loaded once
+	// at startup and everything here just borrows what is already resident.
 	// Swap these for your own Blender exports; see docs/loading-blender-models.md.
-	const char* FOX_MODEL_PATH = "res/models/fox/Fox.gltf";
+	const char* FOX_MODEL_ID = "fox";
 	const glm::vec2 FOX_WORLD_XZ{ 650.0f, 718.0f };
 	const float FOX_SCALE = 1.5f;
 	const float FOX_YAW = 160.f;
 
-	const char* LANTERN_MODEL_PATH = "res/models/lantern/Lantern.gltf";
+	const char* LANTERN_MODEL_ID = "lantern";
 	const glm::vec2 LANTERN_WORLD_XZ{ 524.0f, 700.0f };
 	const float LANTERN_SCALE = 10.0f;
 	const float LANTERN_YAW = 60.f;
@@ -29,7 +28,9 @@ namespace
 }
 
 World::World(unsigned int screenWidth, unsigned int screenHeight,
-	ResourceLibrary<Shader>& shaders, ResourceLibrary<Texture>& textures)
+	ResourceLibrary<Shader>& shaders,
+	ResourceLibrary<Texture>& textures,
+	ResourceLibrary<Model>& models)
 	: m_Terrain(textures),
 	m_Camera(m_Terrain.GetMiddleTerrainPosition(), screenWidth, screenHeight),
 	m_Lights(),
@@ -54,6 +55,8 @@ World::World(unsigned int screenWidth, unsigned int screenHeight,
 	float yOffset = 0.2f;
 	float scale = m_Terrain.GetTerrainWorldScale();
 
+	/*
+	
 	auto addLight = [&](float offsetX, float offsetZ)
 		{
 			LightActor& light = m_Actors.Spawn<LightActor>(m_Lights, glm::vec3(0.0f), true);
@@ -63,6 +66,7 @@ World::World(unsigned int screenWidth, unsigned int screenHeight,
 
 	addLight(50.0f, 50.0f);
 	addLight(-100.0f, -100.0f);
+	*/
 
 	// Water
 	m_WaterLevel = m_Terrain.GetTerrainHeightScale() * 0.3f;
@@ -72,17 +76,16 @@ World::World(unsigned int screenWidth, unsigned int screenHeight,
 		glm::vec3(700.0f, 1.0f, 700.0f),
 		m_WaterLevel);
 
-	// Bodies. All optional: a file that is not there just means the scene renders
-	// without it, so this hands back null rather than throwing.
-	auto loadModel = [&](const char* relativePath) -> Model*
+	// Bodies. All optional: a model that is not there just means the scene
+	// renders without it, so this hands back null rather than throwing.
+	auto findModel = [&](const char* id) -> Model*
 		{
-			const std::string path = FileSystem::getPath(relativePath);
-			if (!std::filesystem::exists(path))
+			if (!models.Exists(id))
 			{
-				std::cout << "No model at " << path << ", skipping.\n";
+				std::cout << "No model '" << id << "', skipping.\n";
 				return nullptr;
 			}
-			return &m_Models.Add(path, textures);
+			return &models.Get(id);
 		};
 
 	// Everything in the scene is an actor from here on. What each one is comes
@@ -96,7 +99,7 @@ World::World(unsigned int screenWidth, unsigned int screenHeight,
 
 	std::cout << "Water level " << m_WaterLevel << ".\n";
 
-	if (Model* model = loadModel(LANTERN_MODEL_PATH))
+	if (Model* model = findModel(LANTERN_MODEL_ID))
 	{
 		LightActor& lantern = m_Actors.Spawn<LightActor>(m_Lights, LANTERN_LIGHT_OFFSET);
 		lantern.SetName("lantern");
@@ -111,23 +114,45 @@ World::World(unsigned int screenWidth, unsigned int screenHeight,
 			<< ", light at y=" << lantern.GetLightPosition().y << "\n";
 	}
 
-	if (Model* model = loadModel(FOX_MODEL_PATH))
+	if (Model* model = findModel(FOX_MODEL_ID))
 	{
-		AnimalActor& fox = m_Actors.Spawn<AnimalActor>(
-			AnimalActor::Clips{ "Survey", "Walk", "Run" });
-		fox.SetName("fox");
-		fox.SetModel(model);
-		fox.PlaceOnTerrain(m_Terrain, FOX_WORLD_XZ);
-		fox.GetTransform().SetScale(FOX_SCALE);
-		fox.GetTransform().SetYaw(FOX_YAW);
+		// Three foxes on one Model: one set of GPU buffers, one copy of the
+		// textures and of the keyframes between them. All that makes them
+		// different is a Body each, so they can stand apart, run different clips
+		// and start at different points in them.
+		struct FoxSetup
+		{
+			glm::vec2         offset;
+			AnimalActor::State state;
+			float             phase;   // seconds into the clip
+		};
 
-		std::cout << "fox at y=" << fox.GetTransform().GetPosition().y
-			<< ", walking: " << std::boolalpha
-			<< fox.SetState(AnimalActor::State::Walking) << "\n";
+		const FoxSetup setups[] = {
+			{ {   0.0f,  0.0f }, AnimalActor::State::Walking, 0.0f },
+			{ {  60.0f, 25.0f }, AnimalActor::State::Running, 0.4f },
+			{ { -45.0f, 55.0f }, AnimalActor::State::Idle,    0.8f },
+		};
+
+		for (const FoxSetup& setup : setups)
+		{
+			AnimalActor& fox = m_Actors.Spawn<AnimalActor>(
+				AnimalActor::Clips{ "Survey", "Walk", "Run" });
+			fox.SetName("fox");
+			fox.SetModel(model);
+			fox.PlaceOnTerrain(m_Terrain, FOX_WORLD_XZ + setup.offset);
+			fox.GetTransform().SetScale(FOX_SCALE);
+			fox.GetTransform().SetYaw(FOX_YAW);
+
+			const bool playing = fox.SetState(setup.state);
+			fox.GetBody().SetAnimationTime(setup.phase);
+
+			std::cout << "fox at y=" << fox.GetTransform().GetPosition().y
+				<< ", clip playing: " << std::boolalpha << playing << "\n";
+		}
 	}
 
-	// One zero-length tick so every actor has pushed its transform into its
-	// model and its light before the first frame is drawn.
+	// One zero-length tick so every actor has settled its light and its pose
+	// before the first frame is drawn.
 	ActorContext actorContext{ m_Terrain, m_Camera, m_Actors };
 	m_Actors.Update(0.0f, actorContext);
 }
@@ -143,8 +168,6 @@ void World::Update(float deltaTime)
 	// Actors first: they decide where things are, and the models follow.
 	ActorContext actorContext{ m_Terrain, m_Camera, m_Actors };
 	m_Actors.Update(deltaTime, actorContext);
-
-	m_Models.Update(deltaTime);
 }
 
 RenderContext World::MakeRenderContext() const
@@ -166,10 +189,10 @@ void World::RenderOpaque(const RenderContext& renderContext)
 	m_Lights.Render(m_TerrainShader, m_CubeLightShader, renderContext);
 	m_Terrain.Render(m_TerrainShader, renderContext);
 
-	if (!m_Models.IsEmpty())
+	if (!m_Actors.IsEmpty())
 	{
 		m_Lights.ApplyUniforms(m_ModelShader, renderContext);
-		m_Models.Render(m_ModelShader, renderContext);
+		m_Actors.Render(m_Models, m_ModelShader, renderContext);
 	}
 
 	m_Sky.Render(m_SkyShader, m_SkyTexture, renderContext);

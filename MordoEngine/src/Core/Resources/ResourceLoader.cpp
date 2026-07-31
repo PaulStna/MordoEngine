@@ -1,5 +1,7 @@
 #include "ResourceLoader.h"
 #include "../FileSystem/FileSystem.h"
+#include <filesystem>
+#include <iostream>
 #include <vector>
 #include <string>
 
@@ -39,4 +41,27 @@ void LoadTextures(ResourceLibrary<Texture>& textures)
 	textures.Load("rock", FileSystem::getPath("res/textures/rock_high.png"));
 	textures.Load("skyBox", FileSystem::getPath("res/textures/cubemap/"), cubeMapFaces);
 	textures.Load("dudvMap", FileSystem::getPath("res/textures/water/dudvMap.png"));
+}
+
+void LoadModels(ResourceLibrary<Model>& models, ResourceLibrary<Texture>& textures)
+{
+	// glTF Separate (.gltf + .bin + textures), never .glb: Texture only builds
+	// from a file path, so embedded textures cannot be read.
+	//
+	// Models are optional. A file that is not there is skipped rather than
+	// thrown over, so the scene still comes up without it and whoever asked for
+	// it finds nothing under that id.
+	auto load = [&](const std::string& id, const std::string& relativePath)
+		{
+			const std::string path = FileSystem::getPath(relativePath);
+			if (!std::filesystem::exists(path))
+			{
+				std::cout << "No model at " << path << ", skipping.\n";
+				return;
+			}
+			models.Load(id, path, textures);
+		};
+
+	load("fox", "res/models/fox/Fox.gltf");
+	load("lantern", "res/models/lantern/Lantern.gltf");
 }

@@ -31,10 +31,10 @@ Blender  →  res/models/<name>/<name>.gltf
               ↓  ModelLoader        (Assimp → CPU, not a single GL call)
             ModelData
               ↓  ModelRenderer      (VAO/VBO/EBO, emits MeshDrawCall)
-            Model                   (mesh + materials + transform)
-              ↓
-            ModelSystem             (the collection + the per-pass uniforms)
-              ↓
+            Model                   (mesh + materials + rig — shared by everyone)
+              ↓  Body               (one per actor: the model it borrows + its own Animator)
+            Actor                   (the transform, and what the thing does)
+              ↓  ModelSystem        (per-pass uniforms, then one draw per body)
             World::RenderOpaque
 ```
 
@@ -44,6 +44,13 @@ not depend on OpenGL, so it can be compiled and exercised on its own, with no
 window and no context: that is what the [quick verification](#8-quick-verification)
 relies on.
 
+**The other split, running the other way, is asset against instance.** A `Model`
+is loaded once per file and shared: it holds the GPU buffers, the materials and
+the `Rig`, none of which tell two copies apart. Everything that does — where the
+thing stands, which clip it is on and how far into it — lives in the `Body` its
+actor owns. That is what lets three foxes cost one set of buffers and one copy of
+the keyframes, plus a few kilobytes of pose each.
+
 ### The files
 
 | File | What it is |
@@ -52,10 +59,12 @@ relies on.
 | [`Core/Model/ModelData.h`](../MordoEngine/src/Core/Model/ModelData.h) | A model as plain CPU data |
 | [`Core/Model/ModelLoader.h`](../MordoEngine/src/Core/Model/ModelLoader.h) · [`.cpp`](../MordoEngine/src/Core/Model/ModelLoader.cpp) | File → `ModelData`, through Assimp |
 | [`Renderer/Model/ModelRenderer.h`](../MordoEngine/src/Renderer/Model/ModelRenderer.h) · [`.cpp`](../MordoEngine/src/Renderer/Model/ModelRenderer.cpp) | The GPU buffers and the draw calls |
-| [`Core/Model/Model.h`](../MordoEngine/src/Core/Model/Model.h) · [`.cpp`](../MordoEngine/src/Core/Model/Model.cpp) | A model already on the GPU, with its place in the world |
-| [`Core/Model/System/ModelSystem.h`](../MordoEngine/src/Core/Model/System/ModelSystem.h) · [`.cpp`](../MordoEngine/src/Core/Model/System/ModelSystem.cpp) | The collection of models and the shared uniforms |
+| [`Core/Model/Model.h`](../MordoEngine/src/Core/Model/Model.h) · [`.cpp`](../MordoEngine/src/Core/Model/Model.cpp) | A model already on the GPU. The asset, shared by every actor that wants that shape |
+| [`Core/Model/Body.h`](../MordoEngine/src/Core/Model/Body.h) · [`.cpp`](../MordoEngine/src/Core/Model/Body.cpp) | What one actor looks like: the model it borrows, plus its own animation state |
+| [`Core/Model/System/ModelSystem.h`](../MordoEngine/src/Core/Model/System/ModelSystem.h) · [`.cpp`](../MordoEngine/src/Core/Model/System/ModelSystem.cpp) | Draws a body at a transform. Owns nothing |
 | [`Core/Transform/Transform.h`](../MordoEngine/src/Core/Transform/Transform.h) · [`.cpp`](../MordoEngine/src/Core/Transform/Transform.cpp) | Position, rotation and scale |
 | [`res/shaders/model.vs`](../MordoEngine/res/shaders/model.vs) · [`model.fs`](../MordoEngine/res/shaders/model.fs) | The model shaders |
+| [`Core/Model/Animation/Rig.h`](../MordoEngine/src/Core/Model/Animation/Rig.h) · [`.cpp`](../MordoEngine/src/Core/Model/Animation/Rig.cpp) | See [Model animation](model-animation.md) |
 | [`Core/Model/Animation/Animator.h`](../MordoEngine/src/Core/Model/Animation/Animator.h) · [`.cpp`](../MordoEngine/src/Core/Model/Animation/Animator.cpp) | See [Model animation](model-animation.md) |
 
 ---
@@ -187,37 +196,58 @@ Two things worth knowing before touching it:
 ### 4.4 `Model`
 
 [`Model`](../MordoEngine/src/Core/Model/Model.h) is a model already resident on the
-GPU: its buffers, the draw call and texture of each submesh, its place in the world
-and, if the file carried one, the animation currently playing. All the work happens
-in the constructor, so **a `Model` that exists is a `Model` you can draw**.
+GPU: its buffers, the draw call and texture of each submesh and, if the file
+carried animation, the [`Rig`](model-animation.md#4-the-rig-and-the-animator) its
+clips are authored on. All the work happens in the constructor, so **a `Model` that
+exists is a `Model` you can draw**.
+
+**It holds nothing that tells two copies apart.** No transform, no animator: those
+belong to the `Body`. That is deliberate, because a `Model` lives in the
+`ResourceLibrary` under one id, so every actor asking for `"fox"` gets *the same
+object* — if the transform lived here, two foxes would be drawn on top of each
+other, and if the animator did, one changing clip would change the other's too.
 
 The detail that is not cosmetic: `m_Renderer` is held through a `unique_ptr`
-precisely because `ModelRenderer` is not movable. That indirection is the only
-thing keeping `Model` movable, and therefore storable in a `std::vector` — without
-it, `ModelSystem` would not compile.
+precisely because `ModelRenderer` is not movable, and that indirection is what
+keeps `Model` itself movable.
 
 Submeshes are kept as a list of `Piece`, with the draw call, the texture, the node
 index and the skinning flag together, rather than four parallel vectors that would
 have to be kept aligned by hand.
 
-### 4.5 `ModelSystem`
+### 4.5 `Body`
 
-[`ModelSystem`](../MordoEngine/src/Core/Model/System/ModelSystem.h) holds no
-geometry: it holds models and sets the uniforms they share. A system with zero
-models is a valid state — it is constructed empty and `Render` does nothing — so
-`World` needs no pointers and no null checks.
+[`Body`](../MordoEngine/src/Core/Model/Body.h) is the other half: a non-owning
+`Model*` and, when that model has a rig, an `Animator` of its own. An `Actor` holds
+one, and an empty `Body` is the normal state for something with nothing to draw —
+a trigger volume, a spawn point, the player.
 
-**The way the uniforms are split is the point of this pair of classes.**
-`projection`, `view`, `plane` and `texture1` are the same for every model in the
-pass, and are set **once** in `ModelSystem::Render`. The only thing that changes
-from one model to the next is its `model` matrix, and `Model::Render` sets that. If
-they all lived inside the loop you would pay four `glUniform` calls per model for
-nothing.
+`SetModel` is all it takes to dress an actor: it points the body at the shared
+model and builds the animator from that model's rig, so the body is ready to play
+immediately. Pass `null` to strip it.
 
-`Add` returns a `Model&` with the same contract as `std::vector`: **the reference
-is invalidated by the next call to `Add`**. Use it right away or do not keep it.
+The body is what makes two actors on one model behave independently:
+`PlayAnimation` picks this body's clip, and `SetAnimationTime` offsets where it
+starts inside it. Without that offset every animal on the same clip moves in
+lockstep, which on screen reads as one animal drawn several times.
 
-### 4.6 The shaders
+### 4.6 `ModelSystem`
+
+[`ModelSystem`](../MordoEngine/src/Core/Model/System/ModelSystem.h) owns nothing at
+all. The models live in the `ResourceLibrary`, the bodies live on their actors, and
+this only knows how to put the two together.
+
+**The way the uniforms are split is the point.** `projection`, `view`, `plane` and
+`texture1` are the same for every body in the pass and are set **once**, in
+`BeginPass`. What changes from one body to the next — its `model` matrix and its
+bone matrices — is set by `Render`, which takes the body and the transform its
+actor decided. If the per-pass ones lived inside the loop you would pay four
+`glUniform` calls per body for nothing.
+
+`ActorSystem::Render` is what calls both: `BeginPass` once, then `Render` per
+actor.
+
+### 4.7 The shaders
 
 [`model.vs`](../MordoEngine/res/shaders/model.vs) applies the same clip plane as
 the terrain, which is what makes models show up in the water reflection and
@@ -232,7 +262,7 @@ it without changing anything.
 > skewed. With `Transform::SetScale(float)` the scale is uniform and the problem
 > does not arise.
 
-### 4.7 The `LightSystem` change
+### 4.8 The `LightSystem` change
 
 `LightSystem::ApplyUniforms` was **private**, and `Render()` only applied it to the
 terrain shader. Without touching that, any model draws **completely black**,
@@ -246,17 +276,23 @@ nothing.
 
 ## 5. Transforms
 
-A `Model` does not hold a loose `glm::mat4`, it holds a
-[`Transform`](../MordoEngine/src/Core/Transform/Transform.h). That makes changing
-the height or the size of something a one-liner instead of recomposing a matrix:
+The transform does not live on the `Model` — it lives on the
+[`Actor`](../MordoEngine/src/Actor/Actor.h), and it is a
+[`Transform`](../MordoEngine/src/Core/Transform/Transform.h) rather than a loose
+`glm::mat4`. That makes changing the height or the size of something a one-liner
+instead of recomposing a matrix:
 
 ```cpp
-Transform& t = model.GetTransform();
+Transform& t = actor.GetTransform();
 t.SetPosition({ x, terrainHeight, z });
 t.SetScale(0.35f);        // uniform, no distortion
 t.SetYaw(-120.0f);        // degrees
 t.SetHeight(y + 5.0f);    // height only, x and z untouched
 ```
+
+There is exactly one copy of it. `ModelSystem::Render` takes it as an argument and
+hands its matrix to the shader, so nothing has to be kept in step and there is no
+frame where the model is drawn a step behind the actor it belongs to.
 
 Three decisions worth knowing about:
 
@@ -276,15 +312,19 @@ Three decisions worth knowing about:
 Loading a model is **optional**: with nothing on disk the engine still starts and
 just says so on the console.
 
-What has to change, all in [`World`](../MordoEngine/src/World/World.cpp):
+Files are read **once, at startup**, in
+[`LoadModels`](../MordoEngine/src/Core/Resources/ResourceLoader.cpp), into the
+`ResourceLibrary<Model>` that `EngineContext` owns. `World` receives that library
+and only borrows from it — it never loads anything itself.
 
 | Where | What |
 |---|---|
-| `World.h` | A `ModelSystem m_Models` member and a `Shader& m_ModelShader` reference |
-| Initialiser list | `m_ModelShader(shaders.Get("model"))`. `m_Models` does **not** go here: it is default constructed empty |
-| Constructor body | Check the file exists and call `m_Models.Add(...)` |
-| `World::Update` | `m_Models.Update(deltaTime)` |
-| `World::RenderOpaque` | `m_Lights.ApplyUniforms(m_ModelShader, ...)` and then `m_Models.Render(...)` |
+| `ResourceLoader.cpp` | `load("fox", "res/models/fox/Fox.gltf")` — registers the file under an id, skipping it if it is not there |
+| `World.h` | A `ModelSystem m_Models` and an `ActorSystem m_Actors` member, plus a `Shader& m_ModelShader` reference |
+| Initialiser list | `m_ModelShader(shaders.Get("model"))`. Neither system goes here: both are default constructed empty |
+| Constructor body | `models.Get(id)` for the model, then `Spawn` an actor and `SetModel` it |
+| `World::Update` | `m_Actors.Update(deltaTime, actorContext)` — this is also what advances the animations |
+| `World::RenderOpaque` | `m_Lights.ApplyUniforms(m_ModelShader, ...)` and then `m_Actors.Render(m_Models, m_ModelShader, renderContext)` |
 
 Four things that matter and do not show up in a diff:
 
@@ -295,20 +335,40 @@ Four things that matter and do not show up in a diff:
    and they will not appear in the water.
 3. **They go before the sky.** The skybox is drawn last with its depth trick, so
    any opaque geometry has to come first.
-4. **The existence check lives in `World`**, because "no model yet" is a normal
-   state for the scene. But if the file is there and Assimp cannot read it,
-   `LoadModel` throws and the program dies with the message: that one really is an
-   error.
+4. **The existence check lives in `LoadModels`**, because "no model yet" is a normal
+   state for the scene: a missing file is skipped and nothing is registered under
+   that id. But if the file is there and Assimp cannot read it, `LoadModel` throws
+   and the program dies with the message: that one really is an error.
 
-Adding more models is calling `Add` again, even with the same path. The `Model`
-objects live in a `std::vector`, so they get moved when it reallocates; that works
-because the renderer's `unique_ptr` moves with them and nobody frees the GL names
-twice.
+### Adding more of the same model
+
+Load the file **once** and spawn as many actors as you want on it:
+
+```cpp
+Model* model = &models.Get("fox");
+
+for (const glm::vec2& xz : positions)
+{
+    AnimalActor& fox = m_Actors.Spawn<AnimalActor>(
+        AnimalActor::Clips{ "Survey", "Walk", "Run" });
+    fox.SetModel(model);                // shared: buffers, textures, keyframes
+    fox.PlaceOnTerrain(m_Terrain, xz);  // its own place
+    fox.SetState(AnimalActor::State::Walking);
+}
+```
+
+Each `SetModel` builds that actor a `Body` with its own `Animator`, so they move
+independently. Nothing is duplicated on the GPU: the extra cost of the second fox
+is one pose, a `mat4` per node plus one per bone.
+
+Two of them on the same clip will still march in perfect step, because `Play`
+always restarts from zero. `body.SetAnimationTime(seconds)` offsets one of them
+and breaks it up.
 
 ### Placing the model on the terrain
 
-`World` uses a helper that looks up the terrain height at (x, z) and drops the
-model there. Two warnings:
+[`Actor::PlaceOnTerrain`](../MordoEngine/src/Actor/Actor.h) looks up the terrain
+height at (x, z) and drops the actor there. Two warnings:
 
 - **If the model's pivot is at its centre** instead of its base, it will sink
   halfway in. Check it with the `min.y` of its bounding box: if it is not ~0, add

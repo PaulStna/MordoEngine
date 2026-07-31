@@ -6,27 +6,6 @@ namespace
 {
 	const glm::mat4 IDENTITY{ 1.0f };
 
-	// Splits a node's local matrix into translation, rotation and scale. Done once
-	// per node at construction so a clip that only animates one of the three can
-	// fall back to the authored values for the others.
-	void Decompose(const glm::mat4& matrix,
-		glm::vec3& position, glm::quat& rotation, glm::vec3& scale)
-	{
-		position = glm::vec3(matrix[3]);
-
-		scale = { glm::length(glm::vec3(matrix[0])),
-				  glm::length(glm::vec3(matrix[1])),
-				  glm::length(glm::vec3(matrix[2])) };
-
-		glm::mat3 rotationOnly = glm::mat3(matrix);
-		for (int axis = 0; axis < 3; axis++)
-		{
-			if (scale[axis] > 1e-8f) rotationOnly[axis] /= scale[axis];
-		}
-
-		rotation = glm::normalize(glm::quat_cast(rotationOnly));
-	}
-
 	// Keyframe lists are sorted by time, so this walks until it finds the pair
 	// bracketing the requested time.
 	glm::vec3 SampleVec3(const std::vector<KeyFrame<glm::vec3>>& keys,
@@ -70,25 +49,17 @@ namespace
 	}
 }
 
-Animator::Animator(const ModelData& data)
-	: m_Nodes(data.nodes),
-	m_Bones(data.bones),
-	m_Animations(data.animations)
+Animator::Animator(const Rig& rig) : m_Rig(&rig)
 {
-	m_Rest.resize(m_Nodes.size());
-	for (size_t i = 0; i < m_Nodes.size(); i++)
-	{
-		Decompose(m_Nodes[i].localTransform,
-			m_Rest[i].position, m_Rest[i].rotation, m_Rest[i].scale);
-	}
+	const size_t nodeCount = m_Rig->GetNodes().size();
 
-	m_Globals.assign(m_Nodes.size(), IDENTITY);
-	m_BoneMatrices.assign(m_Bones.size(), IDENTITY);
-	m_ChannelForNode.assign(m_Nodes.size(), -1);
+	m_Globals.assign(nodeCount, IDENTITY);
+	m_BoneMatrices.assign(m_Rig->GetBones().size(), IDENTITY);
+	m_ChannelForNode.assign(nodeCount, -1);
 
 	// Start on the first clip so a model that has animation is animating without
 	// anyone having to ask. Call Play to pick a different one.
-	if (!m_Animations.empty())
+	if (m_Rig->HasAnimations())
 	{
 		Play(size_t{ 0 }, true);
 	}
@@ -102,11 +73,13 @@ Animator::Animator(const ModelData& data)
 
 void Animator::BindChannels()
 {
-	m_ChannelForNode.assign(m_Nodes.size(), -1);
+	const std::vector<AnimationData>& animations = m_Rig->GetAnimations();
 
-	if (m_Current >= m_Animations.size()) return;
+	m_ChannelForNode.assign(m_Rig->GetNodes().size(), -1);
 
-	const std::vector<NodeChannel>& channels = m_Animations[m_Current].channels;
+	if (m_Current >= animations.size()) return;
+
+	const std::vector<NodeChannel>& channels = animations[m_Current].channels;
 	for (size_t c = 0; c < channels.size(); c++)
 	{
 		const int node = channels[c].nodeIndex;
@@ -117,7 +90,7 @@ void Animator::BindChannels()
 	}
 }
 
-glm::mat4 Animator::SampleChannel(const NodeChannel& channel, const RestPose& rest) const
+glm::mat4 Animator::SampleChannel(const NodeChannel& channel, const Rig::RestPose& rest) const
 {
 	const glm::vec3 position = SampleVec3(channel.positions, m_TimeTicks, rest.position);
 	const glm::quat rotation = SampleQuat(channel.rotations, m_TimeTicks, rest.rotation);
@@ -130,33 +103,38 @@ glm::mat4 Animator::SampleChannel(const NodeChannel& channel, const RestPose& re
 
 void Animator::ComputePose()
 {
+	const std::vector<NodeData>& nodes = m_Rig->GetNodes();
+	const std::vector<Rig::RestPose>& rest = m_Rig->GetRestPoses();
+	const std::vector<BoneData>& bones = m_Rig->GetBones();
+	const std::vector<AnimationData>& animations = m_Rig->GetAnimations();
+
 	// One forward pass is enough because the loader flattened the tree depth
 	// first, so a parent is always at a lower index than its children.
-	for (size_t i = 0; i < m_Nodes.size(); i++)
+	for (size_t i = 0; i < nodes.size(); i++)
 	{
-		glm::mat4 local = m_Nodes[i].localTransform;
+		glm::mat4 local = nodes[i].localTransform;
 
 		const int channel = m_ChannelForNode[i];
 		if (m_Playing && channel >= 0)
 		{
-			local = SampleChannel(m_Animations[m_Current].channels[channel], m_Rest[i]);
+			local = SampleChannel(animations[m_Current].channels[channel], rest[i]);
 		}
 
-		const int parent = m_Nodes[i].parent;
+		const int parent = nodes[i].parent;
 		m_Globals[i] = parent < 0 ? local : m_Globals[parent] * local;
 	}
 
-	for (size_t b = 0; b < m_Bones.size(); b++)
+	for (size_t b = 0; b < bones.size(); b++)
 	{
-		const int node = m_Bones[b].nodeIndex;
+		const int node = bones[b].nodeIndex;
 		m_BoneMatrices[b] = (node >= 0 ? m_Globals[node] : IDENTITY)
-			* m_Bones[b].inverseBind;
+			* bones[b].inverseBind;
 	}
 }
 
 void Animator::Play(size_t index, bool loop)
 {
-	if (index >= m_Animations.size()) return;
+	if (index >= m_Rig->GetAnimationCount()) return;
 
 	m_Current = index;
 	m_Loop = loop;
@@ -169,22 +147,36 @@ void Animator::Play(size_t index, bool loop)
 
 bool Animator::Play(const std::string& name, bool loop)
 {
-	for (size_t i = 0; i < m_Animations.size(); i++)
+	const int index = m_Rig->FindAnimation(name);
+	if (index < 0) return false;
+
+	Play(static_cast<size_t>(index), loop);
+	return true;
+}
+
+void Animator::SetTime(float seconds)
+{
+	const std::vector<AnimationData>& animations = m_Rig->GetAnimations();
+	if (m_Current >= animations.size()) return;
+
+	const AnimationData& animation = animations[m_Current];
+	m_TimeTicks = seconds * animation.ticksPerSecond;
+
+	if (animation.durationTicks > 0.0f)
 	{
-		if (m_Animations[i].name == name)
-		{
-			Play(i, loop);
-			return true;
-		}
+		m_TimeTicks = std::fmod(m_TimeTicks, animation.durationTicks);
+		if (m_TimeTicks < 0.0f) m_TimeTicks += animation.durationTicks;
 	}
-	return false;
+
+	ComputePose();
 }
 
 void Animator::Update(float deltaTime)
 {
-	if (!m_Playing || m_Current >= m_Animations.size()) return;
+	const std::vector<AnimationData>& animations = m_Rig->GetAnimations();
+	if (!m_Playing || m_Current >= animations.size()) return;
 
-	const AnimationData& animation = m_Animations[m_Current];
+	const AnimationData& animation = animations[m_Current];
 	m_TimeTicks += animation.ticksPerSecond * deltaTime;
 
 	if (animation.durationTicks > 0.0f)
@@ -215,23 +207,24 @@ const glm::mat4& Animator::GetNodeGlobal(int nodeIndex) const
 
 const std::string& Animator::GetAnimationName(size_t index) const
 {
-	static const std::string empty;
-	return index < m_Animations.size() ? m_Animations[index].name : empty;
+	return m_Rig->GetAnimationName(index);
 }
 
 float Animator::GetTimeSeconds() const
 {
-	if (m_Current >= m_Animations.size()) return 0.0f;
+	const std::vector<AnimationData>& animations = m_Rig->GetAnimations();
+	if (m_Current >= animations.size()) return 0.0f;
 
-	const float ticksPerSecond = m_Animations[m_Current].ticksPerSecond;
+	const float ticksPerSecond = animations[m_Current].ticksPerSecond;
 	return ticksPerSecond > 0.0f ? m_TimeTicks / ticksPerSecond : 0.0f;
 }
 
 float Animator::GetDurationSeconds() const
 {
-	if (m_Current >= m_Animations.size()) return 0.0f;
+	const std::vector<AnimationData>& animations = m_Rig->GetAnimations();
+	if (m_Current >= animations.size()) return 0.0f;
 
-	const AnimationData& animation = m_Animations[m_Current];
+	const AnimationData& animation = animations[m_Current];
 	return animation.ticksPerSecond > 0.0f
 		? animation.durationTicks / animation.ticksPerSecond
 		: 0.0f;

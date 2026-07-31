@@ -19,7 +19,7 @@ const std::string& AnimalActor::ClipFor(State state) const
 bool AnimalActor::SetState(State state)
 {
 	const std::string& clip = ClipFor(state);
-	if (!m_Model || clip.empty() || !m_Model->PlayAnimation(clip))
+	if (clip.empty() || !m_Body.PlayAnimation(clip))
 		return false;
 
 	m_State = state;

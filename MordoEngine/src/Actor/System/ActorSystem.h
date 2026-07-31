@@ -2,6 +2,9 @@
 #include "../Actor.h"
 #include <memory>
 #include <type_traits>
+#include "../../Core/Shader/Shader.h"
+#include "../../Renderer/RenderContext.h"
+#include "../../Core/Model/System/ModelSystem.h"
 #include <utility>
 #include <vector>
 
@@ -31,17 +34,20 @@ public:
 		return reference;
 	}
 
-	// Updates every actor, then syncs their transforms into their models and
-	// drops whatever asked to be destroyed.
+	// Updates every actor, advances their animations and drops whatever asked to
+	// be destroyed.
 	void Update(float deltaTime, ActorContext& context);
+
+	// Draws every actor that has a body. This is the only list: an actor that is
+	// gone is not drawn, because nothing else holds a copy of what it looked
+	// like.
+	void Render(ModelSystem& modelSystem,
+		const Shader& shader, const RenderContext& renderContext);
 
 	// Marks the actor for removal at the end of the current Update. Erasing it
 	// on the spot would pull the vector out from under the loop walking it, and
-	// an actor is allowed to call this on itself.
-	//
-	// NOTE: this drops the actor, not its model. ModelSystem has no way to
-	// remove one yet, so a destroyed actor leaves its body standing where it
-	// was. Fine while nothing is destroyed; needs fixing before anything dies.
+	// an actor is allowed to call this on itself. The body goes with it; the
+	// model it borrowed stays in the ResourceLibrary for whoever else wants it.
 	void Destroy(Actor& actor);
 
 	bool IsEmpty() const { return m_Actors.empty(); }

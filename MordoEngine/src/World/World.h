@@ -22,7 +22,10 @@ class World
 {
 public:
 	World(unsigned int screenWidth, unsigned int screenHeight,
-		ResourceLibrary<Shader>& shaders, ResourceLibrary<Texture>& textures);
+		ResourceLibrary<Shader>& shaders, 
+		ResourceLibrary<Texture>& textures,
+		ResourceLibrary<Model>& models
+	);
 
 	void Update(float deltaTime);
 	void RenderOpaque(const RenderContext& renderContext);

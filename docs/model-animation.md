@@ -14,7 +14,7 @@ it.
 1. [What it covers and what it does not](#1-what-it-covers-and-what-it-does-not)
 2. [The `PreTransformVertices` conflict](#2-the-pretransformvertices-conflict)
 3. [The data: nodes, bones and channels](#3-the-data-nodes-bones-and-channels)
-4. [The `Animator`](#4-the-animator)
+4. [The `Rig` and the `Animator`](#4-the-rig-and-the-animator)
 5. [Skinning on the GPU](#5-skinning-on-the-gpu)
 6. [Four concrete traps](#6-four-concrete-traps)
 7. [Exporting animation from Blender](#7-exporting-animation-from-blender)
@@ -31,7 +31,7 @@ not solved the same way:
 | Kind | Status | How it is solved |
 |---|---|---|
 | **Skeleton** (skinning: joints and per-vertex weights) | ✅ | The `Animator` produces one matrix per bone; the vertex shader blends up to four per vertex. |
-| **Rigid node** (a whole piece that moves, with no skeleton) | ✅ | The submesh keeps its `nodeIndex` and `Model::Render` multiplies its transform by that node's live global. |
+| **Rigid node** (a whole piece that moves, with no skeleton) | ✅ | The submesh keeps its `nodeIndex` and `Model::Render` multiplies the body's transform by that node's live global. |
 | **Morph targets** (Blender shape keys) | ❌ | **Not implemented.** It needs *per-vertex positions* blended, not node transforms, so it is a different path: one VBO per target, or a buffer of deltas. Assimp exposes them in `aiMesh::mAnimMeshes` if it is ever wanted. |
 
 The first two share all the machinery, because both reduce to node transforms. The
@@ -113,13 +113,28 @@ reason the order of that vector cannot be changed without breaking the `Animator
 
 ---
 
-## 4. The `Animator`
+## 4. The `Rig` and the `Animator`
 
-[`Animator`](../MordoEngine/src/Core/Model/Animation/Animator.h) plays one clip and
-produces the matrices the shader needs. Each `Model` has its own, or none if the
-file carried no clips.
+Animation is split in two, along the line between what the file says and what one
+copy of the model is doing with it:
 
-What it does on every `Update`:
+| | [`Rig`](../MordoEngine/src/Core/Model/Animation/Rig.h) | [`Animator`](../MordoEngine/src/Core/Model/Animation/Animator.h) |
+|---|---|---|
+| Holds | The nodes, the decomposed rest pose, the bones and every clip | The current clip, the time in it, and the pose that comes out |
+| Lives on | The `Model` — one per file | The `Body` — one per actor |
+| Changes at runtime | Never | Every frame |
+
+**Why they are not one class.** A `Model` is shared: every actor asking the
+`ResourceLibrary` for `"fox"` gets the same object. If the playback state lived
+there, two foxes would be forced into the same pose and one calling `Play` would
+change the other's clip. Splitting them means the expensive half — the keyframes,
+which is most of the file — is loaded once, while the second fox costs only its own
+pose: one `mat4` per node plus one per bone.
+
+The `Animator` holds a `const Rig*` it does not own. The rig belongs to the model,
+which outlives every body built on it.
+
+What the `Animator` does on every `Update`:
 
 1. Advances the time in ticks, wrapping it with `fmod` if the clip loops. If it
    does not, it stops on the last frame and holds the pose.
@@ -131,17 +146,23 @@ What it does on every `Update`:
 
 Three design decisions:
 
-- **The rest pose is decomposed once at construction.** If a clip animates only a
-  node's rotation, the position and scale have to come from somewhere; they come
-  from the values the file carries in that node's local transform.
+- **The rest pose is decomposed once, when the `Rig` is built.** If a clip animates
+  only a node's rotation, the position and scale have to come from somewhere; they
+  come from the values the file carries in that node's local transform. Being on
+  the rig, that work is done once per file rather than once per animal.
 - **Channels are indexed by node when `Play` is called.** That makes sampling a
-  vector lookup instead of a walk through every channel, per node, per frame.
+  vector lookup instead of a walk through every channel, per node, per frame. This
+  one is per animator, since it depends on which clip *this* body is playing.
 - **A model with bones but no clips still resolves the rest pose**, so it draws in
   its bind pose instead of collapsing.
 
-`Play` takes the clip name and returns `false` if the file does not have it,
-leaving whatever was playing alone. The first clip starts on its own, so it is only
-needed to pick a different one.
+`Play` takes the clip name and returns `false` if the rig does not have it, leaving
+whatever was playing alone. The first clip starts on its own, so it is only needed
+to pick a different one.
+
+`SetTime` moves this body to a different point inside the current clip. `Play`
+always restarts from zero, so without it every animal on the same clip advances
+together and reads as one animal drawn several times.
 
 The matrices are computed **once per frame**, in `Update`, not in `Render`. That
 matters because the water passes draw the scene three times: with the computation
@@ -211,8 +232,9 @@ important difference and three additions:
   Total* with a limit of 4 leaves the mesh matching what the layout can carry, and
   spares the importer from having to discard weights.
 
-The name you pass to `Model::PlayAnimation` is the action or clip name. If you get
-it wrong, the engine lists the ones the file does have on the console.
+The name you pass to `Body::PlayAnimation` — or to the `AnimalActor::Clips` an
+animal is built with — is the action or clip name. If you get it wrong, the engine
+lists the ones the file does have on the console.
 
 ---
 
@@ -221,7 +243,8 @@ it wrong, the engine lists the ones the file does have on the console.
 | Symptom | Likely cause |
 |---|---|
 | The skeleton explodes into spikes running to infinity | The `aiMatrix4x4` → `glm::mat4` conversion does not transpose. |
-| The animated model shows up in its rest pose, motionless | The file carried no clips, or nobody calls `ModelSystem::Update`. |
+| The animated model shows up in its rest pose, motionless | The file carried no clips, or nobody calls `ActorSystem::Update`, which is what advances every body. |
+| Several copies of the same model animate in perfect lockstep | They share one `Animator`, or nobody offset them. Each actor needs its own `Body`, and `SetAnimationTime` to stagger them. |
 | The animated model collapses into a point | The weights never arrived: check whether `boneIds` is all `-1`, or whether `MAX_BONES` was too low. |
 | The animation runs at double or half speed | The file's `ticksPerSecond` is 0 and the default of 25 is being used. |
 | Parts of the model lag behind when animating | A rigid mesh in an animated file with no `nodeIndex`, or `PreTransformVertices` was applied to it. |

@@ -9,11 +9,3 @@ void Actor::PlaceOnTerrain(const TerrainSystem& terrain, const glm::vec2& xz,
 		terrain.GetTerrainInterpolatedHeightAt(xz.x, xz.y, heightOffset),
 		xz.y });
 }
-
-void Actor::SyncToModel()
-{
-	if (m_Model)
-	{
-		m_Model->GetTransform() = m_Transform;
-	}
-}

@@ -1,5 +1,6 @@
 #pragma once
 #include "../Core/Transform/Transform.h"
+#include "../Core/Model/Body.h"
 #include <string>
 
 class Model;
@@ -9,11 +10,11 @@ struct ActorContext;
 // Anything in the world that has a place in it and may do something with time:
 // the player, an animal, a chest, a lamp, etc...
 //
-// An actor never draws itself. It owns where it is, and ModelSystem keeps
-// drawing every model in its single pass exactly as before. This split is not
-// tidiness: World::RenderOpaque runs three times per frame (reflection,
-// refraction, screen), so anything that happens there happens three times.
-// Gameplay belongs in Update, which runs once.
+// An actor never draws itself. It owns where it is and what it looks like, and
+// ActorSystem walks the list once per pass handing both to ModelSystem. This
+// split is not tidiness: World::RenderOpaque runs three times per frame
+// (reflection, refraction, screen), so anything that happens there happens three
+// times. Gameplay belongs in Update, which runs once.
 //
 // Used as-is for a prop that only stands somewhere. Derive from it when the
 // behaviour is genuinely its own, and prefer a component for what repeats
@@ -24,8 +25,8 @@ public:
 	Actor() = default;
 	virtual ~Actor() = default;
 
-	// An actor points at a model it does not own, so copying one would leave two
-	// actors fighting over the same transform.
+	// An actor owns a body, and two actors sharing one would fight over its
+	// animation.
 	Actor(const Actor&) = delete;
 	Actor& operator=(const Actor&) = delete;
 
@@ -33,16 +34,20 @@ public:
 	// is the right amount of work for a prop.
 	virtual void Update(float deltaTime, ActorContext& context) {}
 
-	// Where the actor is. This is the authoritative transform: the one on the
-	// model is a copy that SyncToModel refreshes.
+	// Where the actor is, and the only copy of it: the body carries the pose,
+	// not the placement, so there is nothing to keep in step with this.
 	Transform& GetTransform() { return m_Transform; }
 	const Transform& GetTransform() const { return m_Transform; }
 
-	// The model this actor drives, or null for an actor with no visible body
-	// (a trigger volume, a spawn point). 
-	// The model is owned by ModelSystem and outlives the actor.
-	void SetModel(Model* model) { m_Model = model; }
-	Model* GetModel() const { return m_Model; }
+	// Gives the actor a body built on that model, or clears it with null. The
+	// model is shared and outlives the actor; the body it builds is the actor's
+	// own, which is what lets two actors share one model and still differ.
+	void SetModel(Model* model) { m_Body.SetModel(model); }
+
+	// The actor's own animation state. Empty for an actor with no visible body
+	// (a trigger volume, a spawn point).
+	Body& GetBody() { return m_Body; }
+	const Body& GetBody() const { return m_Body; }
 
 	const std::string& GetName() const { return m_Name; }
 	void SetName(std::string name) { m_Name = std::move(name); }
@@ -50,16 +55,11 @@ public:
 	void PlaceOnTerrain(const TerrainSystem& terrain, const glm::vec2& xz,
 		float heightOffset = 0.0f);
 
-	// Pushes the transform into the model. ActorSystem calls this for every
-	// actor after they have all updated, so an actor that moves another one
-	// still lands the right transform on screen.
-	void SyncToModel();
-
 	bool IsPendingDestroy() const { return m_PendingDestroy; }
 
 protected:
 	Transform   m_Transform;
-	Model*      m_Model = nullptr;
+	Body        m_Body;
 	std::string m_Name;
 
 private:

@@ -1,5 +1,6 @@
 #include "Model.h"
 #include "ModelLoader.h"
+#include "Animation/Animator.h"
 #include "../Shader/Shader.h"
 
 Model::Model(const std::string& path, ResourceLibrary<Texture>& textures)
@@ -33,39 +34,30 @@ Model::Model(const std::string& path, ResourceLibrary<Texture>& textures)
 		m_Pieces.push_back(piece);
 	}
 
-	// The animator keeps the skeleton and the clips, so it is only worth building
-	// when the file actually had animation in it.
+	// The rig keeps the skeleton and the clips, so it is only worth building when
+	// the file actually had animation in it.
 	if (!model.animations.empty())
 	{
-		m_Animator = std::make_unique<Animator>(model);
+		m_Rig = std::make_unique<Rig>(model);
 	}
 }
 
-void Model::Update(float deltaTime)
+void Model::Render(const Shader& shader, const glm::mat4& transform,
+	const Animator* animator) const
 {
-	if (m_Animator)
+	// One upload for the whole skeleton, shared by every piece of this body.
+	if (animator)
 	{
-		m_Animator->Update(deltaTime);
-	}
-}
-
-void Model::Render(const Shader& shader) const
-{
-	const glm::mat4& base = m_Transform.GetMatrix();
-
-	// One upload for the whole skeleton, shared by every piece of this model.
-	if (m_Animator)
-	{
-		shader.SetMat4Array("finalBones", m_Animator->GetBoneMatrices());
+		shader.SetMat4Array("finalBones", animator->GetBoneMatrices());
 	}
 
 	for (const Piece& piece : m_Pieces)
 	{
 		// A rigid piece whose node is animated has to follow that node; a skinned
 		// or already baked one does not, and keeps the model transform as is.
-		const glm::mat4 modelMatrix = (piece.nodeIndex >= 0 && m_Animator)
-			? base * m_Animator->GetNodeGlobal(piece.nodeIndex)
-			: base;
+		const glm::mat4 modelMatrix = (piece.nodeIndex >= 0 && animator)
+			? transform * animator->GetNodeGlobal(piece.nodeIndex)
+			: transform;
 
 		shader.SetMat4("model", modelMatrix);
 		shader.SetInt("skinned", piece.skinned ? 1 : 0);
@@ -78,14 +70,4 @@ void Model::Render(const Shader& shader) const
 
 		m_Renderer->Render(piece.drawCall);
 	}
-}
-
-bool Model::IsAnimated() const
-{
-	return m_Animator && m_Animator->HasAnimations();
-}
-
-bool Model::PlayAnimation(const std::string& name, bool loop)
-{
-	return m_Animator ? m_Animator->Play(name, loop) : false;
 }
