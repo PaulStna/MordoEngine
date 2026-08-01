@@ -172,6 +172,20 @@ step copies the Assimp DLL next to the executable.
 
 ## Documentation
 
+**The conventions this codebase is held to**
+
+- **[C++ style](docs/cpp-style.md)** — naming, formatting, what earns a comment
+  and what does not, the ownership rules, and the architecture rules that break
+  the engine when they are ignored
+- **[Architecture](docs/architecture.md)** — the three-way split every subsystem
+  follows, the context structs, the ownership patterns, and the checklist for
+  adding a new subsystem
+- **[Documenting code](docs/documenting-code.md)** — the `///` rules that reach
+  Visual Studio's Quick Info, when a `@param` earns its line, and worked
+  before/after examples
+
+**Working with the engine**
+
 - **[Loading Blender models](docs/loading-blender-models.md)** — exporting from
   Blender, the two conventions that bite, what each piece of the pipeline does, and
   how to get a model into the scene
