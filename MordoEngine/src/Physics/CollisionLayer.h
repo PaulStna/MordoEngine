@@ -1,13 +1,17 @@
 #pragma once
 #include <cstdint>
 
-// What kind of thing a collider is, as a bit, so a query can ask for some of
-// them and ignore the rest.
-//
-// A mask is the difference between "what am I looking at" and "what blocks me",
-// which are the same geometry asked two different questions. Without it every
-// query walks everything and filters by hand at the call site, and that is the
-// part that becomes unworkable once there is more than one kind of query.
+/// What kind of thing a collider is, as a bit, so a query can ask for some of
+/// them and ignore the rest.
+///
+/// A mask is the difference between "what am I looking at" and "what blocks
+/// me", which are the same geometry asked two different questions. Without it
+/// every query walks everything and filters by hand at the call site, and that
+/// is the part that becomes unworkable once there is more than one kind of
+/// query.
+///
+/// A new kind of thing takes the next free bit; the values are a bit field, so
+/// they must stay powers of two.
 enum class CollisionLayer : std::uint32_t
 {
 	None         = 0,
@@ -20,6 +24,7 @@ enum class CollisionLayer : std::uint32_t
 	All          = 0xFFFFFFFFu
 };
 
+/// Combines layers into a mask.
 inline CollisionLayer operator|(CollisionLayer a, CollisionLayer b)
 {
 	return static_cast<CollisionLayer>(
@@ -32,7 +37,9 @@ inline CollisionLayer operator&(CollisionLayer a, CollisionLayer b)
 		static_cast<std::uint32_t>(a) & static_cast<std::uint32_t>(b));
 }
 
-// Whether a layer is in a mask. The one thing every query needs.
+/// Whether a layer is in a mask. The one thing every query needs.
+/// @param layer The single layer a candidate is on.
+/// @param mask  What the query is willing to accept.
 inline bool LayerMatches(CollisionLayer layer, CollisionLayer mask)
 {
 	return (static_cast<std::uint32_t>(layer) & static_cast<std::uint32_t>(mask)) != 0;

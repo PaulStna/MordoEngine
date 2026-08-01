@@ -104,7 +104,7 @@ void WaterSystem::RenderRefraction(const WaterTileData& waterTile,
 	const RenderContext& renderContext,
 	const RenderPass& renderPass)
 {
-	const float clipY = waterTile.yPos + offSet;
+	const float clipY = waterTile.yPos + m_ClipPlaneOffset;
 
 	// Keep only what is below the surface.
 	RenderContext pass = renderContext;
@@ -128,7 +128,7 @@ void WaterSystem::RenderReflection(const WaterTileData& waterTile,
 	const glm::vec3 reflectedForward = glm::vec3(camForward.x, -camForward.y, camForward.z);
 	const glm::vec3 reflectedUp = glm::cross(camRight, reflectedForward);
 
-	const float clipY = waterTile.yPos + offSet;
+	const float clipY = waterTile.yPos + m_ClipPlaneOffset;
 
 	// Mirror the camera across the surface and keep only what is above it.
 	RenderContext pass = renderContext;

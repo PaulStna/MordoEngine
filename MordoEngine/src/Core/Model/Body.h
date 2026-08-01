@@ -5,16 +5,16 @@
 
 class Model;
 
-// What an actor looks like: the shared Model it borrows its shape from, plus the
-// animation state that is nobody else's.
-//
-// This is the half that cannot be shared. Two foxes point at one Model - one set
-// of GPU buffers, one copy of the textures and of every keyframe - and carry a
-// Body each, so one can walk while the other runs and moving one leaves the
-// other where it was.
-//
-// Empty by default, which is the right state for an actor with no visible body:
-// a trigger volume, a spawn point, the player.
+/// What an actor looks like: the shared Model it borrows its shape from, plus
+/// the animation state that is nobody else's.
+///
+/// This is the half that cannot be shared. Two creatures point at one Model —
+/// one set of GPU buffers, one copy of the textures and of every keyframe — and
+/// carry a Body each, so one can walk while the other runs and moving one
+/// leaves the other where it was.
+///
+/// Empty by default, which is the right state for an actor with no visible
+/// body: a trigger volume, a spawn point, the player.
 class Body
 {
 public:
@@ -27,32 +27,46 @@ public:
 	Body(Body&&) = default;
 	Body& operator=(Body&&) = default;
 
-	// The model is non-owning: models live in the ResourceLibrary and outlive
-	// every body built on them. Builds the animator when that model has a rig,
-	// so a body is ready to play the moment it has a model. Pass null to clear.
+	/// Points this body at a model, replacing whatever it had.
+	///
+	/// Builds the animator when that model has a rig, so a body is ready to play
+	/// the moment it has a model.
+	///
+	/// @param model Non-owning: models live in the ResourceLibrary and outlive
+	///              every body built on them. Null clears the body back to
+	///              empty and destroys its animator.
 	void SetModel(Model* model);
 
 	Model* GetModel() const { return m_Model; }
 	bool   IsEmpty()  const { return m_Model == nullptr; }
 
-	// Advances the animation, if there is one. Cheap no-op otherwise.
+	/// Advances the animation. A cheap no-op on a body with no animator.
+	/// @param deltaTime Seconds since the last frame.
 	void Update(float deltaTime);
 
-	// Returns false if the model has no clip by that name, or no rig at all,
-	// leaving whatever is playing alone.
+	/// Starts a clip from the beginning.
+	/// @param name Clip name as it appears in the source file.
+	/// @param loop When false the clip holds on its last frame instead of
+	///             restarting.
+	/// @return false if the model has no clip by that name, or no rig at all,
+	///         leaving whatever is playing alone.
 	bool PlayAnimation(const std::string& name, bool loop = true);
 
-	// Where this body starts inside its clip. Same model, same clip, different
-	// offset is what keeps two of the same animal from moving as one.
+	/// Where this body starts inside its clip.
+	/// @param seconds Offset into the current clip. Same model, same clip,
+	///                different offset is what keeps two of the same creature
+	///                from moving as one.
 	void SetAnimationTime(float seconds);
 
 	bool IsAnimated() const { return m_Animator != nullptr; }
 
-	// Null for a body with no animation. ModelSystem hands it straight to the
-	// model at draw time.
+	/// Null for a body with no animation. ModelSystem hands it straight to the
+	/// model at draw time.
 	const Animator* GetAnimator() const { return m_Animator.get(); }
 
 private:
+	// Non-owning: the models live in the ResourceLibrary.
+	// nullptr = an actor with no visible body.
 	Model* m_Model = nullptr;
 
 	// Null until a model with a rig is set. One per body, never shared.

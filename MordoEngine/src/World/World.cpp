@@ -174,13 +174,13 @@ void World::Update(float deltaTime, const ActorInput& input)
 
 RenderContext World::MakeRenderContext() const
 {
-	RenderContext ctx;
-	ctx.projection = m_Camera.GetProjectionMatrix();
-	ctx.view = m_Camera.GetViewMatrix();
-	ctx.model = glm::mat4(1.0f);
-	ctx.cameraPos = m_Camera.GetPosition();
-	ctx.clipPlane = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
-	return ctx;
+	RenderContext context;
+	context.projection = m_Camera.GetProjectionMatrix();
+	context.view = m_Camera.GetViewMatrix();
+	context.model = glm::mat4(1.0f);
+	context.cameraPos = m_Camera.GetPosition();
+	context.clipPlane = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+	return context;
 }
 
 void World::RenderOpaque(const RenderContext& renderContext)

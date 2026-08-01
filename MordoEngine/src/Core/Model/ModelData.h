@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-// One submesh: a contiguous run of geometry that shares a single material.
+/// One submesh: a contiguous run of geometry that shares a single material.
 struct SubMeshData
 {
 	std::vector<ModelVertex>  vertices;
@@ -23,32 +23,34 @@ struct SubMeshData
 	bool skinned = false;
 };
 
-// One joint of a skin: the node that drives it, and the matrix that takes a
-// vertex from model space into that joint's local space.
+/// One joint of a skin: the node that drives it, and the matrix that takes a
+/// vertex from model space into that joint's local space.
 struct BoneData
 {
 	int       nodeIndex = -1;
 	glm::mat4 inverseBind{ 1.0f };
 };
 
-// One entry of the flattened node hierarchy. Parents always come before their
-// children, so a single forward pass computes every global transform.
+/// One entry of the flattened node hierarchy. Parents always come before their
+/// children, so a single forward pass computes every global transform.
 struct NodeData
 {
 	std::string name;
-	int         parent = -1;
+	int         parent = -1;   // -1 = root
 	glm::mat4   localTransform{ 1.0f };
 };
 
+/// One sampled value on a timeline.
+/// @tparam T What is being animated: a position, a scale or a rotation.
 template<typename T>
 struct KeyFrame
 {
-	float time = 0.0f;
+	float time = 0.0f;   // ticks, matching AnimationData
 	T     value{};
 };
 
-// The keyframes that animate one node. Any of the three lists may be empty, in
-// which case the node keeps its default local value for that component.
+/// The keyframes that animate one node. Any of the three lists may be empty, in
+/// which case the node keeps its default local value for that component.
 struct NodeChannel
 {
 	int nodeIndex = -1;
@@ -57,8 +59,10 @@ struct NodeChannel
 	std::vector<KeyFrame<glm::vec3>> scales;
 };
 
-// Times are in ticks, the unit the file was authored in; divide by
-// ticksPerSecond to get seconds.
+/// One named clip, and every node it drives.
+///
+/// Times are in ticks, the unit the file was authored in; divide by
+/// ticksPerSecond to get seconds.
 struct AnimationData
 {
 	std::string              name;
@@ -67,7 +71,9 @@ struct AnimationData
 	std::vector<NodeChannel> channels;
 };
 
-// Whole model as plain CPU data.
+/// A whole model as plain CPU data, the output of ModelLoader and the input to
+/// Model. Nothing here has touched OpenGL, which is what lets a file be
+/// inspected without a window.
 struct ModelData
 {
 	std::vector<SubMeshData>   subMeshes;

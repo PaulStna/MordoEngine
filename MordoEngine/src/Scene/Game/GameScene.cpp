@@ -1,20 +1,20 @@
 #include "GameScene.h"
 #include "../../Input/Input.h"
 
-GameScene::GameScene(EngineContext& ctx)
-    : m_Ctx(ctx),
-    m_CameraController(std::make_unique<GameCameraController>(ctx.GetWorld().GetCamera()))
+GameScene::GameScene(EngineContext& context)
+    : m_Context(context),
+    m_CameraController(std::make_unique<GameCameraController>(context.GetWorld().GetCamera()))
 {
 }
 
 void GameScene::OnEntry()
 {
-    m_CameraController->TouchTerrain(m_Ctx.GetWorld().GetTerrain());
+    m_CameraController->TouchTerrain(m_Context.GetWorld().GetTerrain());
 }
 
 void GameScene::Update(float deltaTime)
 {
-    World& world = m_Ctx.GetWorld();
+    World& world = m_Context.GetWorld();
     float velocity = 100.0f * world.GetTerrain().GetTerrainWorldScale() * deltaTime;
     m_CameraController->Update(deltaTime, velocity, world.GetTerrain());
 
@@ -33,7 +33,7 @@ void GameScene::Update(float deltaTime)
 
 void GameScene::Render()
 {
-    World& world = m_Ctx.GetWorld();
+    World& world = m_Context.GetWorld();
     world.Render();
 }
 

@@ -44,7 +44,7 @@ void LightSystem::ApplyUniforms(const Shader& shader, const RenderContext& rende
 	// The count is what was actually written, which also keeps numPointLights
 	// from ever claiming more than the array holds.
 	int slot = 0;
-	for (std::size_t i = 0; i < m_PointLights.size() && slot < MAX_POINT_IGHTS; i++) {
+	for (std::size_t i = 0; i < m_PointLights.size() && slot < MAX_POINT_LIGHTS; i++) {
 		if (!m_PointLights[i].IsEnabled()) continue;
 
 		const PointLightData& pointLight = m_PointLights[i].GetData();

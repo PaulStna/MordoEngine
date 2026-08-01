@@ -20,11 +20,11 @@ void EditorInputHandlerController::Update(EditorSystem& editorSystem, TerrainSys
 	}
 
 	if (Input::KeyPressed(GLFW_KEY_N)) {
-		editorSystem.IncreaseBrushStrenght();
+		editorSystem.IncreaseBrushStrength();
 	}
 
 	if (Input::KeyPressed(GLFW_KEY_M)) {
-		editorSystem.DecreaseBrushStrenght();
+		editorSystem.DecreaseBrushStrength();
 	}
 
 	if (Input::KeyPressed(GLFW_KEY_O)) {

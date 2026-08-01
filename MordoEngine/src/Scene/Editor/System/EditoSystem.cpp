@@ -34,7 +34,7 @@ void EditorSystem::Update(const Terrain& terrain, const Camera& camera)
 			heights[i] = m_LastWorldPosition.y;
 		}
 		else {
-			heights[i] = terrain.GetHeightInterpolated(posX, posZ) + m_HeightOffSet;
+			heights[i] = terrain.GetHeightInterpolated(posX, posZ) + m_HeightOffset;
 		}
 	}
 	m_Renderer->SetHeights(heights, m_LastWorldPosition);
@@ -42,7 +42,7 @@ void EditorSystem::Update(const Terrain& terrain, const Camera& camera)
 
 glm::vec3 EditorSystem::RaycastToTerrain(
 	const glm::vec3& rayOrigin,
-	const glm::vec3& rayDir,
+	const glm::vec3& rayDirection,
 	const Terrain& terrain)
 {
 	float terrainSize = terrain.GetSize() * terrain.GetWorldScale();
@@ -51,7 +51,7 @@ glm::vec3 EditorSystem::RaycastToTerrain(
 	float stepSize = 0.5f;
 
 	for (float t = 0; t < maxDistance; t += stepSize) {
-		glm::vec3 point = rayOrigin + rayDir * t;
+		glm::vec3 point = rayOrigin + rayDirection * t;
 
 		if (point.x < 0.0f || point.x > terrainSize ||
 			point.z < 0.0f || point.z > terrainSize) {
@@ -80,15 +80,15 @@ glm::vec3 EditorSystem::GetWorldPosition() const
 
 void EditorSystem::IncreaseSelector()
 {
-	ModyfySelector(m_RadiusStep);
+	ModifySelector(m_RadiusStep);
 }
 
 void EditorSystem::DecreaseSelector()
 {
-	ModyfySelector(-m_RadiusStep);
+	ModifySelector(-m_RadiusStep);
 }
 
-void EditorSystem::ModyfySelector(float radius)
+void EditorSystem::ModifySelector(float radius)
 {
 	m_Radius += radius;
 	if (m_Radius > 35.0f) {
@@ -104,12 +104,12 @@ void EditorSystem::ModyfySelector(float radius)
 
 void EditorSystem::IncreaseTerrain(Terrain& terrain)
 {
-	ModifyTerrain(terrain, m_BrushStrenght);
+	ModifyTerrain(terrain, m_BrushStrength);
 }
 
 void EditorSystem::DecreaseTerrain(Terrain& terrain)
 {
-	ModifyTerrain(terrain, -m_BrushStrenght);
+	ModifyTerrain(terrain, -m_BrushStrength);
 }
 
 void EditorSystem::ModifyTerrain(Terrain& terrain, float heightFactor)
@@ -144,25 +144,25 @@ void EditorSystem::ModifyTerrain(Terrain& terrain, float heightFactor)
 	}
 }
 
-void EditorSystem::IncreaseBrushStrenght()
+void EditorSystem::IncreaseBrushStrength()
 {
-	ModifyBrushStrenght(m_BrushStrenghtStep);
+	ModifyBrushStrength(m_BrushStrengthStep);
 }
-void EditorSystem::DecreaseBrushStrenght()
+void EditorSystem::DecreaseBrushStrength()
 {
-	ModifyBrushStrenght(-m_BrushStrenghtStep);
+	ModifyBrushStrength(-m_BrushStrengthStep);
 }
 
-void EditorSystem::ModifyBrushStrenght(float strenghtFactor)
+void EditorSystem::ModifyBrushStrength(float strengthFactor)
 {
-	m_BrushStrenght += strenghtFactor;
-	if (m_BrushStrenght > 50)
+	m_BrushStrength += strengthFactor;
+	if (m_BrushStrength > 50)
 	{
-		m_BrushStrenght = 50;
+		m_BrushStrength = 50;
 	}
 
-	if (m_BrushStrenght < 0)
+	if (m_BrushStrength < 0)
 	{
-		m_BrushStrenght = 0.5f;
+		m_BrushStrength = 0.5f;
 	}
 }

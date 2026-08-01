@@ -4,12 +4,12 @@
 #include "../Input/Input.h"
 #include <iostream>
 
-SceneManager::SceneManager(EngineContext& ctx)
-    : m_Ctx(ctx), m_ActiveScene(nullptr), m_ActiveSceneName("")
+SceneManager::SceneManager(EngineContext& context)
+    : m_Context(context), m_ActiveScene(nullptr), m_ActiveSceneName("")
 {
     Input::DisableCursor();
-    AddScene("game", std::make_unique<GameScene>(m_Ctx));
-    AddScene("editor", std::make_unique<EditorScene>(m_Ctx));
+    AddScene("game", std::make_unique<GameScene>(m_Context));
+    AddScene("editor", std::make_unique<EditorScene>(m_Context));
     SetActiveScene("game");
 }
 
