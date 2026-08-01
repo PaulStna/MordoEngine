@@ -51,6 +51,11 @@ private:
 	// Null for a model whose file carried no animation.
 	std::unique_ptr<Rig>           m_Rig;
 
+	// Model space, measured off the vertices at load. Shared like everything
+	// else here: every actor on this model fits the same box, and its transform
+	// is what turns that into a place in the world.
+	Bounds                         m_LocalBounds = Bounds::Empty();
+
 public:
 	// Throws std::runtime_error if the file cannot be read.
 	Model(const std::string& path, ResourceLibrary<Texture>& textures);
@@ -69,4 +74,8 @@ public:
 
 	// Null when the file carried no animation. Body builds its animator from it.
 	const Rig* GetRig() const { return m_Rig.get(); }
+
+	// The extent of the geometry, in model space. Actor fits its collider to
+	// this, so a model with a body gets one without anyone asking.
+	const Bounds& GetLocalBounds() const { return m_LocalBounds; }
 };

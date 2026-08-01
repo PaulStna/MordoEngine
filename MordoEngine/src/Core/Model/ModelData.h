@@ -1,5 +1,6 @@
 #pragma once
 #include "ModelVertex.h"
+#include "../Math/Bounds.h"
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <string>
@@ -73,4 +74,12 @@ struct ModelData
 	std::vector<NodeData>      nodes;
 	std::vector<BoneData>      bones;
 	std::vector<AnimationData> animations;
+
+	// Everything the model covers, in model space, which is the only place the
+	// vertices are still around to measure. Computed during the load rather than
+	// afterwards because it is one pass over data already in cache.
+	//
+	// For a skinned mesh this is the bind pose. Animation moves vertices outside
+	// it, so anything that needs to be safe rather than tight should Expand it.
+	Bounds bounds = Bounds::Empty();
 };

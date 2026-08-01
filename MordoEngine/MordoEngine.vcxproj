@@ -150,6 +150,7 @@
     <ClCompile Include="src\Actor\System\ActorSystem.cpp" />
     <ClCompile Include="src\API\OpenGL\OpenGLBackend.cpp" />
     <ClCompile Include="src\Camera\Camera.cpp" />
+    <ClCompile Include="src\Core\Math\Bounds.cpp" />
     <ClCompile Include="src\Core\Model\Animation\Animator.cpp" />
     <ClCompile Include="src\Core\Model\Animation\Rig.cpp" />
     <ClCompile Include="src\Core\Model\Body.cpp" />
@@ -157,6 +158,10 @@
     <ClCompile Include="src\Core\Model\ModelLoader.cpp" />
     <ClCompile Include="src\Core\Model\System\ModelSystem.cpp" />
     <ClCompile Include="src\Core\Resources\ResourceLoader.cpp" />
+    <ClCompile Include="src\Renderer\Debug\DebugLineRenderer.cpp" />
+    <ClCompile Include="src\Renderer\Debug\CollisionDebugRenderer.cpp" />
+    <ClCompile Include="src\Physics\BoxCollider.cpp" />
+    <ClCompile Include="src\Physics\SphereCollider.cpp" />
     <ClCompile Include="src\Core\Transform\Transform.cpp" />
     <ClCompile Include="src\Core\Shader\Shader.cpp" />
     <ClCompile Include="src\Core\Texture\Texture.cpp" />
@@ -204,6 +209,8 @@
     <ClInclude Include="src\Camera\Camera.h" />
     <ClInclude Include="src\Core\EngineContext.h" />
     <ClInclude Include="src\Core\FileSystem\FileSystem.h" />
+    <ClInclude Include="src\Core\Math\Bounds.h" />
+    <ClInclude Include="src\Core\Math\Ray.h" />
     <ClInclude Include="src\Core\Model\Animation\Animator.h" />
     <ClInclude Include="src\Core\Model\Animation\Rig.h" />
     <ClInclude Include="src\Core\Model\Body.h" />
@@ -212,6 +219,12 @@
     <ClInclude Include="src\Core\Model\ModelLoader.h" />
     <ClInclude Include="src\Core\Model\ModelVertex.h" />
     <ClInclude Include="src\Core\Model\System\ModelSystem.h" />
+    <ClInclude Include="src\Renderer\Debug\DebugLineRenderer.h" />
+    <ClInclude Include="src\Renderer\Debug\CollisionDebugRenderer.h" />
+    <ClInclude Include="src\Physics\BoxCollider.h" />
+    <ClInclude Include="src\Physics\Collider.h" />
+    <ClInclude Include="src\Physics\CollisionLayer.h" />
+    <ClInclude Include="src\Physics\SphereCollider.h" />
     <ClInclude Include="src\Core\Resources\ResourceLibrary.h" />
     <ClInclude Include="src\Core\Resources\ResourceLoader.h" />
     <ClInclude Include="src\Core\Shader\Shader.h" />
@@ -268,6 +281,8 @@
     <None Include="res\models\lantern\Lantern.gltf" />
     <None Include="res\shaders\lightCube.fs" />
     <None Include="res\shaders\lightCube.vs" />
+    <None Include="res\shaders\debugLine.fs" />
+    <None Include="res\shaders\debugLine.vs" />
     <None Include="res\shaders\model.fs" />
     <None Include="res\shaders\model.vs" />
     <None Include="res\shaders\skyBox.fs" />

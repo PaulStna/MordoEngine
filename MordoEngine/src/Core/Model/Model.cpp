@@ -9,6 +9,8 @@ Model::Model(const std::string& path, ResourceLibrary<Texture>& textures)
 	const ModelData model = LoadModel(path);
 	const std::vector<MeshDrawCall> drawCalls = m_Renderer->Upload(model);
 
+	m_LocalBounds = model.bounds;
+
 	m_Pieces.reserve(drawCalls.size());
 
 	for (size_t i = 0; i < drawCalls.size(); i++)

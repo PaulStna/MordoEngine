@@ -4,6 +4,19 @@
 AnimalActor::AnimalActor(Clips clips) : m_Clips(std::move(clips))
 {
 	SetName("animal");
+
+	SetLayer(CollisionLayer::Creature);
+	m_Interactable = true;
+}
+
+bool AnimalActor::Interact(Actor& source, ActorContext& context)
+{
+	switch (m_State)
+	{
+	case State::Idle:    return SetState(State::Walking);
+	case State::Walking: return SetState(State::Running);
+	default:             return SetState(State::Idle);
+	}
 }
 
 const std::string& AnimalActor::ClipFor(State state) const

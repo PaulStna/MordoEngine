@@ -31,6 +31,11 @@ public:
 	bool SetState(State state);
 	State GetState() const { return m_State; }
 
+	// Prodding it moves it up a gear and wraps back round to idle. A placeholder
+	// for whatever reacting turns out to mean, and enough to prove the whole
+	// path works: the click lands on this animal and only this one changes.
+	bool Interact(Actor& source, ActorContext& context) override;
+
 private:
 	Clips m_Clips;
 	State m_State = State::Idle;

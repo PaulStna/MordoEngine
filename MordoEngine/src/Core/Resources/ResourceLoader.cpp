@@ -28,6 +28,9 @@ void LoadShaders(ResourceLibrary<Shader>& shaders)
 	shaders.Load("model",
 		FileSystem::getPath("res/shaders/model.vs"),
 		FileSystem::getPath("res/shaders/model.fs"));
+	shaders.Load("debugLine",
+		FileSystem::getPath("res/shaders/debugLine.vs"),
+		FileSystem::getPath("res/shaders/debugLine.fs"));
 }
 
 void LoadTextures(ResourceLibrary<Texture>& textures)

@@ -36,5 +36,10 @@ public:
 	std::size_t GetPointLightCount() const { return m_PointLights.size(); }
 	void SetPointLightPosition(std::size_t index, const glm::vec3& position);
 
+	// Turning one off keeps everything about it and only stops it reaching the
+	// shaders, so a lamp can be switched without its actor rebuilding anything.
+	void SetPointLightEnabled(std::size_t index, bool enabled);
+	bool IsPointLightEnabled(std::size_t index) const;
+
 	~LightSystem();
 };

@@ -20,8 +20,9 @@ void PointLight::Update(float deltaTime)
 
 void PointLight::Render(const Shader& shader, const RenderContext& renderContext)
 {
-	// A light that lives inside a lamp has nothing to draw of its own.
-	if (!m_Renderer)
+	// A light that lives inside a lamp has nothing to draw of its own, and one
+	// that is off should not leave its marker floating there.
+	if (!m_Renderer || !m_Enabled)
 		return;
 
 	shader.Use();

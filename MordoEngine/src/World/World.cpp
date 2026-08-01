@@ -42,6 +42,7 @@ World::World(unsigned int screenWidth, unsigned int screenHeight,
 	m_WaterShader(shaders.Get("water")),
 	m_UnderwaterShader(shaders.Get("underwater")),
 	m_ModelShader(shaders.Get("model")),
+	m_DebugLineShader(shaders.Get("debugLine")),
 	m_SkyTexture(textures.Get("skyBox")),
 	m_WaterDuDv(textures.Get("dudvMap")),
 	m_SceneBuffer(std::make_unique<Framebuffer>()),
@@ -152,12 +153,13 @@ World::World(unsigned int screenWidth, unsigned int screenHeight,
 	}
 
 	// One zero-length tick so every actor has settled its light and its pose
-	// before the first frame is drawn.
-	ActorContext actorContext{ m_Terrain, m_Camera, m_Actors };
+	// before the first frame is drawn. Nothing is pressed on frame zero.
+	const ActorInput noInput;
+	ActorContext actorContext{ m_Terrain, m_Camera, m_Actors, noInput };
 	m_Actors.Update(0.0f, actorContext);
 }
 
-void World::Update(float deltaTime)
+void World::Update(float deltaTime, const ActorInput& input)
 {
 	m_Time += deltaTime;
 	m_Terrain.Update(deltaTime);
@@ -166,7 +168,7 @@ void World::Update(float deltaTime)
 	m_Water.Update(deltaTime, m_Camera.GetPosition());
 
 	// Actors first: they decide where things are, and the models follow.
-	ActorContext actorContext{ m_Terrain, m_Camera, m_Actors };
+	ActorContext actorContext{ m_Terrain, m_Camera, m_Actors, input };
 	m_Actors.Update(deltaTime, actorContext);
 }
 
@@ -232,6 +234,14 @@ void World::Render()
 	else
 	{
 		RenderSceneAndWater(renderContext);
+	}
+
+	// Last, and outside RenderOpaque on purpose: that one is the callback the
+	// water passes invoke, so anything drawn there would be drawn three times
+	// and would show up in the reflection.
+	if (m_CollisionDebugVisible && m_Player)
+	{
+		m_CollisionDebug.Render(m_Actors, *m_Player, m_DebugLineShader, renderContext);
 	}
 }
 

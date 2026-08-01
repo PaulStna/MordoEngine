@@ -384,6 +384,26 @@ ModelData LoadModel(const std::string& path)
 				}
 			}
 
+			// The box a collider is fitted to. Which space these vertices are in
+			// depends on which branch above ran, and only one of the three left
+			// them somewhere other than model space:
+			//   skinned    already model space, the bones take it from there
+			//   baked      just transformed, above
+			//   rigid node still in node space, so put the rest pose global back
+			//              in for the measurement only
+			{
+				const glm::mat4* toModelSpace = subMesh.nodeIndex >= 0
+					? &globals[n]
+					: nullptr;
+
+				for (const ModelVertex& vertex : subMesh.vertices)
+				{
+					model.bounds.Encapsulate(toModelSpace
+						? glm::vec3(*toModelSpace * glm::vec4(vertex.pos, 1.0f))
+						: vertex.pos);
+				}
+			}
+
 			model.subMeshes.push_back(std::move(subMesh));
 		}
 	}

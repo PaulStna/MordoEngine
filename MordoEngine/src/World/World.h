@@ -5,6 +5,7 @@
 #include "../Lighting/LightSystem.h"
 #include "../Sky/System/SkySystem.h"
 #include "../Core/Model/System/ModelSystem.h"
+#include "../Actor/ActorContext.h"
 #include "../Actor/System/ActorSystem.h"
 #include "../Actor/Player/PlayerActor.h"
 #include "../Actor/Light/LightActor.h"
@@ -12,6 +13,7 @@
 #include "../Renderer/RenderContext.h"
 #include "../Renderer/Framebuffer/Framebuffer.h"
 #include "../Renderer/Plane/PlaneRenderer.h"
+#include "../Renderer/Debug/CollisionDebugRenderer.h"
 #include "../Core/Resources/ResourceLibrary.h"
 #include <memory>
 
@@ -27,7 +29,9 @@ public:
 		ResourceLibrary<Model>& models
 	);
 
-	void Update(float deltaTime);
+	// The input defaults to nothing pressed, so a scene that does not read a
+	// device at all still drives the world.
+	void Update(float deltaTime, const ActorInput& input = ActorInput{});
 	void RenderOpaque(const RenderContext& renderContext);
 	void Render();
 	RenderContext MakeRenderContext() const;
@@ -36,6 +40,13 @@ public:
 	TerrainSystem& GetTerrain() { return m_Terrain; }
 
 	PlayerActor& GetPlayer() { return *m_Player; }
+
+	// Off by default. Draws every collider and the player's aim ray over the
+	// finished frame; costs nothing while it is off, since the renderer is only
+	// asked for anything inside the guard.
+	void SetCollisionDebugVisible(bool visible) { m_CollisionDebugVisible = visible; }
+	bool IsCollisionDebugVisible() const { return m_CollisionDebugVisible; }
+	void ToggleCollisionDebug() { m_CollisionDebugVisible = !m_CollisionDebugVisible; }
 
 private:
 	TerrainSystem m_Terrain;
@@ -55,8 +66,12 @@ private:
 	Shader&  m_WaterShader;
 	Shader&  m_UnderwaterShader;
 	Shader&  m_ModelShader;
+	Shader&  m_DebugLineShader;
 	Texture& m_SkyTexture;
 	Texture& m_WaterDuDv;
+
+	CollisionDebugRenderer m_CollisionDebug;
+	bool                   m_CollisionDebugVisible = false;
 
 	// Offscreen buffer + fullscreen quad used for the underwater post-process.
 	std::unique_ptr<Framebuffer> m_SceneBuffer;

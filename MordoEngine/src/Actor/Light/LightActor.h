@@ -23,11 +23,23 @@ private:
 	// actor's scale and rotation on its own.
 	glm::vec3 m_LocalOffset{ 0.0f };
 
+	bool m_On = true;
+
 public:
 	LightActor(LightSystem& lights, const glm::vec3& localOffset = glm::vec3(0.0f),
 		bool debugCube = false);
 
 	void Update(float deltaTime, ActorContext& context) override;
+
+	// Flips the switch. Always succeeds, so it always reports true: there is no
+	// state in which a lamp refuses to be a lamp.
+	bool Interact(Actor& source, ActorContext& context) override;
+
+	// Off keeps everything, it only stops the light reaching the shaders. The
+	// body, if there is one, stays exactly where it was: an unlit lamp is still
+	// a lamp standing there.
+	void SetOn(bool on);
+	bool IsOn() const { return m_On; }
 
 	// Where the light actually ends up, offset included.
 	glm::vec3 GetLightPosition() const;

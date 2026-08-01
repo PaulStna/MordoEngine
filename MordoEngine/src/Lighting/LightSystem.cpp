@@ -37,10 +37,18 @@ void LightSystem::ApplyUniforms(const Shader& shader, const RenderContext& rende
 	shader.SetVec3("dirLight.ambient", dirLight.ambient);
 	shader.SetVec3("dirLight.diffuse", dirLight.diffuse);
 
-	shader.SetInt("numPointLights", m_PointLights.size());
-	for (int i = 0; i < m_PointLights.size() && i < MAX_POINT_IGHTS; i++) {
+	// Packed rather than indexed by position in the vector: a light that is off
+	// is skipped and the ones after it move down, so the shader always reads a
+	// run of live lights starting at zero.
+	//
+	// The count is what was actually written, which also keeps numPointLights
+	// from ever claiming more than the array holds.
+	int slot = 0;
+	for (std::size_t i = 0; i < m_PointLights.size() && slot < MAX_POINT_IGHTS; i++) {
+		if (!m_PointLights[i].IsEnabled()) continue;
+
 		const PointLightData& pointLight = m_PointLights[i].GetData();
-		std::string path = "pointLights[" + std::to_string(i) + "].";
+		std::string path = "pointLights[" + std::to_string(slot) + "].";
 		shader.SetVec3(path + "position", pointLight.position);
 		shader.SetVec3(path + "ambient", pointLight.ambient);
 		shader.SetVec3(path + "diffuse", pointLight.diffuse);
@@ -48,7 +56,10 @@ void LightSystem::ApplyUniforms(const Shader& shader, const RenderContext& rende
 		shader.SetFloat(path + "constant", pointLight.constant);
 		shader.SetFloat(path + "linear", pointLight.linear);
 		shader.SetFloat(path + "quadratic", pointLight.quadratic);
+		slot++;
 	}
+
+	shader.SetInt("numPointLights", slot);
 }
 
 std::size_t LightSystem::AddPointLight(PointLight&& pointLight)
@@ -63,6 +74,19 @@ void LightSystem::SetPointLightPosition(std::size_t index, const glm::vec3& posi
 	{
 		m_PointLights[index].SetPosition(position);
 	}
+}
+
+void LightSystem::SetPointLightEnabled(std::size_t index, bool enabled)
+{
+	if (index < m_PointLights.size())
+	{
+		m_PointLights[index].SetEnabled(enabled);
+	}
+}
+
+bool LightSystem::IsPointLightEnabled(std::size_t index) const
+{
+	return index < m_PointLights.size() && m_PointLights[index].IsEnabled();
 }
 
 LightSystem::~LightSystem()
